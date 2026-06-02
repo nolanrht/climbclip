@@ -1,336 +1,1025 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
+import { FFmpeg } from "@ffmpeg/ffmpeg"
+import { fetchFile } from "@ffmpeg/util"
 
-type Track = {
-  id: number
-  title: string
-  artist: { name: string }
-  preview: string
-  album: { cover_small: string }
+type Track = { id: number; title: string; artist: { name: string }; preview: string; album: { cover_small: string } }
+type Clip = { id: string; name: string; base64: string; owner_email: string; folder_id: string | null; created_at: string; thumbnail?: string }
+type Folder = { id: string; name: string; owner_email: string; shared_with: string[]; created_at: string; parent_id: string | null }
+type VideoItem = { id: string; type: "file" | "link"; path?: string; url?: string; name: string; thumbnail?: string }
+type TimestampPreview = { start: number; duration: number; name: string; description?: string }
+type Lang = "EN" | "FR" | "ES" | "IT" | "DE"
+type Preset = { id: string; name: string; format: string; colorGrade: string; transition: string; prompt: string; options: string[]; exportQuality: string; exportCodec: string; watermark: boolean }
+type QueueItem = { id: string; videos: VideoItem[]; prompt: string; status: "pending" | "processing" | "done" | "error"; clips?: any[] }
+
+const SERVER_URL = "https://climbclip-server.onrender.com"
+
+const CG_LABELS: Record<Lang, Record<string, string>> = {
+  EN: { none:"None", cinematic:"Cinematic", orange_teal:"Orange Teal", bw:"Black & White", vibrant:"Vibrant", moody:"Moody", warm:"Warm", cold:"Cold" },
+  FR: { none:"Aucun", cinematic:"Cinématique", orange_teal:"Orange Teal", bw:"Noir & Blanc", vibrant:"Vibrant", moody:"Atmosphérique", warm:"Chaud", cold:"Froid" },
+  ES: { none:"Ninguno", cinematic:"Cinemático", orange_teal:"Naranja Teal", bw:"Blanco y Negro", vibrant:"Vibrante", moody:"Oscuro", warm:"Cálido", cold:"Frío" },
+  IT: { none:"Nessuno", cinematic:"Cinematografico", orange_teal:"Arancione Teal", bw:"Bianco e Nero", vibrant:"Vibrante", moody:"Cupo", warm:"Caldo", cold:"Freddo" },
+  DE: { none:"Keiner", cinematic:"Cinematisch", orange_teal:"Orange Teal", bw:"Schwarz-Weiß", vibrant:"Lebendig", moody:"Düster", warm:"Warm", cold:"Kalt" },
 }
 
-const ADMIN_EMAIL = "nolanrochette26@gmail.com"
+const TR_LABELS: Record<Lang, Record<string, string>> = {
+  EN: { none:"None", fade:"Fade", flash:"Flash", glitch:"Glitch", zoom_in:"Zoom In" },
+  FR: { none:"Aucune", fade:"Fondu", flash:"Flash", glitch:"Glitch", zoom_in:"Zoom avant" },
+  ES: { none:"Ninguna", fade:"Fundido", flash:"Flash", glitch:"Glitch", zoom_in:"Zoom" },
+  IT: { none:"Nessuna", fade:"Dissolvenza", flash:"Flash", glitch:"Glitch", zoom_in:"Zoom avanti" },
+  DE: { none:"Keine", fade:"Überblenden", flash:"Flash", glitch:"Glitch", zoom_in:"Hineinzoomen" },
+}
+
+const TRANSLATIONS: Record<Lang, Record<string, string>> = {
+  EN: { home:"Home",library:"Library",settings:"Settings",logout:"Logout",videos:"Videos",addFile:"+ Add file",dragVideo:"Drop a video or click to import",dragSub:"TikTok, Instagram, local file • max 50MB",addAnother:"Add another video",pasteLink:"Paste a TikTok / Instagram link...",import:"Import",outputFormat:"Output format",beatSync:"Beat sync",subtitles:"Subtitles",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsules",introOutro:"Intro / Outro",addMusic:"Add music",zoomIntensity:"Zoom intensity",speedIntensity:"Speed ramp intensity",description:"Description",promptHistory:"History",preview:"Preview",promptHelper:"Prompt help",generating:"Generating...",generate:"Generate",preparingVideos:"Preparing videos...",analyzingAI:"AI analysis...",detectingEffects:"Detecting effects...",renderingClips:"Rendering clips...",generatedClips:"Generated clips",downloadAll:"Download all",download:"Download",serverStarting:"Server starting — may take 30-50s...",check:"Check",newFolder:"+ New folder",folders:"Folders",clipsInFolder:"Clips in this folder",clipsNoFolder:"Clips without folder",noClips:"No clips here",generateFirst:"Generate your first clip",back:"Back",rename:"Rename",move:"Move",delete:"Delete",shareFolder:"Share folder",sharedWith:"Shared with",cancel:"Cancel",create:"Create",apply:"Apply",close:"Close",use:"Use",newFolderName:"Folder name...",emailMember:"Member email...",addMember:"Add a member",createAccount:"Create account",creating:"Creating...",reportProblem:"Report a problem",send:"Send",compressTitle:"File too large",compressMsg:"Compress automatically?",no:"No",yesCompress:"Yes, compress",compressing:"Compressing...",chooseMusic:"Choose music",searchMusic:"Search artist, title...",timestampPreview:"Timestamp preview",timestampDesc:"Moments the AI will cut.",useTimestamps:"Use these timestamps",capsuleTitle:"Capsules",shortVideo:"Short video",shortSub:"sequential clips",longVideo:"Long video",longSub:"best moments",capsuleCount:"Number of capsules",promptGenerated:"Generated prompt:",refVideo:"Reference video",optional:"optional",addRefVideo:"+ Add reference video",lastGenerated:"Last generated",serverActive:"Server active",cmdEnterHint:"Cmd+Enter to generate",subfolders:"Subfolders",newSubfolder:"+ Subfolder",share:"Share",colorGrade:"Color grade",transition:"Transition",textOverlay:"Text overlay",stabilize:"Stabilize",vocalVolume:"Vocal volume",none:"None",exportQuality:"Export quality",exportCodec:"Codec",watermark:"Watermark",presets:"Presets",savePreset:"Save preset",presetName:"Preset name...",stats:"Stats",totalClips:"Total clips",clipsInLib:"In library",queue:"Queue",addToQueue:"+ Queue",runQueue:"Run queue",queueEmpty:"Queue is empty",copyLink:"Copy link",copied:"Copied!" },
+  FR: { home:"Accueil",library:"Bibliothèque",settings:"Paramètres",logout:"Déconnexion",videos:"Vidéos",addFile:"+ Ajouter",dragVideo:"Glisse une vidéo ou clique",dragSub:"TikTok, Instagram, fichier local • max 50MB",addAnother:"Ajouter une autre vidéo",pasteLink:"Coller un lien TikTok / Instagram...",import:"Importer",outputFormat:"Format de sortie",beatSync:"Beat sync",subtitles:"Sous-titres",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsules",introOutro:"Intro / Outro",addMusic:"Ajouter musique",zoomIntensity:"Intensité zoom",speedIntensity:"Intensité speed ramp",description:"Description",promptHistory:"Historique",preview:"Aperçu",promptHelper:"Aide prompt",generating:"Génération...",generate:"Générer",preparingVideos:"Préparation des vidéos...",analyzingAI:"Analyse IA...",detectingEffects:"Détection des effets...",renderingClips:"Rendu des clips...",generatedClips:"Clips générés",downloadAll:"Tout télécharger",download:"Télécharger",serverStarting:"Serveur en démarrage — 30-50 secondes...",check:"Vérifier",newFolder:"+ Créer un dossier",folders:"Dossiers",clipsInFolder:"Clips dans ce dossier",clipsNoFolder:"Clips sans dossier",noClips:"Aucun clip ici",generateFirst:"Générer un premier clip",back:"Retour",rename:"Renommer",move:"Déplacer",delete:"Supprimer",shareFolder:"Partager le dossier",sharedWith:"Partagé avec",cancel:"Annuler",create:"Créer",apply:"Appliquer",close:"Fermer",use:"Utiliser",newFolderName:"Nom du dossier...",emailMember:"Email du membre...",addMember:"Ajouter un membre",createAccount:"Créer le compte",creating:"Création...",reportProblem:"Signaler un problème",send:"Envoyer",compressTitle:"Vidéo trop lourde",compressMsg:"Compresser automatiquement ?",no:"Non",yesCompress:"Oui, compresser",compressing:"Compression...",chooseMusic:"Choisir une musique",searchMusic:"Rechercher un artiste, un titre...",timestampPreview:"Aperçu des timestamps",timestampDesc:"Moments que l'IA va découper.",useTimestamps:"Utiliser ces timestamps",capsuleTitle:"Capsules",shortVideo:"Vidéo courte",shortSub:"clips qui se suivent",longVideo:"Vidéo longue",longSub:"meilleurs moments",capsuleCount:"Nombre de capsules",promptGenerated:"Prompt généré :",refVideo:"Vidéo de référence",optional:"optionnel",addRefVideo:"+ Ajouter une vidéo",lastGenerated:"Dernier clip généré",serverActive:"Serveur actif",cmdEnterHint:"Cmd+Entrée pour générer",subfolders:"Sous-dossiers",newSubfolder:"+ Sous-dossier",share:"Partager",colorGrade:"Color grade",transition:"Transition",textOverlay:"Texte overlay",stabilize:"Stabiliser",vocalVolume:"Volume voix",none:"Aucun",exportQuality:"Qualité export",exportCodec:"Codec",watermark:"Watermark",presets:"Presets",savePreset:"Sauvegarder",presetName:"Nom du preset...",stats:"Stats",totalClips:"Clips générés",clipsInLib:"En bibliothèque",queue:"File d'attente",addToQueue:"+ File",runQueue:"Lancer la file",queueEmpty:"File vide",copyLink:"Copier le lien",copied:"Copié !" },
+  ES: { home:"Inicio",library:"Biblioteca",settings:"Ajustes",logout:"Salir",videos:"Vídeos",addFile:"+ Añadir",dragVideo:"Arrastra un vídeo o haz clic",dragSub:"TikTok, Instagram • máx 50MB",addAnother:"Añadir otro vídeo",pasteLink:"Pegar enlace TikTok / Instagram...",import:"Importar",outputFormat:"Formato",beatSync:"Beat sync",subtitles:"Subtítulos",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Cápsulas",introOutro:"Intro / Outro",addMusic:"Añadir música",zoomIntensity:"Intensidad zoom",speedIntensity:"Intensidad speed",description:"Descripción",promptHistory:"Historial",preview:"Vista previa",promptHelper:"Ayuda prompt",generating:"Generando...",generate:"Generar",preparingVideos:"Preparando...",analyzingAI:"Analizando IA...",detectingEffects:"Detectando efectos...",renderingClips:"Renderizando...",generatedClips:"Clips generados",downloadAll:"Descargar todo",download:"Descargar",serverStarting:"Servidor iniciando...",check:"Verificar",newFolder:"+ Nueva carpeta",folders:"Carpetas",clipsInFolder:"Clips en carpeta",clipsNoFolder:"Clips sin carpeta",noClips:"Sin clips",generateFirst:"Generar primer clip",back:"Volver",rename:"Renombrar",move:"Mover",delete:"Eliminar",shareFolder:"Compartir",sharedWith:"Compartido con",cancel:"Cancelar",create:"Crear",apply:"Aplicar",close:"Cerrar",use:"Usar",newFolderName:"Nombre...",emailMember:"Email miembro...",addMember:"Añadir miembro",createAccount:"Crear cuenta",creating:"Creando...",reportProblem:"Reportar problema",send:"Enviar",compressTitle:"Archivo grande",compressMsg:"¿Comprimir?",no:"No",yesCompress:"Sí, comprimir",compressing:"Comprimiendo...",chooseMusic:"Elegir música",searchMusic:"Buscar...",timestampPreview:"Vista previa",timestampDesc:"Momentos que la IA cortará.",useTimestamps:"Usar timestamps",capsuleTitle:"Cápsulas",shortVideo:"Vídeo corto",shortSub:"clips seguidos",longVideo:"Vídeo largo",longSub:"mejores momentos",capsuleCount:"Número",promptGenerated:"Prompt:",refVideo:"Referencia",optional:"opcional",addRefVideo:"+ Añadir",lastGenerated:"Último clip",serverActive:"Activo",cmdEnterHint:"Cmd+Enter para generar",subfolders:"Subcarpetas",newSubfolder:"+ Subcarpeta",share:"Compartir",colorGrade:"Color grade",transition:"Transición",textOverlay:"Texto",stabilize:"Estabilizar",vocalVolume:"Volumen voz",none:"Ninguno",exportQuality:"Calidad",exportCodec:"Codec",watermark:"Marca",presets:"Presets",savePreset:"Guardar",presetName:"Nombre...",stats:"Stats",totalClips:"Clips",clipsInLib:"Biblioteca",queue:"Cola",addToQueue:"+ Cola",runQueue:"Ejecutar",queueEmpty:"Cola vacía",copyLink:"Copiar",copied:"¡Copiado!" },
+  IT: { home:"Home",library:"Libreria",settings:"Impostazioni",logout:"Esci",videos:"Video",addFile:"+ Aggiungi",dragVideo:"Trascina un video",dragSub:"TikTok, Instagram • max 50MB",addAnother:"Aggiungi altro video",pasteLink:"Incolla link TikTok / Instagram...",import:"Importa",outputFormat:"Formato",beatSync:"Beat sync",subtitles:"Sottotitoli",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsule",introOutro:"Intro / Outro",addMusic:"Aggiungi musica",zoomIntensity:"Intensità zoom",speedIntensity:"Intensità speed",description:"Descrizione",promptHistory:"Cronologia",preview:"Anteprima",promptHelper:"Aiuto prompt",generating:"Generazione...",generate:"Genera",preparingVideos:"Preparazione...",analyzingAI:"Analisi IA...",detectingEffects:"Rilevamento...",renderingClips:"Rendering...",generatedClips:"Clip generate",downloadAll:"Scarica tutto",download:"Scarica",serverStarting:"Server in avvio...",check:"Verifica",newFolder:"+ Nuova cartella",folders:"Cartelle",clipsInFolder:"Clip in cartella",clipsNoFolder:"Clip senza cartella",noClips:"Nessuna clip",generateFirst:"Genera prima clip",back:"Indietro",rename:"Rinomina",move:"Sposta",delete:"Elimina",shareFolder:"Condividi",sharedWith:"Condiviso con",cancel:"Annulla",create:"Crea",apply:"Applica",close:"Chiudi",use:"Usa",newFolderName:"Nome...",emailMember:"Email membro...",addMember:"Aggiungi membro",createAccount:"Crea account",creating:"Creazione...",reportProblem:"Segnala problema",send:"Invia",compressTitle:"File grande",compressMsg:"Comprimi?",no:"No",yesCompress:"Sì, comprimi",compressing:"Compressione...",chooseMusic:"Scegli musica",searchMusic:"Cerca...",timestampPreview:"Anteprima",timestampDesc:"Momenti che l'IA taglierà.",useTimestamps:"Usa timestamp",capsuleTitle:"Capsule",shortVideo:"Video corto",shortSub:"clip consecutive",longVideo:"Video lungo",longSub:"momenti migliori",capsuleCount:"Numero",promptGenerated:"Prompt:",refVideo:"Riferimento",optional:"opzionale",addRefVideo:"+ Aggiungi",lastGenerated:"Ultima clip",serverActive:"Attivo",cmdEnterHint:"Cmd+Invio per generare",subfolders:"Sottocartelle",newSubfolder:"+ Sottocartella",share:"Condividi",colorGrade:"Color grade",transition:"Transizione",textOverlay:"Testo",stabilize:"Stabilizza",vocalVolume:"Volume voce",none:"Nessuno",exportQuality:"Qualità",exportCodec:"Codec",watermark:"Watermark",presets:"Preset",savePreset:"Salva",presetName:"Nome...",stats:"Stats",totalClips:"Clip",clipsInLib:"Libreria",queue:"Coda",addToQueue:"+ Coda",runQueue:"Avvia",queueEmpty:"Coda vuota",copyLink:"Copia",copied:"Copiato!" },
+  DE: { home:"Start",library:"Bibliothek",settings:"Einstellungen",logout:"Abmelden",videos:"Videos",addFile:"+ Hinzufügen",dragVideo:"Video ziehen oder klicken",dragSub:"TikTok, Instagram • max 50MB",addAnother:"Weiteres Video",pasteLink:"TikTok / Instagram Link...",import:"Importieren",outputFormat:"Format",beatSync:"Beat sync",subtitles:"Untertitel",autoZoom:"Auto-Zoom",speedRamp:"Speed ramp",capsules:"Kapseln",introOutro:"Intro / Outro",addMusic:"Musik",zoomIntensity:"Zoom-Intensität",speedIntensity:"Speed-Intensität",description:"Beschreibung",promptHistory:"Verlauf",preview:"Vorschau",promptHelper:"Prompt-Hilfe",generating:"Generierung...",generate:"Generieren",preparingVideos:"Videos vorbereiten...",analyzingAI:"KI-Analyse...",detectingEffects:"Effekte erkennen...",renderingClips:"Rendern...",generatedClips:"Clips",downloadAll:"Alle herunterladen",download:"Herunterladen",serverStarting:"Server startet...",check:"Prüfen",newFolder:"+ Ordner",folders:"Ordner",clipsInFolder:"Clips in Ordner",clipsNoFolder:"Clips ohne Ordner",noClips:"Keine Clips",generateFirst:"Ersten Clip erstellen",back:"Zurück",rename:"Umbenennen",move:"Verschieben",delete:"Löschen",shareFolder:"Teilen",sharedWith:"Geteilt mit",cancel:"Abbrechen",create:"Erstellen",apply:"Anwenden",close:"Schließen",use:"Verwenden",newFolderName:"Ordnername...",emailMember:"E-Mail...",addMember:"Mitglied hinzufügen",createAccount:"Konto erstellen",creating:"Erstelle...",reportProblem:"Problem melden",send:"Senden",compressTitle:"Datei zu groß",compressMsg:"Komprimieren?",no:"Nein",yesCompress:"Ja, komprimieren",compressing:"Komprimierung...",chooseMusic:"Musik wählen",searchMusic:"Suchen...",timestampPreview:"Vorschau",timestampDesc:"Momente die die KI schneidet.",useTimestamps:"Timestamps verwenden",capsuleTitle:"Kapseln",shortVideo:"Kurzes Video",shortSub:"aufeinanderfolgende",longVideo:"Langes Video",longSub:"beste Momente",capsuleCount:"Anzahl",promptGenerated:"Prompt:",refVideo:"Referenzvideo",optional:"optional",addRefVideo:"+ Hinzufügen",lastGenerated:"Letzter Clip",serverActive:"Aktiv",cmdEnterHint:"Cmd+Enter zum Generieren",subfolders:"Unterordner",newSubfolder:"+ Unterordner",share:"Teilen",colorGrade:"Color grade",transition:"Übergang",textOverlay:"Text",stabilize:"Stabilisieren",vocalVolume:"Stimme",none:"Keiner",exportQuality:"Qualität",exportCodec:"Codec",watermark:"Wasserzeichen",presets:"Presets",savePreset:"Speichern",presetName:"Name...",stats:"Stats",totalClips:"Clips",clipsInLib:"Bibliothek",queue:"Warteschlange",addToQueue:"+ Warte",runQueue:"Starten",queueEmpty:"Leer",copyLink:"Kopieren",copied:"Kopiert!" },
+}
+
+const ClimbLogo = ({ size = 30 }: { size?: number }) => (
+  <svg width={size} height={size * 0.85} viewBox="0 0 120 102" fill="none">
+    <defs>
+      <linearGradient id="peak1" x1="60" y1="0" x2="60" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stopColor="#f0f0f0"/><stop offset="60%" stopColor="#aaaaaa"/><stop offset="100%" stopColor="#666"/></linearGradient>
+      <linearGradient id="peak2" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox"><stop offset="0%" stopColor="#c8c8c8"/><stop offset="100%" stopColor="#444"/></linearGradient>
+      <linearGradient id="shadow1" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox"><stop offset="0%" stopColor="#222" stopOpacity="0.9"/><stop offset="100%" stopColor="#000" stopOpacity="0.4"/></linearGradient>
+    </defs>
+    <polygon points="60,4 92,78 28,78" fill="url(#peak1)"/>
+    <polygon points="60,4 92,78 60,78" fill="url(#shadow1)" opacity="0.7"/>
+    <polygon points="28,20 52,78 4,78" fill="url(#peak2)" opacity="0.85"/>
+    <polygon points="28,20 52,78 28,78" fill="#111" opacity="0.6"/>
+    <polygon points="92,20 116,78 68,78" fill="url(#peak2)" opacity="0.85"/>
+    <polygon points="92,20 116,78 92,78" fill="#111" opacity="0.6"/>
+    <line x1="4" y1="78" x2="116" y2="78" stroke="#888" strokeWidth="1" opacity="0.4"/>
+  </svg>
+)
+
+const MountainBg = ({ dark }: { dark: boolean }) => (
+  <svg viewBox="0 0 1440 280" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"
+    style={{ position:"fixed", bottom:0, left:0, width:"100%", height:"32vh", pointerEvents:"none", zIndex:0, opacity: dark ? 0.052 : 0.028 }}>
+    <defs>
+      <linearGradient id="mg1" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor={dark ? "#c8d86e" : "#444"} stopOpacity="0.8"/>
+        <stop offset="100%" stopColor={dark ? "#ffffff" : "#000"} stopOpacity="0"/>
+      </linearGradient>
+    </defs>
+    {/* Far range */}
+    <polygon points="0,200 100,145 180,170 290,110 410,150 530,90 660,130 780,75 900,118 1020,68 1140,108 1260,82 1380,112 1440,95 1440,280 0,280" fill="url(#mg1)" opacity="0.3"/>
+    {/* Mid range */}
+    <polygon points="0,225 70,182 150,205 240,162 360,192 470,142 590,175 700,128 820,165 940,112 1060,152 1180,124 1300,158 1440,132 1440,280 0,280" fill="url(#mg1)" opacity="0.55"/>
+    {/* Front range — sharp */}
+    <polygon points="0,252 55,222 120,240 195,205 290,228 390,188 490,215 590,172 700,205 810,165 930,198 1050,168 1165,195 1285,170 1390,192 1440,178 1440,280 0,280" fill="url(#mg1)" opacity="0.95"/>
+    {/* Snow caps */}
+    <polygon points="390,188 404,198 418,190 405,177" fill="white" opacity="0.45"/>
+    <polygon points="810,165 825,176 840,167 826,154" fill="white" opacity="0.38"/>
+    <polygon points="1165,195 1177,204 1191,196 1178,184" fill="white" opacity="0.32"/>
+    <polygon points="530,90 543,100 556,91 543,79" fill="white" opacity="0.28"/>
+  </svg>
+)
+
+const NoiseBg = () => (
+  <svg style={{ position:"fixed", inset:0, width:"100%", height:"100%", pointerEvents:"none", zIndex:0, opacity:0.032 }} xmlns="http://www.w3.org/2000/svg">
+    <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+    <rect width="100%" height="100%" filter="url(#noise)" fill="white"/>
+  </svg>
+)
 
 export default function Home() {
   const router = useRouter()
   const [dark, setDark] = useState(true)
+  const [lang, setLang] = useState<Lang>("FR")
   const [user, setUser] = useState<any>(null)
+  const [currentPage, setCurrentPage] = useState<"home"|"library">("home")
   const [activeOptions, setActiveOptions] = useState<string[]>(["Beat sync"])
   const [showSettings, setShowSettings] = useState(false)
   const [showReport, setShowReport] = useState(false)
   const [showMusic, setShowMusic] = useState(false)
+  const [showCompressModal, setShowCompressModal] = useState(false)
+  const [showPromptHelper, setShowPromptHelper] = useState(false)
+  const [showCapsulesModal, setShowCapsulesModal] = useState(false)
+  const [showTimestampPreview, setShowTimestampPreview] = useState(false)
+  const [showStats, setShowStats] = useState(false)
+  const [showPresets, setShowPresets] = useState(false)
+  const [showSavePreset, setShowSavePreset] = useState(false)
+  const [showQueue, setShowQueue] = useState(false)
+  const [capsulesType, setCapsulesType] = useState<"courte"|"longue"|null>(null)
+  const [capsulesCount, setCapsulesCount] = useState(4)
+  const [pendingFile, setPendingFile] = useState<File|null>(null)
+  const [compressing, setCompressing] = useState(false)
   const [selectedProblems, setSelectedProblems] = useState<string[]>([])
   const [hasGenerated, setHasGenerated] = useState(false)
-  const [selectedMusic, setSelectedMusic] = useState<Track | null>(null)
+  const [generating, setGenerating] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [promptText, setPromptText] = useState("")
+  const [generatedClips, setGeneratedClips] = useState<any[]>([])
+  const [selectedMusic, setSelectedMusic] = useState<Track|null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [tracks, setTracks] = useState<Track[]>([])
   const [loadingTracks, setLoadingTracks] = useState(false)
-  const [playingId, setPlayingId] = useState<number | null>(null)
-  const audioRef = { current: null as HTMLAudioElement | null }
-  const searchTimeout = { current: null as ReturnType<typeof setTimeout> | null }
+  const [playingId, setPlayingId] = useState<number|null>(null)
+  const [videos, setVideos] = useState<VideoItem[]>([])
+  const [linkInput, setLinkInput] = useState("")
+  const [importingLink, setImportingLink] = useState(false)
+  const [newMemberEmail, setNewMemberEmail] = useState("")
+  const [newMemberPassword, setNewMemberPassword] = useState("")
+  const [addingMember, setAddingMember] = useState(false)
+  const [memberSuccess, setMemberSuccess] = useState<string|null>(null)
+  const [helperInput, setHelperInput] = useState("")
+  const [helperResult, setHelperResult] = useState("")
+  const [helperLoading, setHelperLoading] = useState(false)
+  const [helperRefVideo, setHelperRefVideo] = useState<File|null>(null)
+  const [selectedFormat, setSelectedFormat] = useState("9:16")
+  const [zoomIntensity, setZoomIntensity] = useState(50)
+  const [speedIntensity, setSpeedIntensity] = useState(50)
+  const [addIntroOutro, setAddIntroOutro] = useState(false)
+  const [colorGrade, setColorGrade] = useState("none")
+  const [transition, setTransition] = useState("fade")
+  const [textOverlay, setTextOverlay] = useState("")
+  const [stabilize, setStabilize] = useState(false)
+  const [vocalVolume, setVocalVolume] = useState(30)
+  const [watermark, setWatermark] = useState(false)
+  const [exportQuality, setExportQuality] = useState("1080p")
+  const [exportCodec, setExportCodec] = useState("H264")
+  const [timestampPreviews, setTimestampPreviews] = useState<TimestampPreview[]>([])
+  const [loadingTimestamps, setLoadingTimestamps] = useState(false)
+  const [customTimestamps, setCustomTimestamps] = useState<TimestampPreview[]|null>(null)
+  const [promptHistory, setPromptHistory] = useState<string[]>([])
+  const [showPromptHistory, setShowPromptHistory] = useState(false)
+  const [serverAwake, setServerAwake] = useState<boolean|null>(null)
+  const [renamingClip, setRenamingClip] = useState<string|null>(null)
+  const [renameValue, setRenameValue] = useState("")
+  const [lastGeneratedClip, setLastGeneratedClip] = useState<any|null>(null)
+  const [folders, setFolders] = useState<Folder[]>([])
+  const [clips, setClips] = useState<Clip[]>([])
+  const [folderStack, setFolderStack] = useState<string[]>([])
+  const [showNewFolder, setShowNewFolder] = useState(false)
+  const [newFolderName, setNewFolderName] = useState("")
+  const [newFolderParent, setNewFolderParent] = useState<string|null>(null)
+  const [clipMenu, setClipMenu] = useState<string|null>(null)
+  const [folderMenu, setFolderMenu] = useState<string|null>(null)
+  const [showMoveModal, setShowMoveModal] = useState<string|null>(null)
+  const [showShareModal, setShowShareModal] = useState<string|null>(null)
+  const [shareEmail, setShareEmail] = useState("")
+  const [showLangMenu, setShowLangMenu] = useState(false)
+  const [presets, setPresets] = useState<Preset[]>([])
+  const [presetName, setPresetName] = useState("")
+  const [queue, setQueue] = useState<QueueItem[]>([])
+  const [queueRunning, setQueueRunning] = useState(false)
+  const [copiedId, setCopiedId] = useState<string|null>(null)
 
-  const defaultQueries = ["phonk", "rap us", "drill", "travis scott", "central cee"]
+  const audioRef = useRef<HTMLAudioElement|null>(null)
+  const searchTimeout = useRef<ReturnType<typeof setTimeout>|null>(null)
+  const defaultQueries = ["phonk","rap us","drill","travis scott","central cee"]
+  const T = TRANSLATIONS[lang]
+  const CGL = CG_LABELS[lang]
+  const TRL = TR_LABELS[lang]
+  const currentFolder = folderStack.length > 0 ? folderStack[folderStack.length-1] : null
 
-  // THEME COLORS
   const t = {
-    bg: dark ? "#0a0a0a" : "#e8e8e3",
-    bgNav: dark ? "#0f0f0f" : "#f0f0eb",
-    bgCard: dark ? "#141414" : "#f0f0eb",
-    bgInput: dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)",
-    bgPill: dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.05)",
-    bgThumb: dark ? "#1a1a1a" : "#d8d8d3",
-    bgPanel: dark ? "#111" : "#f0f0eb",
-    bgModal: dark ? "#161616" : "#f0f0eb",
-    border: dark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.1)",
-    borderMed: dark ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.15)",
-    text: dark ? "#f0f0f0" : "#111111",
-    textSub: dark ? "#aaa" : "#333333",
-    textMuted: dark ? "#555" : "#555555",
-    textHint: dark ? "#444" : "#777777",
-    overlay: dark ? "rgba(0,0,0,0.55)" : "rgba(0,0,0,0.3)",
-    overlayHeavy: dark ? "rgba(0,0,0,0.75)" : "rgba(0,0,0,0.4)",
+    bg: dark ? "#0b0b0b" : "#e5e5e0",
+    bgNav: dark ? "rgba(11,11,11,0.92)" : "rgba(235,235,230,0.92)",
+    bgCard: dark ? "#131313" : "#ebebE6",
+    bgInput: dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.05)",
+    bgPill: dark ? "rgba(255,255,255,0.035)" : "rgba(0,0,0,0.04)",
+    bgThumb: dark ? "#1c1c1c" : "#d5d5d0",
+    bgPanel: dark ? "#0e0e0e" : "#ebebE6",
+    bgModal: dark ? "#141414" : "#ebebE6",
+    border: dark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.09)",
+    borderMed: dark ? "1px solid rgba(255,255,255,0.09)" : "1px solid rgba(0,0,0,0.13)",
+    text: dark ? "#efefef" : "#0f0f0f",
+    textSub: dark ? "#999" : "#2f2f2f",
+    textMuted: dark ? "#4a4a4a" : "#5a5a5a",
+    textHint: dark ? "#383838" : "#7a7a7a",
+    overlay: dark ? "rgba(0,0,0,0.5)" : "rgba(0,0,0,0.25)",
+    overlayHeavy: dark ? "rgba(0,0,0,0.82)" : "rgba(0,0,0,0.4)",
+    accent: "#e8f542",
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user ?? null)
+    supabase.auth.getSession().then(async ({ data }) => {
+      const u = data.session?.user ?? null; setUser(u)
+      if (!u) { router.push("/auth"); return }
+      const { data: allowed } = await supabase.from("allowed_users").select("email").eq("email", u.email).single()
+      if (!allowed) { await supabase.auth.signOut(); router.push("/auth") }
     })
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
+    supabase.auth.onAuthStateChange(async (_e, session) => { const u = session?.user ?? null; setUser(u); if (!u) router.push("/auth") })
+    checkServerStatus()
+    const saved = localStorage.getItem("promptHistory"); if (saved) setPromptHistory(JSON.parse(saved))
+    const savedLang = localStorage.getItem("lang") as Lang|null; if (savedLang && TRANSLATIONS[savedLang]) setLang(savedLang)
+    const savedPresets = localStorage.getItem("climbPresets"); if (savedPresets) setPresets(JSON.parse(savedPresets))
   }, [])
 
-  const fetchTracks = async (query: string) => {
-    setLoadingTracks(true)
+  useEffect(() => { if (user) loadLibrary() }, [user])
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && !generating && currentPage === "home") handleGenerate() }
+    window.addEventListener("keydown", handler); return () => window.removeEventListener("keydown", handler)
+  }, [generating, currentPage, promptText, videos, activeOptions, selectedMusic, selectedFormat, zoomIntensity, speedIntensity, addIntroOutro, customTimestamps, colorGrade, transition, textOverlay, stabilize, vocalVolume, watermark, exportQuality, exportCodec])
+
+  const setLangAndSave = (l: Lang) => { setLang(l); localStorage.setItem("lang", l); setShowLangMenu(false) }
+  const checkServerStatus = async () => { try { const res = await fetch(`${SERVER_URL}/health`, { signal: AbortSignal.timeout(5000) }); setServerAwake(res.ok) } catch { setServerAwake(false) } }
+
+  const loadLibrary = async () => {
+    const { data: fd } = await supabase.from("folders").select("*").or(`owner_email.eq.${user.email},shared_with.cs.{${user.email}}`).order("created_at", { ascending: false })
+    const { data: cd } = await supabase.from("clips").select("*").eq("owner_email", user.email).order("created_at", { ascending: false })
+    setFolders(fd || []); setClips(cd || [])
+  }
+
+  const saveClipToLibrary = async (clip: any, index: number) => {
+    await supabase.from("clips").insert({ name: clip.name || `Edit #${index+1}`, base64: clip.base64, owner_email: user.email, folder_id: null, thumbnail: clip.thumbnail || null })
+    loadLibrary()
+  }
+
+  const uploadFile = async (file: File): Promise<string|null> => {
+    try { const fd = new FormData(); fd.append("file", file); const res = await fetch(`${SERVER_URL}/upload`, { method:"POST", body:fd }); const d = await res.json(); return d.path || null } catch { return null }
+  }
+
+  const handleFileAdd = async (file: File) => {
+    if (file.size > 50*1024*1024) { setPendingFile(file); setShowCompressModal(true); return }
+    const p = await uploadFile(file); if (p) setVideos(prev => [...prev, { id:Date.now().toString(), type:"file", path:p, name:file.name }])
+  }
+
+  const compressAndUpload = async () => {
+    if (!pendingFile) return; setShowCompressModal(false); setCompressing(true)
     try {
-      const res = await fetch(`/api/music?q=${encodeURIComponent(query)}`)
+      const ff = new FFmpeg(); await ff.load()
+      await ff.writeFile("input.mp4", await fetchFile(pendingFile))
+      await ff.exec(["-i","input.mp4","-vcodec","libx264","-crf","28","-preset","fast","-acodec","aac","output.mp4"])
+      const data = await ff.readFile("output.mp4")
+      const compressed = new File([data as unknown as BlobPart], "compressed.mp4", { type:"video/mp4" })
+      const p = await uploadFile(compressed); if (p) setVideos(prev => [...prev, { id:Date.now().toString(), type:"file", path:p, name:pendingFile.name }])
+    } catch (err: any) { alert(err.message) }
+    setCompressing(false)
+  }
+
+  const handleLinkImport = async () => {
+    const url = linkInput.trim(); if (!url) return; setImportingLink(true)
+    try {
+      const thumbRes = await fetch(`${SERVER_URL}/thumbnail`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ url }) })
+      const thumbData = await thumbRes.json()
+      const res = await fetch(`${SERVER_URL}/download`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ url }) })
       const data = await res.json()
-      setTracks(data.data || [])
-    } catch {
-      setTracks([])
+      if (data.path) { setVideos(prev => [...prev, { id:Date.now().toString(), type:"link", path:data.path, url, name:url.slice(0,40)+"...", thumbnail:thumbData.thumbnail||undefined }]); setLinkInput("") }
+      else alert("Erreur")
+    } catch (err: any) { alert(`Erreur: ${err.message}`) }
+    setImportingLink(false)
+  }
+
+  const removeVideo = (id: string) => setVideos(prev => prev.filter(v => v.id !== id))
+  const savePromptToHistory = (p: string) => { if (!p.trim()) return; const u = [p, ...promptHistory.filter(h => h !== p)].slice(0,10); setPromptHistory(u); localStorage.setItem("promptHistory", JSON.stringify(u)) }
+
+  const buildPayload = () => ({
+    videoPaths: videos.map(v => v.path).filter(Boolean),
+    videoUrls: [],
+    prompt: promptText,
+    options: activeOptions,
+    musicUrl: selectedMusic?.preview || null,
+    format: selectedFormat,
+    zoomIntensity: activeOptions.includes("Auto-zoom") ? zoomIntensity : null,
+    speedIntensity: activeOptions.includes("Speed ramp") ? speedIntensity : null,
+    addIntroOutro,
+    customTimestamps,
+    colorGrade: colorGrade !== "none" ? colorGrade : null,
+    transition: transition !== "none" ? transition : null,
+    textOverlay: textOverlay || null,
+    stabilize,
+    vocalVolume: selectedMusic ? vocalVolume/100 : null,
+    watermark,
+    exportQuality,
+    exportCodec,
+  })
+
+  const handleGenerate = useCallback(async () => {
+    if (videos.length === 0) return
+    savePromptToHistory(promptText); setHasGenerated(false); setGenerating(true); setProgress(0); setServerAwake(null)
+    try {
+      const res = await fetch(`${SERVER_URL}/generate`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(buildPayload()) })
+      setServerAwake(true); const { jobId } = await res.json()
+      const interval = setInterval(async () => {
+        const sr = await fetch(`${SERVER_URL}/status/${jobId}`); const d = await sr.json()
+        if (d.progress) setProgress(d.progress)
+        if (d.status === "done") { clearInterval(interval); setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100); if (d.clips.length > 0) setLastGeneratedClip(d.clips[0]); for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i) }
+        else if (d.status === "error") { clearInterval(interval); alert("Erreur génération"); setGenerating(false) }
+      }, 3000)
+    } catch { alert("Erreur"); setGenerating(false) }
+  }, [videos, promptText, activeOptions, selectedMusic, selectedFormat, zoomIntensity, speedIntensity, addIntroOutro, customTimestamps, colorGrade, transition, textOverlay, stabilize, vocalVolume, watermark, exportQuality, exportCodec])
+
+  // QUEUE
+  const addToQueue = () => {
+    if (videos.length === 0) return
+    setQueue(prev => [...prev, { id:Date.now().toString(), videos:[...videos], prompt:promptText, status:"pending" }])
+  }
+
+  const runQueue = async () => {
+    if (queue.length === 0 || queueRunning) return
+    setQueueRunning(true)
+    for (let i = 0; i < queue.length; i++) {
+      if (queue[i].status !== "pending") continue
+      setQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status:"processing" } : q))
+      try {
+        const payload = { ...buildPayload(), videoPaths:queue[i].videos.map(v => v.path).filter(Boolean), prompt:queue[i].prompt }
+        const res = await fetch(`${SERVER_URL}/generate`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) })
+        const { jobId } = await res.json()
+        await new Promise<void>(resolve => {
+          const interval = setInterval(async () => {
+            const sr = await fetch(`${SERVER_URL}/status/${jobId}`); const d = await sr.json()
+            if (d.status === "done") { clearInterval(interval); setQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status:"done", clips:d.clips } : q)); for (let j = 0; j < d.clips.length; j++) await saveClipToLibrary(d.clips[j], j); resolve() }
+            else if (d.status === "error") { clearInterval(interval); setQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status:"error" } : q)); resolve() }
+          }, 3000)
+        })
+      } catch { setQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status:"error" } : q)) }
     }
-    setLoadingTracks(false)
+    setQueueRunning(false)
   }
 
-  const handleSearch = (val: string) => {
-    setSearchQuery(val)
-    if (searchTimeout.current) clearTimeout(searchTimeout.current)
-    searchTimeout.current = setTimeout(() => {
-      if (val.trim()) fetchTracks(val)
-    }, 500)
+  // PRESETS
+  const savePreset = () => {
+    if (!presetName.trim()) return
+    const p: Preset = { id:Date.now().toString(), name:presetName, format:selectedFormat, colorGrade, transition, prompt:promptText, options:activeOptions, exportQuality, exportCodec, watermark }
+    const updated = [...presets, p]; setPresets(updated); localStorage.setItem("climbPresets", JSON.stringify(updated)); setPresetName(""); setShowSavePreset(false)
+  }
+  const loadPreset = (p: Preset) => { setSelectedFormat(p.format); setColorGrade(p.colorGrade); setTransition(p.transition); setPromptText(p.prompt); setActiveOptions(p.options); setExportQuality(p.exportQuality); setExportCodec(p.exportCodec); setWatermark(p.watermark); setShowPresets(false) }
+  const deletePreset = (id: string) => { const updated = presets.filter(p => p.id !== id); setPresets(updated); localStorage.setItem("climbPresets", JSON.stringify(updated)) }
+
+  // SHARE
+  const shareClipPublic = async (clip: any) => {
+    try {
+      const b64 = clip.base64.split(",")[1]
+      const bytes = atob(b64); const arr = new Uint8Array(bytes.length)
+      for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
+      const blob = new Blob([arr], { type:"video/mp4" })
+      const fileName = `${Date.now()}_${(clip.name||"clip").replace(/\s+/g,"_")}.mp4`
+      const { error } = await supabase.storage.from("clips").upload(fileName, blob, { contentType:"video/mp4", upsert:true })
+      if (error) throw error
+      const { data } = supabase.storage.from("clips").getPublicUrl(fileName)
+      await navigator.clipboard.writeText(data.publicUrl)
+      setCopiedId(clip.name); setTimeout(() => setCopiedId(null), 2500)
+    } catch (err: any) { alert(err.message) }
   }
 
-  const togglePlay = (track: Track) => {
-    if (playingId === track.id) {
-      audioRef.current?.pause()
-      setPlayingId(null)
-    } else {
-      if (audioRef.current) audioRef.current.pause()
-      audioRef.current = new Audio(track.preview)
-      audioRef.current.play()
-      audioRef.current.onended = () => setPlayingId(null)
-      setPlayingId(track.id)
-    }
+  const downloadAllClips = () => generatedClips.forEach((clip, i) => { const a = document.createElement("a"); a.href = clip.base64; a.download = `climbclip_${i+1}.mp4`; a.click() })
+
+  const handlePreviewTimestamps = async () => {
+    if (videos.length === 0) return; setLoadingTimestamps(true)
+    try {
+      const res = await fetch(`${SERVER_URL}/preview-timestamps`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ videoPaths:videos.map(v => v.path).filter(Boolean), prompt:promptText, options:activeOptions }) })
+      const data = await res.json(); setTimestampPreviews(data.timestamps || []); setShowTimestampPreview(true)
+    } catch (err: any) { alert(err.message) }
+    setLoadingTimestamps(false)
   }
 
-  const selectTrack = (track: Track) => {
-    setSelectedMusic(track)
-    audioRef.current?.pause()
-    setPlayingId(null)
-    setShowMusic(false)
+  const handlePromptHelper = async () => {
+    if (!helperInput.trim()) return; setHelperLoading(true); setHelperResult("")
+    try {
+      let refVideoFrames = null
+      if (helperRefVideo) { const v = document.createElement("video"); v.src = URL.createObjectURL(helperRefVideo); await new Promise(r => { v.onloadeddata = r }); const c = document.createElement("canvas"); c.width = 320; c.height = 180; c.getContext("2d")?.drawImage(v, 0, 0, 320, 180); refVideoFrames = [c.toDataURL("image/jpeg", 0.8).split(",")[1]]; URL.revokeObjectURL(v.src) }
+      const res = await fetch(`${SERVER_URL}/prompt-help`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ description:helperInput, refVideoFrames }) })
+      const data = await res.json(); setHelperResult(data.prompt || "")
+    } catch (err: any) { alert(err.message) }
+    setHelperLoading(false)
   }
 
-  const toggleOption = (opt: string) => {
-    setActiveOptions(prev =>
-      prev.includes(opt) ? prev.filter(o => o !== opt) : [...prev, opt]
-    )
-  }
+  const applyCapsules = () => { if (!capsulesType) return; setPromptText(capsulesType === "courte" ? `génère ${capsulesCount} capsules qui se suivent depuis le début, clips de 15-30 secondes` : `génère ${capsulesCount} capsules sur les meilleurs moments, clips de 30-60 secondes`); setShowCapsulesModal(false); setCapsulesType(null) }
+  const fetchTracks = async (query: string) => { setLoadingTracks(true); try { const res = await fetch(`/api/music?q=${encodeURIComponent(query)}`); const data = await res.json(); setTracks(data.data || []) } catch { setTracks([]) }; setLoadingTracks(false) }
+  const handleSearch = (val: string) => { setSearchQuery(val); if (searchTimeout.current) clearTimeout(searchTimeout.current); searchTimeout.current = setTimeout(() => { if (val.trim()) fetchTracks(val) }, 500) }
+  const togglePlay = (track: Track) => { if (playingId === track.id) { audioRef.current?.pause(); audioRef.current = null; setPlayingId(null) } else { if (audioRef.current) { audioRef.current.pause(); audioRef.current = null }; const a = new Audio(track.preview); audioRef.current = a; a.play(); a.onended = () => { audioRef.current = null; setPlayingId(null) }; setPlayingId(track.id) } }
+  const closeMusic = () => { if (audioRef.current) { audioRef.current.pause(); audioRef.current = null }; setPlayingId(null); setShowMusic(false) }
+  const selectTrack = (track: Track) => { if (audioRef.current) { audioRef.current.pause(); audioRef.current = null }; setPlayingId(null); setSelectedMusic(track); setShowMusic(false) }
+  const toggleOption = (opt: string) => setActiveOptions(prev => prev.includes(opt) ? prev.filter(o => o !== opt) : [...prev, opt])
+  const toggleProblem = (p: string) => setSelectedProblems(prev => prev.includes(p) ? prev.filter(o => o !== p) : [...prev, p])
+  const createFolder = async () => { if (!newFolderName.trim()) return; await supabase.from("folders").insert({ name:newFolderName, owner_email:user.email, shared_with:[], parent_id:newFolderParent }); setNewFolderName(""); setShowNewFolder(false); setNewFolderParent(null); loadLibrary() }
+  const deleteClip = async (id: string) => { await supabase.from("clips").delete().eq("id", id); setClipMenu(null); loadLibrary() }
+  const deleteFolder = async (id: string) => { await supabase.from("folders").delete().eq("id", id); setFolderMenu(null); if (currentFolder === id) setFolderStack(prev => prev.slice(0,-1)); loadLibrary() }
+  const moveClip = async (clipId: string, folderId: string|null) => { await supabase.from("clips").update({ folder_id:folderId }).eq("id", clipId); setShowMoveModal(null); loadLibrary() }
+  const renameClip = async (id: string) => { if (!renameValue.trim()) return; await supabase.from("clips").update({ name:renameValue }).eq("id", id); setRenamingClip(null); loadLibrary() }
+  const shareFolder = async (folderId: string) => { if (!shareEmail.trim()) return; const folder = folders.find(f => f.id === folderId); if (!folder) return; await supabase.from("folders").update({ shared_with:[...(folder.shared_with||[]), shareEmail] }).eq("id", folderId); setShareEmail(""); setShowShareModal(null); loadLibrary() }
 
-  const toggleProblem = (p: string) => {
-    setSelectedProblems(prev =>
-      prev.includes(p) ? prev.filter(o => o !== p) : [...prev, p]
-    )
-  }
+  const problems = ["Vidéo non générée","Mauvaise qualité","Sous-titres incorrects","Téléchargement échoué","Musique désynchronisée","Lien non reconnu","Bug d'affichage","Autre"]
+  const formats = ["9:16","16:9","1:1","4:5"]
+  const colorGrades = ["none","cinematic","orange_teal","bw","vibrant","moody","warm","cold"]
+  const transitions = ["none","fade","flash","glitch","zoom_in"]
+  const currentFolderData = currentFolder ? folders.find(f => f.id === currentFolder) : null
+  const displayedFolders = folders.filter(f => f.parent_id === currentFolder)
+  const displayedClips = currentFolder ? clips.filter(c => c.folder_id === currentFolder) : clips.filter(c => !c.folder_id)
+  const modalBase: React.CSSProperties = { background:t.bgModal, border:t.border, borderRadius:16, padding:24, display:"flex", flexDirection:"column", gap:16 }
 
-  const problems = ["Vidéo non générée", "Mauvaise qualité", "Sous-titres incorrects", "Téléchargement échoué", "Musique désynchronisée", "Lien non reconnu", "Bug d'affichage", "Autre"]
-  const clips = [
-    { id: 1, name: "Edit #1", meta: "Beat sync · FR", duration: "0:28" },
-    { id: 2, name: "Edit #2", meta: "Beat sync · EN", duration: "0:22" },
-    { id: 3, name: "Edit #3", meta: "Speed ramp · FR", duration: "0:31" },
-  ]
+  const Pill = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
+    <button onClick={onClick} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:active ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:active ? "rgba(232,245,66,0.08)" : t.bgPill, color:active ? t.accent : t.textSub, fontWeight:active ? 500 : 400, transition:"all 0.15s", boxShadow:active ? "0 0 14px rgba(232,245,66,0.08)" : "none" }}>{label}</button>
+  )
 
   return (
-    <main style={{ display: "flex", flexDirection: "column", alignItems: "center", minHeight: "100vh", width: "100%", background: t.bg, transition: "background 0.2s" }}>
+    <main style={{ display:"flex", flexDirection:"column", alignItems:"center", minHeight:"100vh", width:"100%", background:t.bg, position:"relative", overflowX:"hidden" }}
+      onClick={() => { setClipMenu(null); setFolderMenu(null); setShowPromptHistory(false); setShowLangMenu(false) }}>
+
+      {/* BACKGROUNDS */}
+      {dark && <>
+        <NoiseBg/>
+        <div style={{ position:"fixed", top:"-20%", left:"10%", width:"55vw", height:"55vw", borderRadius:"50%", background:"radial-gradient(circle, rgba(232,245,66,0.022) 0%, transparent 70%)", pointerEvents:"none", zIndex:0 }}/>
+        <div style={{ position:"fixed", bottom:"25%", right:"5%", width:"40vw", height:"40vw", borderRadius:"50%", background:"radial-gradient(circle, rgba(180,180,255,0.015) 0%, transparent 70%)", pointerEvents:"none", zIndex:0 }}/>
+        <div style={{ position:"fixed", inset:0, backgroundImage:"repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.007) 3px, rgba(255,255,255,0.007) 4px)", pointerEvents:"none", zIndex:0 }}/>
+      </>}
+      <MountainBg dark={dark}/>
+
+      {/* COLD START */}
+      {serverAwake === false && (
+        <div style={{ width:"100%", background:"rgba(232,245,66,0.04)", borderBottom:"1px solid rgba(232,245,66,0.11)", padding:"10px 24px", display:"flex", alignItems:"center", gap:10, position:"relative", zIndex:10 }}>
+          <div style={{ width:6, height:6, borderRadius:"50%", background:t.accent, opacity:0.8 }}/>
+          <span style={{ fontSize:12, color:t.accent }}>{T.serverStarting}</span>
+          <button onClick={checkServerStatus} style={{ marginLeft:"auto", fontSize:11, color:t.textMuted, background:"none", border:t.border, borderRadius:6, padding:"3px 8px", cursor:"pointer" }}>{T.check}</button>
+        </div>
+      )}
 
       {/* NAV */}
-      <nav style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 32px", borderBottom: t.border, background: t.bgNav }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 6, background: "#e8f542", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ color: "#0a0a0a", fontSize: 13, fontWeight: 700 }}>✂</span>
+      <nav style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 32px", borderBottom:t.border, background:t.bgNav, backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", position:"sticky", top:0, zIndex:50 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <ClimbLogo size={30}/>
+          <div style={{ display:"flex", flexDirection:"column", lineHeight:1, gap:1 }}>
+            <span style={{ color:t.text, fontWeight:700, fontSize:13, letterSpacing:"0.1em" }}>CLIMB</span>
+            <span style={{ color:t.textMuted, fontSize:8, letterSpacing:"0.2em" }}>CLIP</span>
           </div>
-          <span style={{ color: t.text, fontWeight: 500 }}>Climb<span style={{ color: "#e8f542" }}>Clip</span></span>
+          {serverAwake === true && <div style={{ width:5, height:5, borderRadius:"50%", background:"#4ade80" }} title={T.serverActive}/>}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <button onClick={() => setShowSettings(true)} style={{ fontSize: 13, color: t.textSub, border: t.borderMed, borderRadius: 8, padding: "7px 16px", background: t.bgInput, cursor: "pointer" }}>
-            Paramètres
-          </button>
-          {user ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 12, color: t.textSub }}>{user.email}</span>
-              <button onClick={async () => { await supabase.auth.signOut(); setUser(null) }} style={{ fontSize: 13, color: "#e8453a", border: "1px solid rgba(232,69,58,0.3)", borderRadius: 8, padding: "7px 14px", background: "none", cursor: "pointer" }}>
-                Déconnexion
-              </button>
-            </div>
-          ) : (
-            <button onClick={() => router.push("/auth")} style={{ fontSize: 13, fontWeight: 500, background: "#e8f542", color: "#0a0a0a", borderRadius: 8, padding: "7px 16px", border: "none", cursor: "pointer" }}>
-              Se connecter / Inscription
-            </button>
-          )}
+        <div style={{ display:"flex", alignItems:"center", gap:20 }}>
+          <button onClick={() => setCurrentPage("home")} style={{ fontSize:13, color:currentPage === "home" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "home" ? 600 : 400 }}>{T.home}</button>
+          <button onClick={() => { setCurrentPage("library"); loadLibrary() }} style={{ fontSize:13, color:currentPage === "library" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "library" ? 600 : 400 }}>{T.library}</button>
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+          <button onClick={() => setShowStats(true)} style={{ fontSize:12, color:t.textSub, border:t.border, borderRadius:7, padding:"5px 9px", background:t.bgInput, cursor:"pointer" }}>📊</button>
+          <button onClick={() => setShowQueue(true)} style={{ fontSize:12, color:queue.length > 0 ? t.accent : t.textSub, border:queue.length > 0 ? "1px solid rgba(232,245,66,0.3)" : t.border, borderRadius:7, padding:"5px 9px", background:t.bgInput, cursor:"pointer" }}>⏱{queue.length > 0 ? ` ${queue.length}` : ""}</button>
+          <div style={{ position:"relative" }} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowLangMenu(!showLangMenu)} style={{ fontSize:11, color:t.textSub, background:t.bgInput, border:t.border, borderRadius:7, padding:"5px 9px", cursor:"pointer", letterSpacing:"0.05em" }}>{lang}</button>
+            {showLangMenu && (
+              <div style={{ position:"absolute", right:0, top:"calc(100% + 4px)", background:t.bgModal, border:t.border, borderRadius:8, padding:"4px 0", minWidth:70, boxShadow:"0 8px 24px rgba(0,0,0,0.5)", zIndex:100 }}>
+                {(["EN","FR","ES","IT","DE"] as Lang[]).map(l => (
+                  <button key={l} onClick={() => setLangAndSave(l)} style={{ width:"100%", padding:"7px 12px", background:lang === l ? "rgba(232,245,66,0.07)" : "none", border:"none", color:lang === l ? t.accent : t.text, cursor:"pointer", fontSize:12, textAlign:"left", letterSpacing:"0.04em" }}>{l}</button>
+                ))}
+              </div>
+            )}
+          </div>
+          <button onClick={() => setShowSettings(true)} style={{ fontSize:12, color:t.textSub, border:t.borderMed, borderRadius:7, padding:"6px 13px", background:t.bgInput, cursor:"pointer" }}>{T.settings}</button>
+          {user && <button onClick={async () => { await supabase.auth.signOut(); setUser(null) }} style={{ fontSize:12, color:"#e8453a", border:"1px solid rgba(232,69,58,0.2)", borderRadius:7, padding:"6px 11px", background:"none", cursor:"pointer" }}>{T.logout}</button>}
         </div>
       </nav>
 
-      {/* CONTENT */}
-      <div style={{ width: "100%", maxWidth: 640, display: "flex", flexDirection: "column", alignItems: "center", gap: 28, padding: "48px 24px" }}>
+      {/* HOME */}
+      {currentPage === "home" && (
+        <div style={{ width:"100%", maxWidth:640, display:"flex", flexDirection:"column", gap:26, padding:"44px 24px 120px", position:"relative", zIndex:1 }}>
 
-        {/* UPLOAD */}
-        <div style={{ width: "100%", border: `2px dashed ${dark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)"}`, borderRadius: 16, padding: "40px 24px", display: "flex", flexDirection: "column", alignItems: "center", gap: 14, cursor: "pointer" }}>
-          <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(232,245,66,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ color: "#e8f542", fontSize: 20 }}>↑</span>
+          {/* VIDEOS */}
+          <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+              <p style={{ fontSize:12, color:t.textSub }}>{T.videos} ({videos.length})</p>
+              <button onClick={() => document.getElementById("fileInput")?.click()} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"5px 11px", fontSize:11, color:t.textSub, cursor:"pointer" }}>{T.addFile}</button>
+            </div>
+            <input id="fileInput" type="file" accept="video/*" multiple style={{ display:"none" }} onChange={async e => { if (e.target.files) for (const f of Array.from(e.target.files)) await handleFileAdd(f) }}/>
+            {videos.length > 0 ? (
+              <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+                {videos.map(v => (
+                  <div key={v.id} style={{ display:"flex", alignItems:"center", gap:10, background:t.bgCard, border:t.border, borderRadius:9, padding:"9px 12px" }}>
+                    {v.thumbnail ? <img src={v.thumbnail} style={{ width:46, height:30, borderRadius:4, objectFit:"cover", flexShrink:0 }}/> : <div style={{ width:46, height:30, borderRadius:4, background:t.bgThumb, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}><span style={{ fontSize:12, color:t.textMuted }}>▶</span></div>}
+                    <p style={{ flex:1, fontSize:12, color:t.text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{v.name}</p>
+                    <button onClick={() => removeVideo(v.id)} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15 }}>✕</button>
+                  </div>
+                ))}
+                <div style={{ border:`1px dashed ${dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.1)"}`, borderRadius:9, padding:"12px 20px", display:"flex", alignItems:"center", justifyContent:"center", gap:7, cursor:"pointer", color:t.textMuted, fontSize:12 }} onClick={() => document.getElementById("fileInput")?.click()}>
+                  <span style={{ fontSize:14 }}>{compressing ? "⚙" : "↑"}</span> {compressing ? T.compressing : T.addAnother}
+                </div>
+              </div>
+            ) : (
+              <div style={{ border:`1px dashed ${dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.11)"}`, borderRadius:14, padding:"50px 24px", display:"flex", flexDirection:"column", alignItems:"center", gap:14, cursor:"pointer", background:dark ? "rgba(255,255,255,0.008)" : "rgba(0,0,0,0.01)" }} onClick={() => document.getElementById("fileInput")?.click()}>
+                <div style={{ width:54, height:54, borderRadius:15, background:"rgba(232,245,66,0.05)", border:"1px solid rgba(232,245,66,0.1)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                  <span style={{ fontSize:20, color:t.accent }}>↑</span>
+                </div>
+                <div style={{ textAlign:"center" }}>
+                  <p style={{ fontSize:14, color:t.textSub, marginBottom:4, fontWeight:500 }}>{T.dragVideo}</p>
+                  <p style={{ fontSize:12, color:t.textMuted }}>{T.dragSub}</p>
+                </div>
+              </div>
+            )}
+            <div style={{ display:"flex", gap:7 }} onClick={e => e.stopPropagation()}>
+              <input value={linkInput} onChange={e => setLinkInput(e.target.value)} onKeyDown={e => e.key === "Enter" && handleLinkImport()} style={{ flex:1, background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"9px 13px", fontSize:13, color:t.text, outline:"none" }} placeholder={T.pasteLink}/>
+              <button onClick={handleLinkImport} disabled={importingLink} style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"9px 13px", fontSize:13, color:t.textSub, cursor:"pointer", whiteSpace:"nowrap", opacity:importingLink ? 0.6 : 1 }}>{importingLink ? "⏳" : T.import}</button>
+            </div>
           </div>
-          <p style={{ fontSize: 15, fontWeight: 500, color: t.text }}>Insérer une vidéo</p>
-          <p style={{ fontSize: 12, color: t.textMuted }}>MP4, MOV, AVI — jusqu'à 2 Go</p>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, width: "100%" }}>
-            <div style={{ flex: 1, height: 1, background: dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)" }} />
-            <span style={{ fontSize: 12, color: t.textHint }}>ou</span>
-            <div style={{ flex: 1, height: 1, background: dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)" }} />
+
+          {/* FORMAT */}
+          <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+            <p style={{ fontSize:11, color:t.textMuted, textTransform:"uppercase", letterSpacing:"0.06em" }}>{T.outputFormat}</p>
+            <div style={{ display:"flex", gap:6 }}>
+              {formats.map(f => <button key={f} onClick={() => setSelectedFormat(f)} style={{ flex:1, padding:"8px 4px", borderRadius:8, border:selectedFormat === f ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:selectedFormat === f ? "rgba(232,245,66,0.08)" : t.bgInput, color:selectedFormat === f ? t.accent : t.textSub, cursor:"pointer", fontSize:12, fontWeight:selectedFormat === f ? 600 : 400 }}>{f}</button>)}
+            </div>
           </div>
-          <div style={{ display: "flex", gap: 8, width: "100%" }} onClick={e => e.stopPropagation()}>
-            <input
-              style={{ flex: 1, background: t.bgInput, border: t.borderMed, borderRadius: 8, padding: "10px 14px", fontSize: 13, color: t.text, outline: "none" }}
-              placeholder="Coller un lien TikTok / Instagram / YouTube..."
-            />
-            <button style={{ background: t.bgInput, border: t.borderMed, borderRadius: 8, padding: "10px 14px", fontSize: 13, color: t.textSub, cursor: "pointer", whiteSpace: "nowrap" }}>
-              Importer
+
+          {/* OPTIONS */}
+          <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+            {[["Beat sync","Beat sync"],["Sous-titres",T.subtitles],["Auto-zoom",T.autoZoom],["Speed ramp",T.speedRamp]].map(([key,label]) => (
+              <Pill key={key} label={label} active={activeOptions.includes(key)} onClick={() => toggleOption(key)}/>
+            ))}
+            <Pill label={T.capsules} active={false} onClick={() => setShowCapsulesModal(true)}/>
+            <Pill label={T.introOutro} active={addIntroOutro} onClick={() => setAddIntroOutro(!addIntroOutro)}/>
+            <Pill label={stabilize ? `✓ ${T.stabilize}` : T.stabilize} active={stabilize} onClick={() => setStabilize(!stabilize)}/>
+            <Pill label={watermark ? `✓ ${T.watermark}` : T.watermark} active={watermark} onClick={() => setWatermark(!watermark)}/>
+            <button onClick={() => { setShowMusic(true); fetchTracks(searchQuery || "phonk") }} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:selectedMusic ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:selectedMusic ? "rgba(232,245,66,0.08)" : t.bgPill, color:selectedMusic ? t.accent : t.textSub, display:"flex", alignItems:"center", gap:6, fontWeight:selectedMusic ? 500 : 400 }}>
+              {selectedMusic ? <><img src={selectedMusic.album.cover_small} style={{ width:15, height:15, borderRadius:3 }}/>{selectedMusic.title}</> : T.addMusic}
             </button>
           </div>
-        </div>
 
-        {/* OPTIONS */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, width: "100%" }}>
-          {["Beat sync", "Sous-titres", "Auto-zoom", "Speed ramp"].map(opt => (
-            <button key={opt} onClick={() => toggleOption(opt)} style={{ padding: "6px 14px", borderRadius: 20, fontSize: 12, cursor: "pointer", border: activeOptions.includes(opt) ? "1px solid rgba(232,245,66,0.5)" : t.borderMed, background: activeOptions.includes(opt) ? "rgba(232,245,66,0.07)" : t.bgPill, color: activeOptions.includes(opt) ? "#e8f542" : t.textSub }}>
-              {opt}
-            </button>
-          ))}
-          <button onClick={() => { setShowMusic(true); fetchTracks(searchQuery || "phonk") }} style={{ padding: "6px 14px", borderRadius: 20, fontSize: 12, cursor: "pointer", border: selectedMusic ? "1px solid rgba(232,245,66,0.5)" : t.borderMed, background: selectedMusic ? "rgba(232,245,66,0.07)" : t.bgPill, color: selectedMusic ? "#e8f542" : t.textSub, display: "flex", alignItems: "center", gap: 6 }}>
-            {selectedMusic ? (
-              <>
-                <img src={selectedMusic.album.cover_small} style={{ width: 16, height: 16, borderRadius: 3 }} />
-                {selectedMusic.title} — {selectedMusic.artist.name}
-              </>
-            ) : "🎵 Ajouter musique"}
-          </button>
-        </div>
+          {/* ADVANCED */}
+          <div style={{ display:"flex", flexDirection:"column", gap:14, background:t.bgCard, border:t.border, borderRadius:12, padding:"16px 18px" }}>
+            <div style={{ display:"flex", gap:10 }}>
+              <div style={{ flex:1 }}>
+                <p style={{ fontSize:11, color:t.textMuted, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.colorGrade}</p>
+                <select value={colorGrade} onChange={e => setColorGrade(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 10px", fontSize:12, color:t.text, outline:"none", cursor:"pointer", appearance:"none", WebkitAppearance:"none" }}>
+                  {colorGrades.map(g => <option key={g} value={g}>{CGL[g]}</option>)}
+                </select>
+              </div>
+              <div style={{ flex:1 }}>
+                <p style={{ fontSize:11, color:t.textMuted, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.transition}</p>
+                <select value={transition} onChange={e => setTransition(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 10px", fontSize:12, color:t.text, outline:"none", cursor:"pointer", appearance:"none", WebkitAppearance:"none" }}>
+                  {transitions.map(tr => <option key={tr} value={tr}>{TRL[tr]}</option>)}
+                </select>
+              </div>
+            </div>
+            <div style={{ display:"flex", gap:10 }}>
+              <div style={{ flex:1 }}>
+                <p style={{ fontSize:11, color:t.textMuted, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.exportQuality}</p>
+                <select value={exportQuality} onChange={e => setExportQuality(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 10px", fontSize:12, color:t.text, outline:"none", cursor:"pointer", appearance:"none", WebkitAppearance:"none" }}>
+                  {["720p","1080p","4K"].map(q => <option key={q} value={q}>{q}</option>)}
+                </select>
+              </div>
+              <div style={{ flex:1 }}>
+                <p style={{ fontSize:11, color:t.textMuted, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.exportCodec}</p>
+                <select value={exportCodec} onChange={e => setExportCodec(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 10px", fontSize:12, color:t.text, outline:"none", cursor:"pointer", appearance:"none", WebkitAppearance:"none" }}>
+                  {["H264","H265","VP9"].map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+            </div>
+            <div>
+              <p style={{ fontSize:11, color:t.textMuted, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.textOverlay}</p>
+              <input value={textOverlay} onChange={e => setTextOverlay(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 12px", fontSize:12, color:t.text, outline:"none" }} placeholder="Ex: CLIMB AGENCY"/>
+            </div>
+            {(activeOptions.includes("Auto-zoom") || activeOptions.includes("Speed ramp") || selectedMusic) && (
+              <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+                {activeOptions.includes("Auto-zoom") && (
+                  <div>
+                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}><p style={{ fontSize:11, color:t.textMuted }}>{T.zoomIntensity}</p><span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{zoomIntensity}%</span></div>
+                    <input type="range" min={10} max={100} value={zoomIntensity} onChange={e => setZoomIntensity(Number(e.target.value))} style={{ width:"100%", accentColor:t.accent }}/>
+                  </div>
+                )}
+                {activeOptions.includes("Speed ramp") && (
+                  <div>
+                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}><p style={{ fontSize:11, color:t.textMuted }}>{T.speedIntensity}</p><span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{speedIntensity}%</span></div>
+                    <input type="range" min={10} max={100} value={speedIntensity} onChange={e => setSpeedIntensity(Number(e.target.value))} style={{ width:"100%", accentColor:t.accent }}/>
+                  </div>
+                )}
+                {selectedMusic && (
+                  <div>
+                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}><p style={{ fontSize:11, color:t.textMuted }}>{T.vocalVolume}</p><span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{vocalVolume}%</span></div>
+                    <input type="range" min={0} max={100} value={vocalVolume} onChange={e => setVocalVolume(Number(e.target.value))} style={{ width:"100%", accentColor:t.accent }}/>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
-        {/* PROMPT */}
-        <div style={{ display: "flex", gap: 8, width: "100%", alignItems: "flex-end" }}>
-          <textarea
-            style={{ flex: 1, background: t.bgInput, border: t.borderMed, borderRadius: 8, padding: "12px 14px", fontSize: 13, color: t.text, outline: "none", resize: "none", height: 48, lineHeight: "1.5", fontFamily: "sans-serif" }}
-            placeholder="Ex : 3 clips style edit foot, cuts sur le beat, texte blanc en bas..."
-          />
-          <button onClick={() => setHasGenerated(true)} style={{ background: "#e8f542", color: "#0a0a0a", fontWeight: 500, fontSize: 13, borderRadius: 8, padding: "12px 20px", border: "none", cursor: "pointer", whiteSpace: "nowrap" }}>
-            ✦ Générer
-          </button>
-        </div>
+          {/* PRESETS BAR */}
+          <div style={{ display:"flex", gap:6 }}>
+            <button onClick={() => setShowPresets(true)} style={{ padding:"6px 12px", borderRadius:8, fontSize:11, border:t.borderMed, background:t.bgInput, color:t.textSub, cursor:"pointer" }}>⚡ {T.presets}{presets.length > 0 ? ` (${presets.length})` : ""}</button>
+            <button onClick={() => setShowSavePreset(true)} style={{ padding:"6px 12px", borderRadius:8, fontSize:11, border:t.borderMed, background:t.bgInput, color:t.textSub, cursor:"pointer" }}>+ {T.savePreset}</button>
+          </div>
 
-        {/* RESULTS */}
-        {hasGenerated && (
-          <>
-            <div style={{ width: "100%", height: 1, background: dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)" }} />
-            <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 14 }}>
-              <p style={{ fontSize: 11, color: t.textHint, textTransform: "uppercase", letterSpacing: "0.05em" }}>Clips générés — 3 résultats</p>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
-                {clips.map(clip => (
-                  <div key={clip.id} style={{ background: t.bgCard, border: t.border, borderRadius: 12, overflow: "hidden", display: "flex", flexDirection: "column" }}>
-                    <div style={{ aspectRatio: "9/16", background: t.bgThumb, position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(232,245,66,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <span style={{ color: "#e8f542", fontSize: 14 }}>▶</span>
+          {/* PROMPT */}
+          <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                <p style={{ fontSize:12, color:t.textMuted }}>{T.description}</p>
+                {promptHistory.length > 0 && <button onClick={e => { e.stopPropagation(); setShowPromptHistory(!showPromptHistory) }} style={{ fontSize:10, color:t.textMuted, background:t.bgInput, border:t.border, borderRadius:5, padding:"2px 7px", cursor:"pointer" }}>{T.promptHistory}</button>}
+              </div>
+              <div style={{ display:"flex", gap:5 }}>
+                <button onClick={handlePreviewTimestamps} disabled={loadingTimestamps || videos.length === 0} style={{ fontSize:11, color:t.textSub, background:t.bgInput, border:t.borderMed, borderRadius:6, padding:"4px 9px", cursor:"pointer", opacity:videos.length === 0 ? 0.35 : 1 }}>{loadingTimestamps ? "⏳" : T.preview}</button>
+                <button onClick={() => setShowPromptHelper(true)} style={{ fontSize:11, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.2)", borderRadius:6, padding:"4px 9px", cursor:"pointer" }}>✦ {T.promptHelper}</button>
+              </div>
+            </div>
+            {showPromptHistory && promptHistory.length > 0 && (
+              <div onClick={e => e.stopPropagation()} style={{ background:t.bgModal, border:t.border, borderRadius:8, overflow:"hidden" }}>
+                {promptHistory.map((h, i) => <button key={i} onClick={() => { setPromptText(h); setShowPromptHistory(false) }} style={{ width:"100%", padding:"8px 13px", background:"none", border:"none", borderBottom:i < promptHistory.length-1 ? t.border : "none", color:t.textSub, cursor:"pointer", fontSize:12, textAlign:"left", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{h}</button>)}
+              </div>
+            )}
+            <div style={{ display:"flex", gap:7, alignItems:"flex-end" }}>
+              <textarea value={promptText} onChange={e => setPromptText(e.target.value)} style={{ flex:1, background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"11px 13px", fontSize:13, color:t.text, outline:"none", resize:"none", height:46, lineHeight:"1.5", fontFamily:"sans-serif" }} placeholder="Ex : 1 clip 20s edit foot, cuts sur le beat, dribbles Dybala..."/>
+              <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                <button onClick={handleGenerate} disabled={generating || videos.length === 0} style={{ background:generating ? "rgba(232,245,66,0.35)" : videos.length === 0 ? "rgba(232,245,66,0.15)" : t.accent, color:"#0a0a0a", fontWeight:700, fontSize:13, borderRadius:8, padding:"11px 18px", border:"none", cursor:generating || videos.length === 0 ? "not-allowed" : "pointer", whiteSpace:"nowrap", boxShadow:videos.length > 0 && !generating ? "0 0 22px rgba(232,245,66,0.18)" : "none" }}>
+                  {generating ? T.generating : `✦ ${T.generate}`}
+                </button>
+                <button onClick={addToQueue} disabled={videos.length === 0} style={{ background:"none", border:t.borderMed, borderRadius:8, padding:"5px 10px", fontSize:11, color:t.textSub, cursor:"pointer", opacity:videos.length === 0 ? 0.35 : 1, whiteSpace:"nowrap" }}>{T.addToQueue}</button>
+              </div>
+            </div>
+            <p style={{ fontSize:10, color:t.textHint, textAlign:"right" }}>{T.cmdEnterHint}</p>
+          </div>
+
+          {generating && (
+            <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+              <div style={{ display:"flex", justifyContent:"space-between" }}>
+                <p style={{ fontSize:12, color:t.textSub }}>{progress < 20 ? T.preparingVideos : progress < 40 ? T.analyzingAI : progress < 50 ? T.detectingEffects : T.renderingClips}</p>
+                <p style={{ fontSize:12, color:t.accent, fontWeight:600 }}>{progress}%</p>
+              </div>
+              <div style={{ width:"100%", height:3, background:dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)", borderRadius:4 }}>
+                <div style={{ width:`${progress}%`, height:"100%", background:`linear-gradient(90deg, ${t.accent}, rgba(232,245,66,0.5))`, borderRadius:4, transition:"width 0.5s ease", boxShadow:"0 0 8px rgba(232,245,66,0.35)" }}/>
+              </div>
+            </div>
+          )}
+
+          {hasGenerated && generatedClips.length > 0 && (
+            <>
+              <div style={{ width:"100%", height:1, background:dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)" }}/>
+              <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                  <p style={{ fontSize:11, color:t.textHint, textTransform:"uppercase", letterSpacing:"0.07em" }}>{T.generatedClips} — {generatedClips.length}</p>
+                  {generatedClips.length > 1 && <button onClick={downloadAllClips} style={{ fontSize:11, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.18)", borderRadius:6, padding:"4px 9px", cursor:"pointer" }}>↓ {T.downloadAll}</button>}
+                </div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:10 }}>
+                  {generatedClips.map((clip, i) => (
+                    <div key={i} style={{ background:t.bgCard, border:t.border, borderRadius:11, overflow:"hidden", display:"flex", flexDirection:"column" }}>
+                      <div style={{ aspectRatio:"9/16", background:t.bgThumb, overflow:"hidden" }}>
+                        <video src={clip.base64} style={{ width:"100%", height:"100%", objectFit:"cover" }} controls/>
                       </div>
-                      <span style={{ position: "absolute", top: 8, left: 8, fontSize: 10, color: "#e8f542", background: "rgba(232,245,66,0.12)", border: "1px solid rgba(232,245,66,0.25)", padding: "2px 7px", borderRadius: 4 }}>Clip {clip.id}</span>
-                      <span style={{ position: "absolute", bottom: 6, right: 8, fontSize: 10, color: "rgba(255,255,255,0.4)", background: "rgba(0,0,0,0.5)", padding: "2px 6px", borderRadius: 4 }}>{clip.duration}</span>
+                      <div style={{ padding:"9px 10px 11px", display:"flex", flexDirection:"column", gap:6 }}>
+                        <p style={{ fontSize:12, color:t.text, fontWeight:500 }}>{clip.name}</p>
+                        <a href={clip.base64} download={`climbclip_${i+1}.mp4`} style={{ padding:7, borderRadius:7, fontSize:11, fontWeight:500, border:"1px solid rgba(232,245,66,0.25)", background:"rgba(232,245,66,0.06)", color:t.accent, display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none" }}>↓ {T.download}</a>
+                        <button onClick={() => shareClipPublic(clip)} style={{ padding:7, borderRadius:7, fontSize:11, border:t.border, background:t.bgInput, color:copiedId === clip.name ? "#4ade80" : t.textSub, cursor:"pointer" }}>{copiedId === clip.name ? `✓ ${T.copied}` : T.copyLink}</button>
+                      </div>
                     </div>
-                    <div style={{ padding: "10px 10px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
-                      <p style={{ fontSize: 12, color: t.text, fontWeight: 500 }}>{clip.name}</p>
-                      <p style={{ fontSize: 11, color: t.textMuted }}>{clip.meta}</p>
-                      <button style={{ width: "100%", padding: 8, borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: "pointer", border: "1px solid rgba(232,245,66,0.3)", background: "rgba(232,245,66,0.07)", color: "#e8f542", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
-                        ↓ Télécharger
-                      </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* LIBRARY */}
+      {currentPage === "library" && (
+        <div style={{ width:"100%", maxWidth:800, display:"flex", flexDirection:"column", gap:22, padding:"44px 24px 120px", position:"relative", zIndex:1 }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:9 }}>
+              {folderStack.length > 0 && <button onClick={() => setFolderStack(prev => prev.slice(0,-1))} style={{ background:"none", border:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>← {T.back}</button>}
+              <p style={{ fontSize:16, fontWeight:600, color:t.text }}>{currentFolderData ? currentFolderData.name : T.library}</p>
+            </div>
+            <div style={{ display:"flex", gap:7 }}>
+              {currentFolder && <button onClick={() => { setNewFolderParent(currentFolder); setShowNewFolder(true) }} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"6px 11px", fontSize:11, color:t.textSub, cursor:"pointer" }}>{T.newSubfolder}</button>}
+              <button onClick={() => { setNewFolderParent(null); setShowNewFolder(true) }} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"6px 13px", fontSize:12, color:t.textSub, cursor:"pointer" }}>{T.newFolder}</button>
+            </div>
+          </div>
+
+          {displayedFolders.length > 0 && (
+            <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+              <p style={{ fontSize:10, color:t.textHint, textTransform:"uppercase", letterSpacing:"0.06em" }}>{currentFolder ? T.subfolders : T.folders}</p>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(170px, 1fr))", gap:9 }}>
+                {displayedFolders.map(folder => (
+                  <div key={folder.id} style={{ position:"relative" }}>
+                    <div onClick={() => setFolderStack(prev => [...prev, folder.id])} style={{ background:t.bgCard, border:t.border, borderRadius:9, padding:"13px 15px", cursor:"pointer", display:"flex", alignItems:"center", gap:9 }}>
+                      <div style={{ width:32, height:32, borderRadius:8, background:"rgba(232,245,66,0.05)", border:"1px solid rgba(232,245,66,0.08)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}><span style={{ fontSize:14, opacity:0.6 }}>▣</span></div>
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <p style={{ fontSize:12, color:t.text, fontWeight:500, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{folder.name}</p>
+                        <p style={{ fontSize:10, color:t.textMuted }}>{clips.filter(c => c.folder_id === folder.id).length} clip(s)</p>
+                      </div>
+                      <button onClick={e => { e.stopPropagation(); setFolderMenu(folderMenu === folder.id ? null : folder.id) }} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15 }}>⋯</button>
                     </div>
+                    {folderMenu === folder.id && (
+                      <div onClick={e => e.stopPropagation()} style={{ position:"absolute", right:0, top:"100%", zIndex:50, background:t.bgModal, border:t.border, borderRadius:8, padding:"4px 0", minWidth:130, boxShadow:"0 6px 24px rgba(0,0,0,0.4)" }}>
+                        <button onClick={() => { setShowShareModal(folder.id); setFolderMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.share}</button>
+                        <button onClick={() => deleteFolder(folder.id)} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:"#e8453a", cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.delete}</button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
-          </>
-        )}
-      </div>
+          )}
 
-      {/* MUSIC MODAL */}
-      {showMusic && (
-        <div onClick={() => { setShowMusic(false); audioRef.current?.pause(); setPlayingId(null) }} style={{ position: "fixed", inset: 0, background: t.overlayHeavy, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: t.bgModal, border: t.border, borderRadius: 16, padding: 24, width: 460, maxHeight: "80vh", display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span style={{ fontSize: 14, fontWeight: 500, color: t.text }}>🎵 Choisir une musique</span>
-              <button onClick={() => { setShowMusic(false); audioRef.current?.pause(); setPlayingId(null) }} style={{ background: "none", border: "none", color: t.textMuted, fontSize: 18, cursor: "pointer" }}>✕</button>
-            </div>
-            <input
-              value={searchQuery}
-              onChange={e => handleSearch(e.target.value)}
-              style={{ background: t.bgInput, border: t.borderMed, borderRadius: 8, padding: "10px 14px", fontSize: 13, color: t.text, outline: "none", width: "100%" }}
-              placeholder="Rechercher un artiste, un titre..."
-            />
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              {defaultQueries.map(q => (
-                <button key={q} onClick={() => { setSearchQuery(q); fetchTracks(q) }} style={{ padding: "4px 10px", borderRadius: 20, fontSize: 11, cursor: "pointer", border: t.border, background: t.bgPill, color: t.textMuted }}>
-                  {q}
-                </button>
-              ))}
-            </div>
-            <div style={{ height: 1, background: dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)" }} />
-            <div style={{ overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
-              {loadingTracks ? (
-                <p style={{ fontSize: 13, color: t.textMuted, textAlign: "center", padding: "20px 0" }}>Chargement...</p>
-              ) : tracks.length === 0 ? (
-                <p style={{ fontSize: 13, color: t.textMuted, textAlign: "center", padding: "20px 0" }}>Aucun résultat</p>
-              ) : tracks.map(track => (
-                <div key={track.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 10px", borderRadius: 8, background: selectedMusic?.id === track.id ? "rgba(232,245,66,0.07)" : t.bgInput, border: selectedMusic?.id === track.id ? "1px solid rgba(232,245,66,0.3)" : "1px solid transparent" }}>
-                  <img src={track.album.cover_small} style={{ width: 40, height: 40, borderRadius: 6, flexShrink: 0 }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 13, color: t.text, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{track.title}</p>
-                    <p style={{ fontSize: 11, color: t.textMuted }}>{track.artist.name}</p>
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            <p style={{ fontSize:10, color:t.textHint, textTransform:"uppercase", letterSpacing:"0.06em" }}>{currentFolder ? T.clipsInFolder : T.clipsNoFolder} — {displayedClips.length}</p>
+            {displayedClips.length === 0 ? (
+              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:11, padding:"56px 0" }}>
+                <div style={{ width:50, height:50, borderRadius:13, background:t.bgCard, border:t.border, display:"flex", alignItems:"center", justifyContent:"center" }}><span style={{ fontSize:20, opacity:0.3 }}>▶</span></div>
+                <p style={{ fontSize:13, color:t.textMuted }}>{T.noClips}</p>
+                <button onClick={() => setCurrentPage("home")} style={{ fontSize:12, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.15)", borderRadius:8, padding:"7px 15px", cursor:"pointer" }}>{T.generateFirst}</button>
+              </div>
+            ) : (
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:10 }}>
+                {displayedClips.map(clip => (
+                  <div key={clip.id} style={{ background:t.bgCard, border:t.border, borderRadius:11, overflow:"hidden", display:"flex", flexDirection:"column", position:"relative" }}>
+                    <div style={{ aspectRatio:"9/16", background:t.bgThumb, overflow:"hidden" }}>
+                      {clip.thumbnail ? <img src={clip.thumbnail} style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : <video src={clip.base64} style={{ width:"100%", height:"100%", objectFit:"cover" }} controls/>}
+                    </div>
+                    <div style={{ padding:"9px 10px 11px", display:"flex", flexDirection:"column", gap:6 }}>
+                      {renamingClip === clip.id ? (
+                        <div style={{ display:"flex", gap:4 }}>
+                          <input value={renameValue} onChange={e => setRenameValue(e.target.value)} onKeyDown={e => { if (e.key === "Enter") renameClip(clip.id); if (e.key === "Escape") setRenamingClip(null) }} style={{ flex:1, background:t.bgInput, border:t.borderMed, borderRadius:5, padding:"4px 7px", fontSize:11, color:t.text, outline:"none" }} autoFocus/>
+                          <button onClick={() => renameClip(clip.id)} style={{ background:t.accent, border:"none", borderRadius:5, padding:"4px 7px", fontSize:11, color:"#0a0a0a", cursor:"pointer", fontWeight:700 }}>✓</button>
+                        </div>
+                      ) : (
+                        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                          <p style={{ fontSize:11, color:t.text, fontWeight:500 }}>{clip.name}</p>
+                          <button onClick={e => { e.stopPropagation(); setClipMenu(clipMenu === clip.id ? null : clip.id) }} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15 }}>⋯</button>
+                        </div>
+                      )}
+                      {clipMenu === clip.id && (
+                        <div onClick={e => e.stopPropagation()} style={{ position:"absolute", right:7, bottom:46, zIndex:50, background:t.bgModal, border:t.border, borderRadius:8, padding:"4px 0", minWidth:130, boxShadow:"0 6px 24px rgba(0,0,0,0.4)" }}>
+                          <button onClick={() => { setRenamingClip(clip.id); setRenameValue(clip.name); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.rename}</button>
+                          <a href={clip.base64} download={`${clip.name}.mp4`} style={{ display:"block", padding:"7px 13px", color:t.text, fontSize:12, textDecoration:"none" }}>{T.download}</a>
+                          <button onClick={() => { setShowMoveModal(clip.id); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.move}</button>
+                          <button onClick={() => shareClipPublic(clip)} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.textSub, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.copyLink}</button>
+                          <button onClick={() => deleteClip(clip.id)} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:"#e8453a", cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.delete}</button>
+                        </div>
+                      )}
+                      <a href={clip.base64} download={`${clip.name}.mp4`} style={{ padding:7, borderRadius:7, fontSize:11, fontWeight:500, border:"1px solid rgba(232,245,66,0.22)", background:"rgba(232,245,66,0.05)", color:t.accent, display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none" }}>↓ {T.download}</a>
+                    </div>
                   </div>
-                  <button onClick={() => togglePlay(track)} style={{ width: 32, height: 32, borderRadius: "50%", border: t.border, background: t.bgInput, color: t.textSub, cursor: "pointer", fontSize: 12, flexShrink: 0 }}>
-                    {playingId === track.id ? "⏸" : "▶"}
-                  </button>
-                  <button onClick={() => selectTrack(track)} style={{ padding: "5px 12px", borderRadius: 6, fontSize: 11, fontWeight: 500, cursor: "pointer", border: "1px solid rgba(232,245,66,0.3)", background: "rgba(232,245,66,0.07)", color: "#e8f542", flexShrink: 0 }}>
-                    Choisir
-                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* STATUS BAR */}
+      {lastGeneratedClip && (
+        <div style={{ position:"fixed", bottom:0, left:0, right:0, background:dark ? "rgba(11,11,11,0.96)" : "rgba(229,229,224,0.96)", borderTop:t.border, backdropFilter:"blur(14px)", padding:"9px 28px", display:"flex", alignItems:"center", gap:11, zIndex:40 }}>
+          {lastGeneratedClip.thumbnail && <img src={lastGeneratedClip.thumbnail} style={{ width:34, height:22, borderRadius:4, objectFit:"cover" }}/>}
+          <div style={{ flex:1 }}>
+            <p style={{ fontSize:10, color:t.textMuted }}>{T.lastGenerated}</p>
+            <p style={{ fontSize:12, color:t.text, fontWeight:500 }}>{lastGeneratedClip.name}</p>
+          </div>
+          <a href={lastGeneratedClip.base64} download={`${lastGeneratedClip.name}.mp4`} style={{ fontSize:11, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.18)", borderRadius:7, padding:"5px 11px", textDecoration:"none" }}>↓ {T.download}</a>
+          <button onClick={() => setLastGeneratedClip(null)} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15 }}>✕</button>
+        </div>
+      )}
+
+      {/* MODALES */}
+
+      {showStats && (
+        <div onClick={() => setShowStats(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:300 }}>
+            <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>📊 {T.stats}</span><button onClick={() => setShowStats(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
+            {[[T.totalClips, generatedClips.length + clips.length],[T.clipsInLib, clips.length],[T.queue, queue.length]].map(([label, val]) => (
+              <div key={String(label)} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 0", borderBottom:t.border }}>
+                <span style={{ fontSize:13, color:t.textSub }}>{label}</span>
+                <span style={{ fontSize:20, fontWeight:700, color:t.accent }}>{val}</span>
+              </div>
+            ))}
+            <button onClick={() => setShowStats(false)} style={{ padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.close}</button>
+          </div>
+        </div>
+      )}
+
+      {showPresets && (
+        <div onClick={() => setShowPresets(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:360, maxHeight:"75vh", overflowY:"auto" }}>
+            <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>⚡ {T.presets}</span><button onClick={() => setShowPresets(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
+            {presets.length === 0 ? <p style={{ fontSize:13, color:t.textMuted, textAlign:"center", padding:"20px 0" }}>—</p> : presets.map(p => (
+              <div key={p.id} style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 12px", background:t.bgInput, border:t.border, borderRadius:9 }}>
+                <div style={{ flex:1 }}>
+                  <p style={{ fontSize:13, color:t.text, fontWeight:500 }}>{p.name}</p>
+                  <p style={{ fontSize:10, color:t.textMuted }}>{p.format} · {CGL[p.colorGrade]} · {TRL[p.transition]} · {p.exportQuality}</p>
                 </div>
-              ))}
+                <button onClick={() => loadPreset(p)} style={{ padding:"4px 10px", borderRadius:6, fontSize:11, border:"1px solid rgba(232,245,66,0.28)", background:"rgba(232,245,66,0.06)", color:t.accent, cursor:"pointer" }}>{T.use}</button>
+                <button onClick={() => deletePreset(p.id)} style={{ padding:"4px 8px", borderRadius:6, fontSize:11, border:"none", background:"none", color:"#e8453a", cursor:"pointer" }}>✕</button>
+              </div>
+            ))}
+            <button onClick={() => setShowPresets(false)} style={{ padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.close}</button>
+          </div>
+        </div>
+      )}
+
+      {showSavePreset && (
+        <div onClick={() => setShowSavePreset(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:310 }}>
+            <p style={{ fontSize:14, fontWeight:600, color:t.text }}>+ {T.savePreset}</p>
+            <input value={presetName} onChange={e => setPresetName(e.target.value)} onKeyDown={e => e.key === "Enter" && savePreset()} style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"9px 13px", fontSize:13, color:t.text, outline:"none" }} placeholder={T.presetName} autoFocus/>
+            <p style={{ fontSize:11, color:t.textMuted }}>{selectedFormat} · {CGL[colorGrade]} · {TRL[transition]} · {exportQuality} · {exportCodec}</p>
+            <div style={{ display:"flex", gap:7 }}>
+              <button onClick={() => setShowSavePreset(false)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.cancel}</button>
+              <button onClick={savePreset} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:700 }}>{T.savePreset}</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* SETTINGS PANEL */}
-      {showSettings && (
-        <div onClick={() => setShowSettings(false)} style={{ position: "fixed", inset: 0, background: t.overlay, zIndex: 100, display: "flex" }}>
-          <div onClick={e => e.stopPropagation()} style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 280, background: t.bgPanel, borderLeft: t.border, padding: "22px 18px", display: "flex", flexDirection: "column", gap: 20, overflowY: "auto" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Paramètres</span>
-              <button onClick={() => setShowSettings(false)} style={{ background: "none", border: "none", color: t.textMuted, fontSize: 18, cursor: "pointer" }}>✕</button>
+      {showQueue && (
+        <div onClick={() => setShowQueue(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:420, maxHeight:"75vh", overflowY:"auto" }}>
+            <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>⏱ {T.queue}</span><button onClick={() => setShowQueue(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
+            {queue.length === 0 ? <p style={{ fontSize:13, color:t.textMuted, textAlign:"center", padding:"20px 0" }}>{T.queueEmpty}</p> : queue.map((item, i) => (
+              <div key={item.id} style={{ display:"flex", alignItems:"center", gap:9, padding:"10px 12px", background:t.bgInput, border:item.status === "processing" ? "1px solid rgba(232,245,66,0.3)" : t.border, borderRadius:9 }}>
+                <div style={{ width:26, height:26, borderRadius:"50%", background:item.status === "done" ? "rgba(74,222,128,0.15)" : item.status === "error" ? "rgba(232,69,58,0.12)" : item.status === "processing" ? "rgba(232,245,66,0.1)" : t.bgThumb, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, color:t.text, flexShrink:0 }}>
+                  {item.status === "done" ? "✓" : item.status === "error" ? "✕" : item.status === "processing" ? "⚙" : i+1}
+                </div>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <p style={{ fontSize:12, color:t.text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{item.prompt || `Job ${i+1}`}</p>
+                  <p style={{ fontSize:10, color:t.textMuted }}>{item.videos.length} vidéo(s)</p>
+                </div>
+                {item.status === "pending" && <button onClick={() => setQueue(prev => prev.filter(q => q.id !== item.id))} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:14 }}>✕</button>}
+              </div>
+            ))}
+            <div style={{ display:"flex", gap:7 }}>
+              <button onClick={() => setShowQueue(false)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.close}</button>
+              {queue.some(q => q.status === "pending") && (
+                <button onClick={() => { setShowQueue(false); runQueue() }} disabled={queueRunning} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:700, opacity:queueRunning ? 0.6 : 1 }}>▶ {T.runQueue}</button>
+              )}
             </div>
-            <div style={{ height: 1, background: dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)" }} />
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <p style={{ fontSize: 10, color: t.textHint, textTransform: "uppercase", letterSpacing: "0.06em" }}>Apparence</p>
-              <div style={{ display: "flex", gap: 6 }}>
-                <button onClick={() => setDark(false)} style={{ flex: 1, padding: 8, border: !dark ? "1px solid #e8f542" : t.border, borderRadius: 8, background: !dark ? "rgba(232,245,66,0.07)" : "none", color: !dark ? "#e8f542" : t.textMuted, fontSize: 12, cursor: "pointer" }}>☀ Clair</button>
-                <button onClick={() => setDark(true)} style={{ flex: 1, padding: 8, border: dark ? "1px solid #e8f542" : t.border, borderRadius: 8, background: dark ? "rgba(232,245,66,0.07)" : "none", color: dark ? "#e8f542" : t.textMuted, fontSize: 12, cursor: "pointer" }}>☾ Sombre</button>
+          </div>
+        </div>
+      )}
+
+      {showTimestampPreview && (
+        <div onClick={() => setShowTimestampPreview(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:460, maxHeight:"80vh", overflowY:"auto" }}>
+            <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>{T.timestampPreview}</span><button onClick={() => setShowTimestampPreview(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
+            <p style={{ fontSize:12, color:t.textMuted }}>{T.timestampDesc}</p>
+            {timestampPreviews.map((ts, i) => (
+              <div key={i} style={{ background:t.bgInput, border:t.border, borderRadius:9, padding:"11px 13px" }}>
+                <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:13, color:t.text, fontWeight:500 }}>{ts.name}</span><span style={{ fontSize:11, color:t.accent }}>{ts.start}s → {ts.start + ts.duration}s</span></div>
+                {ts.description && <p style={{ fontSize:11, color:t.textMuted, marginTop:3 }}>{ts.description}</p>}
+              </div>
+            ))}
+            <div style={{ display:"flex", gap:7 }}>
+              <button onClick={() => setShowTimestampPreview(false)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.cancel}</button>
+              <button onClick={() => { setCustomTimestamps(timestampPreviews); setShowTimestampPreview(false) }} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:600 }}>{T.useTimestamps}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCapsulesModal && (
+        <div onClick={() => { setShowCapsulesModal(false); setCapsulesType(null) }} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:370 }}>
+            <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>{T.capsuleTitle}</span><button onClick={() => { setShowCapsulesModal(false); setCapsulesType(null) }} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
+            <div style={{ display:"flex", gap:7 }}>
+              {(["courte","longue"] as const).map(type => (
+                <button key={type} onClick={() => setCapsulesType(type)} style={{ flex:1, padding:"13px 9px", borderRadius:9, border:capsulesType === type ? `1px solid rgba(232,245,66,0.5)` : t.borderMed, background:capsulesType === type ? "rgba(232,245,66,0.07)" : t.bgInput, color:capsulesType === type ? t.accent : t.textSub, cursor:"pointer", fontSize:12, textAlign:"center" }}>
+                  {type === "courte" ? T.shortVideo : T.longVideo}<br/><span style={{ fontSize:10, opacity:0.65 }}>{type === "courte" ? T.shortSub : T.longSub}</span>
+                </button>
+              ))}
+            </div>
+            <div>
+              <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}><p style={{ fontSize:12, color:t.textMuted }}>{T.capsuleCount}</p><span style={{ fontSize:15, fontWeight:700, color:t.accent }}>{capsulesCount}</span></div>
+              <div style={{ display:"flex", alignItems:"center", gap:9 }}>
+                <button onClick={() => setCapsulesCount(Math.max(1, capsulesCount-1))} style={{ width:30, height:30, borderRadius:7, border:t.borderMed, background:t.bgInput, color:t.text, cursor:"pointer", fontSize:15 }}>−</button>
+                <input type="range" min={1} max={10} value={capsulesCount} onChange={e => setCapsulesCount(Number(e.target.value))} style={{ flex:1, accentColor:t.accent }}/>
+                <button onClick={() => setCapsulesCount(Math.min(10, capsulesCount+1))} style={{ width:30, height:30, borderRadius:7, border:t.borderMed, background:t.bgInput, color:t.text, cursor:"pointer", fontSize:15 }}>+</button>
               </div>
             </div>
-            <div style={{ height: 1, background: dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)" }} />
-            <button onClick={() => { setShowSettings(false); setShowReport(true) }} style={{ background: "none", border: "1px solid #e8453a", borderRadius: 8, padding: 10, fontSize: 13, fontWeight: 500, color: "#e8453a", cursor: "pointer", width: "100%" }}>
-              ⚠ Signaler un problème
-            </button>
+            <div style={{ display:"flex", gap:7 }}>
+              <button onClick={() => { setShowCapsulesModal(false); setCapsulesType(null) }} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.cancel}</button>
+              <button onClick={applyCapsules} disabled={!capsulesType} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:capsulesType ? t.accent : t.bgInput, color:capsulesType ? "#0a0a0a" : t.textMuted, cursor:capsulesType ? "pointer" : "not-allowed", fontSize:13, fontWeight:600 }}>{T.apply}</button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* REPORT MODAL */}
+      {showPromptHelper && (
+        <div onClick={() => setShowPromptHelper(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:450 }}>
+            <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>✦ {T.promptHelper}</span><button onClick={() => setShowPromptHelper(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
+            <textarea value={helperInput} onChange={e => setHelperInput(e.target.value)} style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"11px 13px", fontSize:13, color:t.text, outline:"none", resize:"none", height:76, fontFamily:"sans-serif", width:"100%" }} placeholder="Edit de Dybala, style TikTok foot, musique phonk..."/>
+            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+              <input type="file" accept="video/*" id="helperRefInput" style={{ display:"none" }} onChange={e => setHelperRefVideo(e.target.files?.[0] || null)}/>
+              <button onClick={() => document.getElementById("helperRefInput")?.click()} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"6px 11px", fontSize:11, color:t.textSub, cursor:"pointer" }}>{helperRefVideo ? `✓ ${helperRefVideo.name.slice(0,16)}...` : T.addRefVideo}</button>
+              {helperRefVideo && <button onClick={() => setHelperRefVideo(null)} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer" }}>✕</button>}
+              <span style={{ fontSize:10, color:t.textHint }}>({T.optional})</span>
+            </div>
+            {helperResult && (
+              <div style={{ background:"rgba(232,245,66,0.03)", border:"1px solid rgba(232,245,66,0.15)", borderRadius:8, padding:"11px 13px" }}>
+                <p style={{ fontSize:10, color:t.accent, marginBottom:5, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.06em" }}>{T.promptGenerated}</p>
+                <p style={{ fontSize:13, color:t.text, lineHeight:1.55 }}>{helperResult}</p>
+              </div>
+            )}
+            <div style={{ display:"flex", gap:7 }}>
+              <button onClick={() => setShowPromptHelper(false)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.close}</button>
+              {helperResult && <button onClick={() => { setPromptText(helperResult); setShowPromptHelper(false) }} style={{ flex:1, padding:9, borderRadius:8, border:"1px solid rgba(232,245,66,0.28)", background:"rgba(232,245,66,0.06)", color:t.accent, cursor:"pointer", fontSize:13, fontWeight:500 }}>{T.use}</button>}
+              <button onClick={handlePromptHelper} disabled={helperLoading} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:helperLoading ? "rgba(232,245,66,0.35)" : t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:700 }}>{helperLoading ? "⏳" : `✦ ${T.generate}`}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showNewFolder && (
+        <div onClick={() => setShowNewFolder(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:310 }}>
+            <p style={{ fontSize:14, fontWeight:600, color:t.text }}>{newFolderParent ? T.newSubfolder : T.newFolder}</p>
+            <input value={newFolderName} onChange={e => setNewFolderName(e.target.value)} onKeyDown={e => e.key === "Enter" && createFolder()} style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"9px 13px", fontSize:13, color:t.text, outline:"none" }} placeholder={T.newFolderName} autoFocus/>
+            <div style={{ display:"flex", gap:7 }}>
+              <button onClick={() => setShowNewFolder(false)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.cancel}</button>
+              <button onClick={createFolder} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:700 }}>{T.create}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showMoveModal && (
+        <div onClick={() => setShowMoveModal(null)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:310 }}>
+            <p style={{ fontSize:14, fontWeight:600, color:t.text }}>{T.move}...</p>
+            <button onClick={() => moveClip(showMoveModal, null)} style={{ padding:"9px 13px", borderRadius:8, border:t.border, background:t.bgInput, color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>▣ {T.clipsNoFolder}</button>
+            {folders.map(f => <button key={f.id} onClick={() => moveClip(showMoveModal, f.id)} style={{ padding:"9px 13px", borderRadius:8, border:t.border, background:t.bgInput, color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>▣ {f.name}</button>)}
+            <button onClick={() => setShowMoveModal(null)} style={{ padding:8, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.cancel}</button>
+          </div>
+        </div>
+      )}
+
+      {showShareModal && (
+        <div onClick={() => setShowShareModal(null)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:310 }}>
+            <p style={{ fontSize:14, fontWeight:600, color:t.text }}>{T.shareFolder}</p>
+            <p style={{ fontSize:11, color:t.textMuted }}>{T.sharedWith} : {folders.find(f => f.id === showShareModal)?.shared_with?.join(", ") || "—"}</p>
+            <input value={shareEmail} onChange={e => setShareEmail(e.target.value)} style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"9px 13px", fontSize:13, color:t.text, outline:"none" }} placeholder={T.emailMember}/>
+            <div style={{ display:"flex", gap:7 }}>
+              <button onClick={() => setShowShareModal(null)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.cancel}</button>
+              <button onClick={() => shareFolder(showShareModal)} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:700 }}>{T.share}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCompressModal && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", zIndex:300, display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <div style={{ ...modalBase, width:330 }}>
+            <p style={{ fontSize:15, fontWeight:600, color:t.text }}>{T.compressTitle}</p>
+            <p style={{ fontSize:13, color:t.textMuted }}>{T.compressMsg}</p>
+            <div style={{ display:"flex", gap:7 }}>
+              <button onClick={() => setShowCompressModal(false)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.no}</button>
+              <button onClick={compressAndUpload} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:700 }}>{T.yesCompress}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showMusic && (
+        <div onClick={closeMusic} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:450, maxHeight:"80vh" }}>
+            <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>{T.chooseMusic}</span><button onClick={closeMusic} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
+            <input value={searchQuery} onChange={e => handleSearch(e.target.value)} style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"9px 13px", fontSize:13, color:t.text, outline:"none" }} placeholder={T.searchMusic}/>
+            <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>{defaultQueries.map(q => <button key={q} onClick={() => { setSearchQuery(q); fetchTracks(q) }} style={{ padding:"3px 9px", borderRadius:20, fontSize:11, cursor:"pointer", border:t.border, background:t.bgPill, color:t.textMuted }}>{q}</button>)}</div>
+            <div style={{ overflowY:"auto", display:"flex", flexDirection:"column", gap:5 }}>
+              {loadingTracks ? <p style={{ fontSize:13, color:t.textMuted, textAlign:"center", padding:"18px 0" }}>...</p>
+                : tracks.length === 0 ? <p style={{ fontSize:13, color:t.textMuted, textAlign:"center", padding:"18px 0" }}>Aucun résultat</p>
+                : tracks.map(track => (
+                  <div key={track.id} style={{ display:"flex", alignItems:"center", gap:11, padding:"7px 9px", borderRadius:8, background:selectedMusic?.id === track.id ? "rgba(232,245,66,0.06)" : t.bgInput, border:selectedMusic?.id === track.id ? "1px solid rgba(232,245,66,0.28)" : "1px solid transparent" }}>
+                    <img src={track.album.cover_small} style={{ width:38, height:38, borderRadius:5, flexShrink:0 }}/>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <p style={{ fontSize:12, color:t.text, fontWeight:500, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{track.title}</p>
+                      <p style={{ fontSize:10, color:t.textMuted }}>{track.artist.name}</p>
+                    </div>
+                    <button onClick={() => togglePlay(track)} style={{ width:30, height:30, borderRadius:"50%", border:t.border, background:t.bgInput, color:t.textSub, cursor:"pointer", fontSize:11, flexShrink:0 }}>{playingId === track.id ? "⏸" : "▶"}</button>
+                    <button onClick={() => selectTrack(track)} style={{ padding:"4px 10px", borderRadius:5, fontSize:11, fontWeight:600, cursor:"pointer", border:"1px solid rgba(232,245,66,0.28)", background:"rgba(232,245,66,0.06)", color:t.accent, flexShrink:0 }}>OK</button>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSettings && (
+        <div onClick={() => setShowSettings(false)} style={{ position:"fixed", inset:0, background:t.overlay, zIndex:100, display:"flex" }}>
+          <div onClick={e => e.stopPropagation()} style={{ position:"absolute", right:0, top:0, bottom:0, width:270, background:dark ? "rgba(11,11,11,0.98)" : t.bgPanel, borderLeft:t.border, padding:"20px 17px", display:"flex", flexDirection:"column", gap:18, overflowY:"auto", backdropFilter:"blur(16px)" }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>{T.settings}</span><button onClick={() => setShowSettings(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
+            <div style={{ height:1, background:dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)" }}/>
+            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+              <p style={{ fontSize:9, color:t.textHint, textTransform:"uppercase", letterSpacing:"0.08em" }}>Apparence</p>
+              <div style={{ display:"flex", gap:6 }}>
+                <button onClick={() => setDark(false)} style={{ flex:1, padding:7, border:!dark ? `1px solid ${t.accent}` : t.border, borderRadius:7, background:!dark ? "rgba(232,245,66,0.07)" : "none", color:!dark ? t.accent : t.textMuted, fontSize:11, cursor:"pointer" }}>☀ Clair</button>
+                <button onClick={() => setDark(true)} style={{ flex:1, padding:7, border:dark ? `1px solid ${t.accent}` : t.border, borderRadius:7, background:dark ? "rgba(232,245,66,0.07)" : "none", color:dark ? t.accent : t.textMuted, fontSize:11, cursor:"pointer" }}>☾ Sombre</button>
+              </div>
+            </div>
+            {user?.email === "nolanrochette26@gmail.com" && (
+              <>
+                <div style={{ height:1, background:dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)" }}/>
+                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                  <p style={{ fontSize:9, color:t.textHint, textTransform:"uppercase", letterSpacing:"0.08em" }}>{T.addMember}</p>
+                  <input value={newMemberEmail} onChange={e => setNewMemberEmail(e.target.value)} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"8px 11px", fontSize:12, color:t.text, outline:"none" }} placeholder="Email" type="email"/>
+                  <input value={newMemberPassword} onChange={e => setNewMemberPassword(e.target.value)} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"8px 11px", fontSize:12, color:t.text, outline:"none" }} placeholder="Password" type="password"/>
+                  {memberSuccess && <p style={{ fontSize:11, color:t.accent, textAlign:"center" }}>{memberSuccess}</p>}
+                  <button onClick={async () => { if (!newMemberEmail || !newMemberPassword) return; setAddingMember(true); setMemberSuccess(null); const { error } = await supabase.auth.signUp({ email:newMemberEmail, password:newMemberPassword }); if (error) alert(error.message); else { await supabase.from("allowed_users").insert({ email:newMemberEmail }); setMemberSuccess(`✓ ${newMemberEmail}`); setNewMemberEmail(""); setNewMemberPassword("") }; setAddingMember(false) }} disabled={addingMember} style={{ background:t.accent, border:"none", borderRadius:7, padding:9, fontSize:12, fontWeight:700, color:"#0a0a0a", cursor:"pointer", opacity:addingMember ? 0.6 : 1 }}>{addingMember ? T.creating : T.createAccount}</button>
+                </div>
+              </>
+            )}
+            <div style={{ height:1, background:dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)" }}/>
+            <button onClick={() => { setShowSettings(false); setShowReport(true) }} style={{ background:"none", border:"1px solid rgba(232,69,58,0.25)", borderRadius:8, padding:9, fontSize:12, fontWeight:500, color:"#e8453a", cursor:"pointer" }}>⚠ {T.reportProblem}</button>
+          </div>
+        </div>
+      )}
+
       {showReport && (
-        <div onClick={() => setShowReport(false)} style={{ position: "fixed", inset: 0, background: t.overlayHeavy, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: t.bgModal, border: t.border, borderRadius: 16, padding: 24, width: 340, display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span style={{ fontSize: 14, fontWeight: 500, color: t.text }}>⚠ Signaler un problème</span>
-              <button onClick={() => setShowReport(false)} style={{ background: "none", border: "none", color: t.textMuted, fontSize: 18, cursor: "pointer" }}>✕</button>
-            </div>
-            <div style={{ height: 1, background: dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)" }} />
-            <p style={{ fontSize: 11, color: t.textMuted, textTransform: "uppercase", letterSpacing: "0.05em" }}>Problèmes fréquents</p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {problems.map(p => (
-                <button key={p} onClick={() => toggleProblem(p)} style={{ padding: "6px 12px", borderRadius: 20, fontSize: 12, cursor: "pointer", border: selectedProblems.includes(p) ? "1px solid rgba(232,69,58,0.4)" : t.border, background: selectedProblems.includes(p) ? "rgba(232,69,58,0.07)" : t.bgPill, color: selectedProblems.includes(p) ? "#e8453a" : t.textSub }}>
-                  {p}
-                </button>
-              ))}
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <p style={{ fontSize: 12, color: t.textMuted }}>Décrivez votre problème <span style={{ fontSize: 10, color: t.textHint }}>optionnel</span></p>
-              <textarea style={{ background: t.bgInput, border: t.border, borderRadius: 8, padding: "10px 12px", fontSize: 13, color: t.text, outline: "none", resize: "none", height: 80, fontFamily: "sans-serif", width: "100%" }} placeholder="Donnez plus de détails si vous le souhaitez..." />
-            </div>
-            <button style={{ background: t.bgInput, border: t.borderMed, borderRadius: 8, padding: 10, fontSize: 13, fontWeight: 500, color: t.textSub, cursor: "pointer", width: "100%" }}>
-              Envoyer le signalement
-            </button>
+        <div onClick={() => setShowReport(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:330 }}>
+            <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>⚠ {T.reportProblem}</span><button onClick={() => setShowReport(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
+            <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>{problems.map(p => <button key={p} onClick={() => toggleProblem(p)} style={{ padding:"5px 11px", borderRadius:20, fontSize:11, cursor:"pointer", border:selectedProblems.includes(p) ? "1px solid rgba(232,69,58,0.4)" : t.border, background:selectedProblems.includes(p) ? "rgba(232,69,58,0.06)" : t.bgPill, color:selectedProblems.includes(p) ? "#e8453a" : t.textSub }}>{p}</button>)}</div>
+            <textarea style={{ background:t.bgInput, border:t.border, borderRadius:8, padding:"9px 11px", fontSize:12, color:t.text, outline:"none", resize:"none", height:70, fontFamily:"sans-serif", width:"100%" }} placeholder="Détails..."/>
+            <button style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:9, fontSize:12, fontWeight:500, color:t.textSub, cursor:"pointer" }}>{T.send}</button>
           </div>
         </div>
       )}
