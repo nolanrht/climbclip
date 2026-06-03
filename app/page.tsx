@@ -23,7 +23,6 @@ const CG_LABELS: Record<Lang, Record<string, string>> = {
   IT: { none:"Nessuno", cinematic:"Cinematografico", orange_teal:"Arancione Teal", bw:"Bianco e Nero", vibrant:"Vibrante", moody:"Cupo", warm:"Caldo", cold:"Freddo" },
   DE: { none:"Keiner", cinematic:"Cinematisch", orange_teal:"Orange Teal", bw:"Schwarz-Weiß", vibrant:"Lebendig", moody:"Düster", warm:"Warm", cold:"Kalt" },
 }
-
 const TR_LABELS: Record<Lang, Record<string, string>> = {
   EN: { none:"None", fade:"Fade", flash:"Flash", glitch:"Glitch", zoom_in:"Zoom In" },
   FR: { none:"Aucune", fade:"Fondu", flash:"Flash", glitch:"Glitch", zoom_in:"Zoom avant" },
@@ -33,11 +32,19 @@ const TR_LABELS: Record<Lang, Record<string, string>> = {
 }
 
 const TRANSLATIONS: Record<Lang, Record<string, string>> = {
-  EN: { home:"Home",library:"Library",settings:"Settings",logout:"Logout",videos:"Videos",addFile:"+ Add file",dragVideo:"Drop a video or click to import",dragSub:"TikTok, Instagram, local file • max 50MB",addAnother:"Add another video",pasteLink:"Paste a TikTok / Instagram link...",import:"Import",outputFormat:"Output format",beatSync:"Beat sync",subtitles:"Subtitles",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsules",introOutro:"Intro / Outro",addMusic:"Add music",zoomIntensity:"Zoom intensity",speedIntensity:"Speed ramp intensity",description:"Description",promptHistory:"History",preview:"Preview",promptHelper:"Prompt help",generating:"Generating...",generate:"Generate",preparingVideos:"Preparing videos...",analyzingAI:"AI analysis...",detectingEffects:"Detecting effects...",renderingClips:"Rendering clips...",generatedClips:"Generated clips",downloadAll:"Download all",download:"Download",serverStarting:"Server starting — may take 30-50s...",check:"Check",newFolder:"+ New folder",folders:"Folders",clipsInFolder:"Clips in this folder",clipsNoFolder:"Clips without folder",noClips:"No clips here",generateFirst:"Generate your first clip",back:"Back",rename:"Rename",move:"Move",delete:"Delete",shareFolder:"Share folder",sharedWith:"Shared with",cancel:"Cancel",create:"Create",apply:"Apply",close:"Close",use:"Use",newFolderName:"Folder name...",emailMember:"Member email...",addMember:"Add a member",createAccount:"Create account",creating:"Creating...",reportProblem:"Report a problem",send:"Send",compressTitle:"File too large",compressMsg:"Compress automatically?",no:"No",yesCompress:"Yes, compress",compressing:"Compressing...",chooseMusic:"Choose music",searchMusic:"Search artist, title...",timestampPreview:"Timestamp preview",timestampDesc:"Moments the AI will cut.",useTimestamps:"Use these timestamps",capsuleTitle:"Capsules",shortVideo:"Short video",shortSub:"sequential clips",longVideo:"Long video",longSub:"best moments",capsuleCount:"Number of capsules",promptGenerated:"Generated prompt:",refVideo:"Reference video",optional:"optional",addRefVideo:"+ Add reference video",lastGenerated:"Last generated",serverActive:"Server active",cmdEnterHint:"Cmd+Enter to generate",subfolders:"Subfolders",newSubfolder:"+ Subfolder",share:"Share",colorGrade:"Color grade",transition:"Transition",textOverlay:"Text overlay",stabilize:"Stabilize",vocalVolume:"Vocal volume",none:"None",exportQuality:"Export quality",exportCodec:"Codec",watermark:"Watermark",presets:"Presets",savePreset:"Save preset",presetName:"Preset name...",stats:"Stats",totalClips:"Total clips",clipsInLib:"In library",queue:"Queue",addToQueue:"+ Queue",runQueue:"Run queue",queueEmpty:"Queue is empty",copyLink:"Copy link",copied:"Copied!" },
-  FR: { home:"Accueil",library:"Bibliothèque",settings:"Paramètres",logout:"Déconnexion",videos:"Vidéos",addFile:"+ Ajouter",dragVideo:"Glisse une vidéo ou clique",dragSub:"TikTok, Instagram, fichier local • max 50MB",addAnother:"Ajouter une autre vidéo",pasteLink:"Coller un lien TikTok / Instagram...",import:"Importer",outputFormat:"Format de sortie",beatSync:"Beat sync",subtitles:"Sous-titres",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsules",introOutro:"Intro / Outro",addMusic:"Ajouter musique",zoomIntensity:"Intensité zoom",speedIntensity:"Intensité speed ramp",description:"Description",promptHistory:"Historique",preview:"Aperçu",promptHelper:"Aide prompt",generating:"Génération...",generate:"Générer",preparingVideos:"Préparation des vidéos...",analyzingAI:"Analyse IA...",detectingEffects:"Détection des effets...",renderingClips:"Rendu des clips...",generatedClips:"Clips générés",downloadAll:"Tout télécharger",download:"Télécharger",serverStarting:"Serveur en démarrage — 30-50 secondes...",check:"Vérifier",newFolder:"+ Créer un dossier",folders:"Dossiers",clipsInFolder:"Clips dans ce dossier",clipsNoFolder:"Clips sans dossier",noClips:"Aucun clip ici",generateFirst:"Générer un premier clip",back:"Retour",rename:"Renommer",move:"Déplacer",delete:"Supprimer",shareFolder:"Partager le dossier",sharedWith:"Partagé avec",cancel:"Annuler",create:"Créer",apply:"Appliquer",close:"Fermer",use:"Utiliser",newFolderName:"Nom du dossier...",emailMember:"Email du membre...",addMember:"Ajouter un membre",createAccount:"Créer le compte",creating:"Création...",reportProblem:"Signaler un problème",send:"Envoyer",compressTitle:"Vidéo trop lourde",compressMsg:"Compresser automatiquement ?",no:"Non",yesCompress:"Oui, compresser",compressing:"Compression...",chooseMusic:"Choisir une musique",searchMusic:"Rechercher un artiste, un titre...",timestampPreview:"Aperçu des timestamps",timestampDesc:"Moments que l'IA va découper.",useTimestamps:"Utiliser ces timestamps",capsuleTitle:"Capsules",shortVideo:"Vidéo courte",shortSub:"clips qui se suivent",longVideo:"Vidéo longue",longSub:"meilleurs moments",capsuleCount:"Nombre de capsules",promptGenerated:"Prompt généré :",refVideo:"Vidéo de référence",optional:"optionnel",addRefVideo:"+ Ajouter une vidéo",lastGenerated:"Dernier clip généré",serverActive:"Serveur actif",cmdEnterHint:"Cmd+Entrée pour générer",subfolders:"Sous-dossiers",newSubfolder:"+ Sous-dossier",share:"Partager",colorGrade:"Color grade",transition:"Transition",textOverlay:"Texte overlay",stabilize:"Stabiliser",vocalVolume:"Volume voix",none:"Aucun",exportQuality:"Qualité export",exportCodec:"Codec",watermark:"Watermark",presets:"Presets",savePreset:"Sauvegarder",presetName:"Nom du preset...",stats:"Stats",totalClips:"Clips générés",clipsInLib:"En bibliothèque",queue:"File d'attente",addToQueue:"+ File",runQueue:"Lancer la file",queueEmpty:"File vide",copyLink:"Copier le lien",copied:"Copié !" },
-  ES: { home:"Inicio",library:"Biblioteca",settings:"Ajustes",logout:"Salir",videos:"Vídeos",addFile:"+ Añadir",dragVideo:"Arrastra un vídeo o haz clic",dragSub:"TikTok, Instagram • máx 50MB",addAnother:"Añadir otro vídeo",pasteLink:"Pegar enlace TikTok / Instagram...",import:"Importar",outputFormat:"Formato",beatSync:"Beat sync",subtitles:"Subtítulos",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Cápsulas",introOutro:"Intro / Outro",addMusic:"Añadir música",zoomIntensity:"Intensidad zoom",speedIntensity:"Intensidad speed",description:"Descripción",promptHistory:"Historial",preview:"Vista previa",promptHelper:"Ayuda prompt",generating:"Generando...",generate:"Generar",preparingVideos:"Preparando...",analyzingAI:"Analizando IA...",detectingEffects:"Detectando efectos...",renderingClips:"Renderizando...",generatedClips:"Clips generados",downloadAll:"Descargar todo",download:"Descargar",serverStarting:"Servidor iniciando...",check:"Verificar",newFolder:"+ Nueva carpeta",folders:"Carpetas",clipsInFolder:"Clips en carpeta",clipsNoFolder:"Clips sin carpeta",noClips:"Sin clips",generateFirst:"Generar primer clip",back:"Volver",rename:"Renombrar",move:"Mover",delete:"Eliminar",shareFolder:"Compartir",sharedWith:"Compartido con",cancel:"Cancelar",create:"Crear",apply:"Aplicar",close:"Cerrar",use:"Usar",newFolderName:"Nombre...",emailMember:"Email miembro...",addMember:"Añadir miembro",createAccount:"Crear cuenta",creating:"Creando...",reportProblem:"Reportar problema",send:"Enviar",compressTitle:"Archivo grande",compressMsg:"¿Comprimir?",no:"No",yesCompress:"Sí, comprimir",compressing:"Comprimiendo...",chooseMusic:"Elegir música",searchMusic:"Buscar...",timestampPreview:"Vista previa",timestampDesc:"Momentos que la IA cortará.",useTimestamps:"Usar timestamps",capsuleTitle:"Cápsulas",shortVideo:"Vídeo corto",shortSub:"clips seguidos",longVideo:"Vídeo largo",longSub:"mejores momentos",capsuleCount:"Número",promptGenerated:"Prompt:",refVideo:"Referencia",optional:"opcional",addRefVideo:"+ Añadir",lastGenerated:"Último clip",serverActive:"Activo",cmdEnterHint:"Cmd+Enter para generar",subfolders:"Subcarpetas",newSubfolder:"+ Subcarpeta",share:"Compartir",colorGrade:"Color grade",transition:"Transición",textOverlay:"Texto",stabilize:"Estabilizar",vocalVolume:"Volumen voz",none:"Ninguno",exportQuality:"Calidad",exportCodec:"Codec",watermark:"Marca",presets:"Presets",savePreset:"Guardar",presetName:"Nombre...",stats:"Stats",totalClips:"Clips",clipsInLib:"Biblioteca",queue:"Cola",addToQueue:"+ Cola",runQueue:"Ejecutar",queueEmpty:"Cola vacía",copyLink:"Copiar",copied:"¡Copiado!" },
-  IT: { home:"Home",library:"Libreria",settings:"Impostazioni",logout:"Esci",videos:"Video",addFile:"+ Aggiungi",dragVideo:"Trascina un video",dragSub:"TikTok, Instagram • max 50MB",addAnother:"Aggiungi altro video",pasteLink:"Incolla link TikTok / Instagram...",import:"Importa",outputFormat:"Formato",beatSync:"Beat sync",subtitles:"Sottotitoli",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsule",introOutro:"Intro / Outro",addMusic:"Aggiungi musica",zoomIntensity:"Intensità zoom",speedIntensity:"Intensità speed",description:"Descrizione",promptHistory:"Cronologia",preview:"Anteprima",promptHelper:"Aiuto prompt",generating:"Generazione...",generate:"Genera",preparingVideos:"Preparazione...",analyzingAI:"Analisi IA...",detectingEffects:"Rilevamento...",renderingClips:"Rendering...",generatedClips:"Clip generate",downloadAll:"Scarica tutto",download:"Scarica",serverStarting:"Server in avvio...",check:"Verifica",newFolder:"+ Nuova cartella",folders:"Cartelle",clipsInFolder:"Clip in cartella",clipsNoFolder:"Clip senza cartella",noClips:"Nessuna clip",generateFirst:"Genera prima clip",back:"Indietro",rename:"Rinomina",move:"Sposta",delete:"Elimina",shareFolder:"Condividi",sharedWith:"Condiviso con",cancel:"Annulla",create:"Crea",apply:"Applica",close:"Chiudi",use:"Usa",newFolderName:"Nome...",emailMember:"Email membro...",addMember:"Aggiungi membro",createAccount:"Crea account",creating:"Creazione...",reportProblem:"Segnala problema",send:"Invia",compressTitle:"File grande",compressMsg:"Comprimi?",no:"No",yesCompress:"Sì, comprimi",compressing:"Compressione...",chooseMusic:"Scegli musica",searchMusic:"Cerca...",timestampPreview:"Anteprima",timestampDesc:"Momenti che l'IA taglierà.",useTimestamps:"Usa timestamp",capsuleTitle:"Capsule",shortVideo:"Video corto",shortSub:"clip consecutive",longVideo:"Video lungo",longSub:"momenti migliori",capsuleCount:"Numero",promptGenerated:"Prompt:",refVideo:"Riferimento",optional:"opzionale",addRefVideo:"+ Aggiungi",lastGenerated:"Ultima clip",serverActive:"Attivo",cmdEnterHint:"Cmd+Invio per generare",subfolders:"Sottocartelle",newSubfolder:"+ Sottocartella",share:"Condividi",colorGrade:"Color grade",transition:"Transizione",textOverlay:"Testo",stabilize:"Stabilizza",vocalVolume:"Volume voce",none:"Nessuno",exportQuality:"Qualità",exportCodec:"Codec",watermark:"Watermark",presets:"Preset",savePreset:"Salva",presetName:"Nome...",stats:"Stats",totalClips:"Clip",clipsInLib:"Libreria",queue:"Coda",addToQueue:"+ Coda",runQueue:"Avvia",queueEmpty:"Coda vuota",copyLink:"Copia",copied:"Copiato!" },
-  DE: { home:"Start",library:"Bibliothek",settings:"Einstellungen",logout:"Abmelden",videos:"Videos",addFile:"+ Hinzufügen",dragVideo:"Video ziehen oder klicken",dragSub:"TikTok, Instagram • max 50MB",addAnother:"Weiteres Video",pasteLink:"TikTok / Instagram Link...",import:"Importieren",outputFormat:"Format",beatSync:"Beat sync",subtitles:"Untertitel",autoZoom:"Auto-Zoom",speedRamp:"Speed ramp",capsules:"Kapseln",introOutro:"Intro / Outro",addMusic:"Musik",zoomIntensity:"Zoom-Intensität",speedIntensity:"Speed-Intensität",description:"Beschreibung",promptHistory:"Verlauf",preview:"Vorschau",promptHelper:"Prompt-Hilfe",generating:"Generierung...",generate:"Generieren",preparingVideos:"Videos vorbereiten...",analyzingAI:"KI-Analyse...",detectingEffects:"Effekte erkennen...",renderingClips:"Rendern...",generatedClips:"Clips",downloadAll:"Alle herunterladen",download:"Herunterladen",serverStarting:"Server startet...",check:"Prüfen",newFolder:"+ Ordner",folders:"Ordner",clipsInFolder:"Clips in Ordner",clipsNoFolder:"Clips ohne Ordner",noClips:"Keine Clips",generateFirst:"Ersten Clip erstellen",back:"Zurück",rename:"Umbenennen",move:"Verschieben",delete:"Löschen",shareFolder:"Teilen",sharedWith:"Geteilt mit",cancel:"Abbrechen",create:"Erstellen",apply:"Anwenden",close:"Schließen",use:"Verwenden",newFolderName:"Ordnername...",emailMember:"E-Mail...",addMember:"Mitglied hinzufügen",createAccount:"Konto erstellen",creating:"Erstelle...",reportProblem:"Problem melden",send:"Senden",compressTitle:"Datei zu groß",compressMsg:"Komprimieren?",no:"Nein",yesCompress:"Ja, komprimieren",compressing:"Komprimierung...",chooseMusic:"Musik wählen",searchMusic:"Suchen...",timestampPreview:"Vorschau",timestampDesc:"Momente die die KI schneidet.",useTimestamps:"Timestamps verwenden",capsuleTitle:"Kapseln",shortVideo:"Kurzes Video",shortSub:"aufeinanderfolgende",longVideo:"Langes Video",longSub:"beste Momente",capsuleCount:"Anzahl",promptGenerated:"Prompt:",refVideo:"Referenzvideo",optional:"optional",addRefVideo:"+ Hinzufügen",lastGenerated:"Letzter Clip",serverActive:"Aktiv",cmdEnterHint:"Cmd+Enter zum Generieren",subfolders:"Unterordner",newSubfolder:"+ Unterordner",share:"Teilen",colorGrade:"Color grade",transition:"Übergang",textOverlay:"Text",stabilize:"Stabilisieren",vocalVolume:"Stimme",none:"Keiner",exportQuality:"Qualität",exportCodec:"Codec",watermark:"Wasserzeichen",presets:"Presets",savePreset:"Speichern",presetName:"Name...",stats:"Stats",totalClips:"Clips",clipsInLib:"Bibliothek",queue:"Warteschlange",addToQueue:"+ Warte",runQueue:"Starten",queueEmpty:"Leer",copyLink:"Kopieren",copied:"Kopiert!" },
+  EN: { home:"Home",library:"Library",settings:"Settings",logout:"Logout",videos:"Videos",addFile:"+ Add file",dragVideo:"Drop a video or click to import",dragSub:"TikTok, Instagram, local file • max 50MB",addAnother:"Add another video",pasteLink:"Paste a TikTok / Instagram link...",import:"Import",outputFormat:"Output format",beatSync:"Beat sync",subtitles:"Subtitles",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsules",introOutro:"Intro / Outro",addMusic:"Add music",zoomIntensity:"Zoom intensity",speedIntensity:"Speed ramp intensity",description:"Description",promptHistory:"History",preview:"Preview",promptHelper:"Prompt help",generating:"Generating...",generate:"Generate",preparingVideos:"Preparing videos...",analyzingAI:"AI analysis...",detectingEffects:"Detecting effects...",renderingClips:"Rendering clips...",generatedClips:"Generated clips",downloadAll:"Download all",download:"Download",serverStarting:"Server starting — may take 30-50s...",check:"Check",newFolder:"+ New folder",folders:"Folders",clipsInFolder:"Clips in this folder",clipsNoFolder:"Clips without folder",noClips:"No clips here",generateFirst:"Generate your first clip",back:"Back",rename:"Rename",move:"Move",delete:"Delete",shareFolder:"Share folder",sharedWith:"Shared with",cancel:"Cancel",create:"Create",apply:"Apply",close:"Close",use:"Use",newFolderName:"Folder name...",emailMember:"Member email...",addMember:"Add a member",createAccount:"Create account",creating:"Creating...",reportProblem:"Report a problem",send:"Send",compressTitle:"File too large",compressMsg:"Compress automatically?",no:"No",yesCompress:"Yes, compress",compressing:"Compressing...",chooseMusic:"Choose music",searchMusic:"Search artist, title...",timestampPreview:"Timestamp preview",timestampDesc:"Moments the AI will cut.",useTimestamps:"Use these timestamps",capsuleTitle:"Capsules",shortVideo:"Short video",shortSub:"sequential clips",longVideo:"Long video",longSub:"best moments",capsuleCount:"Number of capsules",promptGenerated:"Generated prompt:",refVideo:"Reference video",optional:"optional",addRefVideo:"+ Add reference video",lastGenerated:"Last generated",serverActive:"Server active",cmdEnterHint:"Cmd+Enter to generate",subfolders:"Subfolders",newSubfolder:"+ Subfolder",share:"Share",colorGrade:"Color grade",transition:"Transition",textOverlay:"Text overlay",stabilize:"Stabilize",vocalVolume:"Vocal volume",none:"None",exportQuality:"Export quality",exportCodec:"Codec",watermark:"Watermark",presets:"Presets",savePreset:"Save preset",presetName:"Preset name...",stats:"Stats",totalClips:"Total clips",clipsInLib:"In library",queue:"Queue",addToQueue:"+ Queue",runQueue:"Run queue",queueEmpty:"Queue is empty",copyLink:"Copy link",copied:"Copied!",autoMode:"Auto mode",autoModeDesc:"The AI chooses everything for you",manualMode:"Manual",step1:"Import your video",step2:"Describe your edit",step3:"Generate",onboardingSkip:"Skip",shareNative:"Share",advancedSettings:"Advanced settings",generatingMsg1:"Analyzing your best sequences... 🔍",generatingMsg2:"Detecting scene changes... 🎬",generatingMsg3:"Syncing to the beat... 🎵",generatingMsg4:"Applying color grade... 🎨",generatingMsg5:"Rendering your clips... ✨",generatingMsg6:"Almost there... 🚀" },
+  FR: { home:"Accueil",library:"Bibliothèque",settings:"Paramètres",logout:"Déconnexion",videos:"Vidéos",addFile:"+ Ajouter",dragVideo:"Glisse une vidéo ou clique",dragSub:"TikTok, Instagram, fichier local • max 50MB",addAnother:"Ajouter une autre vidéo",pasteLink:"Coller un lien TikTok / Instagram...",import:"Importer",outputFormat:"Format de sortie",beatSync:"Beat sync",subtitles:"Sous-titres",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsules",introOutro:"Intro / Outro",addMusic:"Ajouter musique",zoomIntensity:"Intensité zoom",speedIntensity:"Intensité speed ramp",description:"Description",promptHistory:"Historique",preview:"Aperçu",promptHelper:"Aide prompt",generating:"Génération...",generate:"Générer",preparingVideos:"Préparation des vidéos...",analyzingAI:"Analyse IA...",detectingEffects:"Détection des effets...",renderingClips:"Rendu des clips...",generatedClips:"Clips générés",downloadAll:"Tout télécharger",download:"Télécharger",serverStarting:"Serveur en démarrage — 30-50 secondes...",check:"Vérifier",newFolder:"+ Dossier",folders:"Dossiers",clipsInFolder:"Clips dans ce dossier",clipsNoFolder:"Clips sans dossier",noClips:"Aucun clip ici",generateFirst:"Générer un premier clip",back:"Retour",rename:"Renommer",move:"Déplacer",delete:"Supprimer",shareFolder:"Partager le dossier",sharedWith:"Partagé avec",cancel:"Annuler",create:"Créer",apply:"Appliquer",close:"Fermer",use:"Utiliser",newFolderName:"Nom du dossier...",emailMember:"Email du membre...",addMember:"Ajouter un membre",createAccount:"Créer le compte",creating:"Création...",reportProblem:"Signaler un problème",send:"Envoyer",compressTitle:"Vidéo trop lourde",compressMsg:"Compresser automatiquement ?",no:"Non",yesCompress:"Oui, compresser",compressing:"Compression...",chooseMusic:"Choisir une musique",searchMusic:"Rechercher artiste, titre...",timestampPreview:"Aperçu timestamps",timestampDesc:"Moments que l'IA va découper.",useTimestamps:"Utiliser ces timestamps",capsuleTitle:"Capsules",shortVideo:"Vidéo courte",shortSub:"clips qui se suivent",longVideo:"Vidéo longue",longSub:"meilleurs moments",capsuleCount:"Nombre",promptGenerated:"Prompt généré :",refVideo:"Vidéo référence",optional:"optionnel",addRefVideo:"+ Ajouter",lastGenerated:"Dernier clip",serverActive:"Serveur actif",cmdEnterHint:"Cmd+Entrée pour générer",subfolders:"Sous-dossiers",newSubfolder:"+ Sous-dossier",share:"Partager",colorGrade:"Color grade",transition:"Transition",textOverlay:"Texte overlay",stabilize:"Stabiliser",vocalVolume:"Volume voix",none:"Aucun",exportQuality:"Qualité export",exportCodec:"Codec",watermark:"Watermark",presets:"Presets",savePreset:"Sauvegarder",presetName:"Nom du preset...",stats:"Stats",totalClips:"Clips générés",clipsInLib:"En bibliothèque",queue:"File d'attente",addToQueue:"+ File",runQueue:"Lancer la file",queueEmpty:"File vide",copyLink:"Copier le lien",copied:"Copié !",autoMode:"Mode Auto",autoModeDesc:"L'IA choisit tout pour toi",manualMode:"Manuel",step1:"Importe ta vidéo",step2:"Décris ton edit",step3:"Génère",onboardingSkip:"Passer",shareNative:"Partager",advancedSettings:"Paramètres avancés",generatingMsg1:"Analyse de tes meilleures séquences... 🔍",generatingMsg2:"Détection des changements de scène... 🎬",generatingMsg3:"Synchronisation sur le beat... 🎵",generatingMsg4:"Application du color grade... 🎨",generatingMsg5:"Rendu de tes clips... ✨",generatingMsg6:"Presque terminé... 🚀" },
+  ES: { home:"Inicio",library:"Biblioteca",settings:"Ajustes",logout:"Salir",videos:"Vídeos",addFile:"+ Añadir",dragVideo:"Arrastra un vídeo",dragSub:"TikTok, Instagram • máx 50MB",addAnother:"Añadir otro",pasteLink:"Enlace TikTok / Instagram...",import:"Importar",outputFormat:"Formato",beatSync:"Beat sync",subtitles:"Subtítulos",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Cápsulas",introOutro:"Intro / Outro",addMusic:"Música",zoomIntensity:"Zoom",speedIntensity:"Speed",description:"Descripción",promptHistory:"Historial",preview:"Vista previa",promptHelper:"Ayuda",generating:"Generando...",generate:"Generar",preparingVideos:"Preparando...",analyzingAI:"IA...",detectingEffects:"Efectos...",renderingClips:"Render...",generatedClips:"Clips",downloadAll:"Descargar todo",download:"Descargar",serverStarting:"Servidor iniciando...",check:"Verificar",newFolder:"+ Carpeta",folders:"Carpetas",clipsInFolder:"Clips en carpeta",clipsNoFolder:"Sin carpeta",noClips:"Sin clips",generateFirst:"Generar clip",back:"Volver",rename:"Renombrar",move:"Mover",delete:"Eliminar",shareFolder:"Compartir",sharedWith:"Compartido",cancel:"Cancelar",create:"Crear",apply:"Aplicar",close:"Cerrar",use:"Usar",newFolderName:"Nombre...",emailMember:"Email...",addMember:"Añadir",createAccount:"Crear cuenta",creating:"Creando...",reportProblem:"Reportar",send:"Enviar",compressTitle:"Archivo grande",compressMsg:"¿Comprimir?",no:"No",yesCompress:"Sí",compressing:"Comprimiendo...",chooseMusic:"Música",searchMusic:"Buscar...",timestampPreview:"Timestamps",timestampDesc:"La IA cortará aquí.",useTimestamps:"Usar",capsuleTitle:"Cápsulas",shortVideo:"Corto",shortSub:"clips seguidos",longVideo:"Largo",longSub:"mejores momentos",capsuleCount:"Número",promptGenerated:"Prompt:",refVideo:"Referencia",optional:"opcional",addRefVideo:"+ Añadir",lastGenerated:"Último",serverActive:"Activo",cmdEnterHint:"Cmd+Enter",subfolders:"Subcarpetas",newSubfolder:"+ Subcarpeta",share:"Compartir",colorGrade:"Color",transition:"Transición",textOverlay:"Texto",stabilize:"Estabilizar",vocalVolume:"Voz",none:"Ninguno",exportQuality:"Calidad",exportCodec:"Codec",watermark:"Marca",presets:"Presets",savePreset:"Guardar",presetName:"Nombre...",stats:"Stats",totalClips:"Clips",clipsInLib:"Biblioteca",queue:"Cola",addToQueue:"+ Cola",runQueue:"Ejecutar",queueEmpty:"Vacía",copyLink:"Copiar",copied:"¡Copiado!",autoMode:"Modo Auto",autoModeDesc:"La IA elige todo",manualMode:"Manual",step1:"Importa tu vídeo",step2:"Describe tu edit",step3:"Genera",onboardingSkip:"Saltar",shareNative:"Compartir",advancedSettings:"Ajustes avanzados",generatingMsg1:"Analizando tus mejores secuencias... 🔍",generatingMsg2:"Detectando cambios de escena... 🎬",generatingMsg3:"Sincronizando con el beat... 🎵",generatingMsg4:"Aplicando color grade... 🎨",generatingMsg5:"Renderizando tus clips... ✨",generatingMsg6:"Casi listo... 🚀" },
+  IT: { home:"Home",library:"Libreria",settings:"Impostazioni",logout:"Esci",videos:"Video",addFile:"+ Aggiungi",dragVideo:"Trascina un video",dragSub:"TikTok, Instagram • max 50MB",addAnother:"Aggiungi altro",pasteLink:"Link TikTok / Instagram...",import:"Importa",outputFormat:"Formato",beatSync:"Beat sync",subtitles:"Sottotitoli",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsule",introOutro:"Intro / Outro",addMusic:"Musica",zoomIntensity:"Zoom",speedIntensity:"Speed",description:"Descrizione",promptHistory:"Cronologia",preview:"Anteprima",promptHelper:"Aiuto",generating:"Generazione...",generate:"Genera",preparingVideos:"Preparazione...",analyzingAI:"IA...",detectingEffects:"Effetti...",renderingClips:"Rendering...",generatedClips:"Clip",downloadAll:"Scarica tutto",download:"Scarica",serverStarting:"Server in avvio...",check:"Verifica",newFolder:"+ Cartella",folders:"Cartelle",clipsInFolder:"Clip in cartella",clipsNoFolder:"Senza cartella",noClips:"Nessuna clip",generateFirst:"Genera clip",back:"Indietro",rename:"Rinomina",move:"Sposta",delete:"Elimina",shareFolder:"Condividi",sharedWith:"Condiviso",cancel:"Annulla",create:"Crea",apply:"Applica",close:"Chiudi",use:"Usa",newFolderName:"Nome...",emailMember:"Email...",addMember:"Aggiungi",createAccount:"Crea account",creating:"Creazione...",reportProblem:"Segnala",send:"Invia",compressTitle:"File grande",compressMsg:"Comprimi?",no:"No",yesCompress:"Sì",compressing:"Compressione...",chooseMusic:"Musica",searchMusic:"Cerca...",timestampPreview:"Timestamp",timestampDesc:"L'IA taglierà qui.",useTimestamps:"Usa",capsuleTitle:"Capsule",shortVideo:"Corto",shortSub:"clip consecutive",longVideo:"Lungo",longSub:"momenti migliori",capsuleCount:"Numero",promptGenerated:"Prompt:",refVideo:"Riferimento",optional:"opzionale",addRefVideo:"+ Aggiungi",lastGenerated:"Ultimo",serverActive:"Attivo",cmdEnterHint:"Cmd+Invio",subfolders:"Sottocartelle",newSubfolder:"+ Sottocartella",share:"Condividi",colorGrade:"Colore",transition:"Transizione",textOverlay:"Testo",stabilize:"Stabilizza",vocalVolume:"Voce",none:"Nessuno",exportQuality:"Qualità",exportCodec:"Codec",watermark:"Watermark",presets:"Preset",savePreset:"Salva",presetName:"Nome...",stats:"Stats",totalClips:"Clip",clipsInLib:"Libreria",queue:"Coda",addToQueue:"+ Coda",runQueue:"Avvia",queueEmpty:"Vuota",copyLink:"Copia",copied:"Copiato!",autoMode:"Modalità Auto",autoModeDesc:"L'IA sceglie tutto",manualMode:"Manuale",step1:"Importa il video",step2:"Descrivi il tuo edit",step3:"Genera",onboardingSkip:"Salta",shareNative:"Condividi",advancedSettings:"Impostazioni avanzate",generatingMsg1:"Analisi delle migliori sequenze... 🔍",generatingMsg2:"Rilevamento cambi scena... 🎬",generatingMsg3:"Sincronizzazione sul beat... 🎵",generatingMsg4:"Applicazione color grade... 🎨",generatingMsg5:"Rendering dei clip... ✨",generatingMsg6:"Quasi finito... 🚀" },
+  DE: { home:"Start",library:"Bibliothek",settings:"Einstellungen",logout:"Abmelden",videos:"Videos",addFile:"+ Hinzufügen",dragVideo:"Video ziehen",dragSub:"TikTok, Instagram • max 50MB",addAnother:"Weiteres Video",pasteLink:"TikTok / Instagram Link...",import:"Importieren",outputFormat:"Format",beatSync:"Beat sync",subtitles:"Untertitel",autoZoom:"Auto-Zoom",speedRamp:"Speed ramp",capsules:"Kapseln",introOutro:"Intro / Outro",addMusic:"Musik",zoomIntensity:"Zoom",speedIntensity:"Speed",description:"Beschreibung",promptHistory:"Verlauf",preview:"Vorschau",promptHelper:"Hilfe",generating:"Generierung...",generate:"Generieren",preparingVideos:"Vorbereitung...",analyzingAI:"KI...",detectingEffects:"Effekte...",renderingClips:"Rendern...",generatedClips:"Clips",downloadAll:"Alle laden",download:"Laden",serverStarting:"Server startet...",check:"Prüfen",newFolder:"+ Ordner",folders:"Ordner",clipsInFolder:"Clips in Ordner",clipsNoFolder:"Ohne Ordner",noClips:"Keine Clips",generateFirst:"Clip erstellen",back:"Zurück",rename:"Umbenennen",move:"Verschieben",delete:"Löschen",shareFolder:"Teilen",sharedWith:"Geteilt mit",cancel:"Abbrechen",create:"Erstellen",apply:"Anwenden",close:"Schließen",use:"Verwenden",newFolderName:"Name...",emailMember:"E-Mail...",addMember:"Hinzufügen",createAccount:"Konto erstellen",creating:"Erstelle...",reportProblem:"Melden",send:"Senden",compressTitle:"Datei groß",compressMsg:"Komprimieren?",no:"Nein",yesCompress:"Ja",compressing:"Komprimierung...",chooseMusic:"Musik",searchMusic:"Suchen...",timestampPreview:"Timestamps",timestampDesc:"KI schneidet hier.",useTimestamps:"Verwenden",capsuleTitle:"Kapseln",shortVideo:"Kurz",shortSub:"aufeinanderfolgend",longVideo:"Lang",longSub:"beste Momente",capsuleCount:"Anzahl",promptGenerated:"Prompt:",refVideo:"Referenz",optional:"optional",addRefVideo:"+ Hinzufügen",lastGenerated:"Letzter",serverActive:"Aktiv",cmdEnterHint:"Cmd+Enter",subfolders:"Unterordner",newSubfolder:"+ Unterordner",share:"Teilen",colorGrade:"Farbe",transition:"Übergang",textOverlay:"Text",stabilize:"Stabilisieren",vocalVolume:"Stimme",none:"Keiner",exportQuality:"Qualität",exportCodec:"Codec",watermark:"Wasserzeichen",presets:"Presets",savePreset:"Speichern",presetName:"Name...",stats:"Stats",totalClips:"Clips",clipsInLib:"Bibliothek",queue:"Warteschlange",addToQueue:"+ Warte",runQueue:"Starten",queueEmpty:"Leer",copyLink:"Kopieren",copied:"Kopiert!",autoMode:"Auto-Modus",autoModeDesc:"KI wählt alles",manualMode:"Manuell",step1:"Video importieren",step2:"Edit beschreiben",step3:"Generieren",onboardingSkip:"Überspringen",shareNative:"Teilen",advancedSettings:"Erweiterte Einstellungen",generatingMsg1:"Beste Sequenzen analysieren... 🔍",generatingMsg2:"Szenenwechsel erkennen... 🎬",generatingMsg3:"Beat synchronisieren... 🎵",generatingMsg4:"Color grade anwenden... 🎨",generatingMsg5:"Clips rendern... ✨",generatingMsg6:"Fast fertig... 🚀" },
+}
+
+const AUTO_PRESETS: Record<string, { colorGrade: string; transition: string; options: string[]; prompt: string }> = {
+  sport:     { colorGrade:"vibrant",   transition:"flash",   options:["Beat sync","Auto-zoom","Speed ramp"], prompt:"edit sport dynamique, cuts sur le beat, meilleurs moments" },
+  lifestyle: { colorGrade:"warm",      transition:"fade",    options:["Beat sync","Auto-zoom"],              prompt:"vlog lifestyle, moments naturels, ambiance chill" },
+  gaming:    { colorGrade:"cinematic", transition:"glitch",  options:["Beat sync","Speed ramp"],             prompt:"highlights gaming, moments épiques, cuts rapides" },
+  music:     { colorGrade:"moody",     transition:"fade",    options:["Beat sync","Sous-titres"],            prompt:"clip musical, synchronisé sur le beat, cinématique" },
+  travel:    { colorGrade:"orange_teal", transition:"zoom_in", options:["Beat sync","Auto-zoom"],            prompt:"montage voyage, paysages, ambiance aventure" },
 }
 
 const ClimbLogo = ({ size = 30 }: { size?: number }) => (
@@ -66,13 +73,9 @@ const MountainBg = ({ dark }: { dark: boolean }) => (
         <stop offset="100%" stopColor={dark ? "#ffffff" : "#000"} stopOpacity="0"/>
       </linearGradient>
     </defs>
-    {/* Far range */}
     <polygon points="0,200 100,145 180,170 290,110 410,150 530,90 660,130 780,75 900,118 1020,68 1140,108 1260,82 1380,112 1440,95 1440,280 0,280" fill="url(#mg1)" opacity="0.3"/>
-    {/* Mid range */}
     <polygon points="0,225 70,182 150,205 240,162 360,192 470,142 590,175 700,128 820,165 940,112 1060,152 1180,124 1300,158 1440,132 1440,280 0,280" fill="url(#mg1)" opacity="0.55"/>
-    {/* Front range — sharp */}
     <polygon points="0,252 55,222 120,240 195,205 290,228 390,188 490,215 590,172 700,205 810,165 930,198 1050,168 1165,195 1285,170 1390,192 1440,178 1440,280 0,280" fill="url(#mg1)" opacity="0.95"/>
-    {/* Snow caps */}
     <polygon points="390,188 404,198 418,190 405,177" fill="white" opacity="0.45"/>
     <polygon points="810,165 825,176 840,167 826,154" fill="white" opacity="0.38"/>
     <polygon points="1165,195 1177,204 1191,196 1178,184" fill="white" opacity="0.32"/>
@@ -105,6 +108,7 @@ export default function Home() {
   const [showPresets, setShowPresets] = useState(false)
   const [showSavePreset, setShowSavePreset] = useState(false)
   const [showQueue, setShowQueue] = useState(false)
+  const [showAdvanced, setShowAdvanced] = useState(false)
   const [capsulesType, setCapsulesType] = useState<"courte"|"longue"|null>(null)
   const [capsulesCount, setCapsulesCount] = useState(4)
   const [pendingFile, setPendingFile] = useState<File|null>(null)
@@ -113,6 +117,7 @@ export default function Home() {
   const [hasGenerated, setHasGenerated] = useState(false)
   const [generating, setGenerating] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [generatingMsgIndex, setGeneratingMsgIndex] = useState(0)
   const [promptText, setPromptText] = useState("")
   const [generatedClips, setGeneratedClips] = useState<any[]>([])
   const [selectedMusic, setSelectedMusic] = useState<Track|null>(null)
@@ -169,14 +174,21 @@ export default function Home() {
   const [queue, setQueue] = useState<QueueItem[]>([])
   const [queueRunning, setQueueRunning] = useState(false)
   const [copiedId, setCopiedId] = useState<string|null>(null)
+  const [autoMode, setAutoMode] = useState(true)
+  const [onboardingDone, setOnboardingDone] = useState(false)
+  const [onboardingStep, setOnboardingStep] = useState(0)
+  const [detectedContentType, setDetectedContentType] = useState<string|null>(null)
 
   const audioRef = useRef<HTMLAudioElement|null>(null)
   const searchTimeout = useRef<ReturnType<typeof setTimeout>|null>(null)
+  const generatingMsgRef = useRef<ReturnType<typeof setInterval>|null>(null)
   const defaultQueries = ["phonk","rap us","drill","travis scott","central cee"]
   const T = TRANSLATIONS[lang]
   const CGL = CG_LABELS[lang]
   const TRL = TR_LABELS[lang]
   const currentFolder = folderStack.length > 0 ? folderStack[folderStack.length-1] : null
+
+  const generatingMsgs = [T.generatingMsg1, T.generatingMsg2, T.generatingMsg3, T.generatingMsg4, T.generatingMsg5, T.generatingMsg6]
 
   const t = {
     bg: dark ? "#0b0b0b" : "#e5e5e0",
@@ -185,7 +197,6 @@ export default function Home() {
     bgInput: dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.05)",
     bgPill: dark ? "rgba(255,255,255,0.035)" : "rgba(0,0,0,0.04)",
     bgThumb: dark ? "#1c1c1c" : "#d5d5d0",
-    bgPanel: dark ? "#0e0e0e" : "#ebebE6",
     bgModal: dark ? "#141414" : "#ebebE6",
     border: dark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.09)",
     borderMed: dark ? "1px solid rgba(255,255,255,0.09)" : "1px solid rgba(0,0,0,0.13)",
@@ -194,7 +205,7 @@ export default function Home() {
     textMuted: dark ? "#4a4a4a" : "#5a5a5a",
     textHint: dark ? "#383838" : "#7a7a7a",
     overlay: dark ? "rgba(0,0,0,0.5)" : "rgba(0,0,0,0.25)",
-    overlayHeavy: dark ? "rgba(0,0,0,0.82)" : "rgba(0,0,0,0.4)",
+    overlayHeavy: dark ? "rgba(0,0,0,0.85)" : "rgba(0,0,0,0.45)",
     accent: "#e8f542",
   }
 
@@ -210,6 +221,7 @@ export default function Home() {
     const saved = localStorage.getItem("promptHistory"); if (saved) setPromptHistory(JSON.parse(saved))
     const savedLang = localStorage.getItem("lang") as Lang|null; if (savedLang && TRANSLATIONS[savedLang]) setLang(savedLang)
     const savedPresets = localStorage.getItem("climbPresets"); if (savedPresets) setPresets(JSON.parse(savedPresets))
+    const savedOnboarding = localStorage.getItem("climbOnboarding"); if (savedOnboarding) setOnboardingDone(true)
   }, [])
 
   useEffect(() => { if (user) loadLibrary() }, [user])
@@ -217,10 +229,23 @@ export default function Home() {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && !generating && currentPage === "home") handleGenerate() }
     window.addEventListener("keydown", handler); return () => window.removeEventListener("keydown", handler)
-  }, [generating, currentPage, promptText, videos, activeOptions, selectedMusic, selectedFormat, zoomIntensity, speedIntensity, addIntroOutro, customTimestamps, colorGrade, transition, textOverlay, stabilize, vocalVolume, watermark, exportQuality, exportCodec])
+  }, [generating, currentPage, promptText, videos, activeOptions, selectedMusic, selectedFormat, zoomIntensity, speedIntensity, addIntroOutro, customTimestamps, colorGrade, transition, textOverlay, stabilize, vocalVolume, watermark, exportQuality, exportCodec, autoMode])
+
+  useEffect(() => {
+    if (generating) {
+      setGeneratingMsgIndex(0)
+      generatingMsgRef.current = setInterval(() => {
+        setGeneratingMsgIndex(prev => (prev + 1) % generatingMsgs.length)
+      }, 4000)
+    } else {
+      if (generatingMsgRef.current) clearInterval(generatingMsgRef.current)
+    }
+    return () => { if (generatingMsgRef.current) clearInterval(generatingMsgRef.current) }
+  }, [generating])
 
   const setLangAndSave = (l: Lang) => { setLang(l); localStorage.setItem("lang", l); setShowLangMenu(false) }
   const checkServerStatus = async () => { try { const res = await fetch(`${SERVER_URL}/health`, { signal: AbortSignal.timeout(5000) }); setServerAwake(res.ok) } catch { setServerAwake(false) } }
+  const completeOnboarding = () => { setOnboardingDone(true); localStorage.setItem("climbOnboarding", "1") }
 
   const loadLibrary = async () => {
     const { data: fd } = await supabase.from("folders").select("*").or(`owner_email.eq.${user.email},shared_with.cs.{${user.email}}`).order("created_at", { ascending: false })
@@ -239,7 +264,11 @@ export default function Home() {
 
   const handleFileAdd = async (file: File) => {
     if (file.size > 50*1024*1024) { setPendingFile(file); setShowCompressModal(true); return }
-    const p = await uploadFile(file); if (p) setVideos(prev => [...prev, { id:Date.now().toString(), type:"file", path:p, name:file.name }])
+    const p = await uploadFile(file)
+    if (p) {
+      setVideos(prev => [...prev, { id:Date.now().toString(), type:"file", path:p, name:file.name }])
+      if (!onboardingDone) setOnboardingStep(1)
+    }
   }
 
   const compressAndUpload = async () => {
@@ -258,11 +287,12 @@ export default function Home() {
   const handleLinkImport = async () => {
     const url = linkInput.trim(); if (!url) return; setImportingLink(true)
     try {
-      const thumbRes = await fetch(`${SERVER_URL}/thumbnail`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ url }) })
-      const thumbData = await thumbRes.json()
-      const res = await fetch(`${SERVER_URL}/download`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ url }) })
-      const data = await res.json()
-      if (data.path) { setVideos(prev => [...prev, { id:Date.now().toString(), type:"link", path:data.path, url, name:url.slice(0,40)+"...", thumbnail:thumbData.thumbnail||undefined }]); setLinkInput("") }
+      const [thumbRes, res] = await Promise.all([
+        fetch(`${SERVER_URL}/thumbnail`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ url }) }),
+        fetch(`${SERVER_URL}/download`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ url }) })
+      ])
+      const [thumbData, data] = await Promise.all([thumbRes.json(), res.json()])
+      if (data.path) { setVideos(prev => [...prev, { id:Date.now().toString(), type:"link", path:data.path, url, name:url.slice(0,40)+"...", thumbnail:thumbData.thumbnail||undefined }]); setLinkInput(""); if (!onboardingDone) setOnboardingStep(1) }
       else alert("Erreur")
     } catch (err: any) { alert(`Erreur: ${err.message}`) }
     setImportingLink(false)
@@ -271,19 +301,29 @@ export default function Home() {
   const removeVideo = (id: string) => setVideos(prev => prev.filter(v => v.id !== id))
   const savePromptToHistory = (p: string) => { if (!p.trim()) return; const u = [p, ...promptHistory.filter(h => h !== p)].slice(0,10); setPromptHistory(u); localStorage.setItem("promptHistory", JSON.stringify(u)) }
 
-  const buildPayload = () => ({
+  const detectContentType = async (): Promise<string> => {
+    if (!promptText) return "sport"
+    const lower = promptText.toLowerCase()
+    if (lower.includes("sport") || lower.includes("foot") || lower.includes("basket") || lower.includes("gym")) return "sport"
+    if (lower.includes("gaming") || lower.includes("game") || lower.includes("highlight")) return "gaming"
+    if (lower.includes("voyage") || lower.includes("travel") || lower.includes("vacances")) return "travel"
+    if (lower.includes("musique") || lower.includes("music") || lower.includes("clip")) return "music"
+    return "lifestyle"
+  }
+
+  const buildPayload = (overrideOptions?: any) => ({
     videoPaths: videos.map(v => v.path).filter(Boolean),
     videoUrls: [],
-    prompt: promptText,
-    options: activeOptions,
+    prompt: promptText || AUTO_PRESETS[detectedContentType || "sport"]?.prompt,
+    options: overrideOptions?.options || activeOptions,
     musicUrl: selectedMusic?.preview || null,
     format: selectedFormat,
-    zoomIntensity: activeOptions.includes("Auto-zoom") ? zoomIntensity : null,
-    speedIntensity: activeOptions.includes("Speed ramp") ? speedIntensity : null,
+    zoomIntensity: (overrideOptions?.options || activeOptions).includes("Auto-zoom") ? zoomIntensity : null,
+    speedIntensity: (overrideOptions?.options || activeOptions).includes("Speed ramp") ? speedIntensity : null,
     addIntroOutro,
     customTimestamps,
-    colorGrade: colorGrade !== "none" ? colorGrade : null,
-    transition: transition !== "none" ? transition : null,
+    colorGrade: (overrideOptions?.colorGrade || colorGrade) !== "none" ? (overrideOptions?.colorGrade || colorGrade) : null,
+    transition: (overrideOptions?.transition || transition) !== "none" ? (overrideOptions?.transition || transition) : null,
     textOverlay: textOverlay || null,
     stabilize,
     vocalVolume: selectedMusic ? vocalVolume/100 : null,
@@ -294,20 +334,37 @@ export default function Home() {
 
   const handleGenerate = useCallback(async () => {
     if (videos.length === 0) return
-    savePromptToHistory(promptText); setHasGenerated(false); setGenerating(true); setProgress(0); setServerAwake(null)
+    savePromptToHistory(promptText)
+    setHasGenerated(false); setGenerating(true); setProgress(0); setServerAwake(null)
+
+    let payload = buildPayload()
+
+    if (autoMode) {
+      const contentType = await detectContentType()
+      setDetectedContentType(contentType)
+      const preset = AUTO_PRESETS[contentType]
+      payload = buildPayload({ colorGrade: preset.colorGrade, transition: preset.transition, options: [...activeOptions, ...preset.options.filter(o => !activeOptions.includes(o))] })
+      if (!promptText) payload.prompt = preset.prompt
+    }
+
     try {
-      const res = await fetch(`${SERVER_URL}/generate`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(buildPayload()) })
+      const res = await fetch(`${SERVER_URL}/generate`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) })
       setServerAwake(true); const { jobId } = await res.json()
       const interval = setInterval(async () => {
         const sr = await fetch(`${SERVER_URL}/status/${jobId}`); const d = await sr.json()
         if (d.progress) setProgress(d.progress)
-        if (d.status === "done") { clearInterval(interval); setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100); if (d.clips.length > 0) setLastGeneratedClip(d.clips[0]); for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i) }
+        if (d.status === "done") {
+          clearInterval(interval)
+          setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100)
+          if (d.clips.length > 0) setLastGeneratedClip(d.clips[0])
+          for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i)
+          if (!onboardingDone) completeOnboarding()
+        }
         else if (d.status === "error") { clearInterval(interval); alert("Erreur génération"); setGenerating(false) }
       }, 3000)
     } catch { alert("Erreur"); setGenerating(false) }
-  }, [videos, promptText, activeOptions, selectedMusic, selectedFormat, zoomIntensity, speedIntensity, addIntroOutro, customTimestamps, colorGrade, transition, textOverlay, stabilize, vocalVolume, watermark, exportQuality, exportCodec])
+  }, [videos, promptText, activeOptions, selectedMusic, selectedFormat, zoomIntensity, speedIntensity, addIntroOutro, customTimestamps, colorGrade, transition, textOverlay, stabilize, vocalVolume, watermark, exportQuality, exportCodec, autoMode, onboardingDone])
 
-  // QUEUE
   const addToQueue = () => {
     if (videos.length === 0) return
     setQueue(prev => [...prev, { id:Date.now().toString(), videos:[...videos], prompt:promptText, status:"pending" }])
@@ -335,7 +392,6 @@ export default function Home() {
     setQueueRunning(false)
   }
 
-  // PRESETS
   const savePreset = () => {
     if (!presetName.trim()) return
     const p: Preset = { id:Date.now().toString(), name:presetName, format:selectedFormat, colorGrade, transition, prompt:promptText, options:activeOptions, exportQuality, exportCodec, watermark }
@@ -344,20 +400,28 @@ export default function Home() {
   const loadPreset = (p: Preset) => { setSelectedFormat(p.format); setColorGrade(p.colorGrade); setTransition(p.transition); setPromptText(p.prompt); setActiveOptions(p.options); setExportQuality(p.exportQuality); setExportCodec(p.exportCodec); setWatermark(p.watermark); setShowPresets(false) }
   const deletePreset = (id: string) => { const updated = presets.filter(p => p.id !== id); setPresets(updated); localStorage.setItem("climbPresets", JSON.stringify(updated)) }
 
-  // SHARE
   const shareClipPublic = async (clip: any) => {
     try {
-      const b64 = clip.base64.split(",")[1]
-      const bytes = atob(b64); const arr = new Uint8Array(bytes.length)
-      for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
-      const blob = new Blob([arr], { type:"video/mp4" })
-      const fileName = `${Date.now()}_${(clip.name||"clip").replace(/\s+/g,"_")}.mp4`
-      const { error } = await supabase.storage.from("clips").upload(fileName, blob, { contentType:"video/mp4", upsert:true })
-      if (error) throw error
-      const { data } = supabase.storage.from("clips").getPublicUrl(fileName)
-      await navigator.clipboard.writeText(data.publicUrl)
-      setCopiedId(clip.name); setTimeout(() => setCopiedId(null), 2500)
+      const res = await fetch(`${SERVER_URL}/share`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ base64:clip.base64, name:clip.name }) })
+      const data = await res.json()
+      if (data.url) { await navigator.clipboard.writeText(data.url); setCopiedId(clip.name); setTimeout(() => setCopiedId(null), 2500) }
+      else alert(data.error)
     } catch (err: any) { alert(err.message) }
+  }
+
+  const shareNative = async (clip: any) => {
+    try {
+      if (navigator.share) {
+        const b64 = clip.base64.split(",")[1]
+        const bytes = atob(b64); const arr = new Uint8Array(bytes.length)
+        for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
+        const blob = new Blob([arr], { type:"video/mp4" })
+        const file = new File([blob], `${clip.name || "clip"}.mp4`, { type:"video/mp4" })
+        await navigator.share({ title: clip.name, files: [file] })
+      } else {
+        shareClipPublic(clip)
+      }
+    } catch {}
   }
 
   const downloadAllClips = () => generatedClips.forEach((clip, i) => { const a = document.createElement("a"); a.href = clip.base64; a.download = `climbclip_${i+1}.mp4`; a.click() })
@@ -407,14 +471,45 @@ export default function Home() {
   const modalBase: React.CSSProperties = { background:t.bgModal, border:t.border, borderRadius:16, padding:24, display:"flex", flexDirection:"column", gap:16 }
 
   const Pill = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
-    <button onClick={onClick} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:active ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:active ? "rgba(232,245,66,0.08)" : t.bgPill, color:active ? t.accent : t.textSub, fontWeight:active ? 500 : 400, transition:"all 0.15s", boxShadow:active ? "0 0 14px rgba(232,245,66,0.08)" : "none" }}>{label}</button>
+    <button onClick={onClick} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:active ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:active ? "rgba(232,245,66,0.08)" : t.bgPill, color:active ? t.accent : t.textSub, fontWeight:active ? 500 : 400, transition:"all 0.15s", whiteSpace:"nowrap" }}>{label}</button>
   )
+
+  // ONBOARDING
+  if (!onboardingDone) {
+    const steps = [T.step1, T.step2, T.step3]
+    return (
+      <main style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"100vh", background:t.bg, padding:24, position:"relative" }}>
+        <MountainBg dark={dark}/>
+        {dark && <NoiseBg/>}
+        <div style={{ position:"relative", zIndex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:32, maxWidth:380, width:"100%", textAlign:"center" }}>
+          <ClimbLogo size={48}/>
+          <div>
+            <p style={{ fontSize:22, fontWeight:700, color:t.text, marginBottom:8 }}>CLIMB CLIP</p>
+            <p style={{ fontSize:14, color:t.textSub }}>Génère des clips TikTok/Instagram en quelques secondes grâce à l'IA</p>
+          </div>
+          <div style={{ display:"flex", flexDirection:"column", gap:12, width:"100%" }}>
+            {steps.map((step, i) => (
+              <div key={i} style={{ display:"flex", alignItems:"center", gap:14, padding:"14px 18px", background:t.bgCard, border:t.border, borderRadius:12 }}>
+                <div style={{ width:32, height:32, borderRadius:"50%", background:"rgba(232,245,66,0.1)", border:"1px solid rgba(232,245,66,0.3)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <span style={{ fontSize:14, fontWeight:700, color:t.accent }}>{i+1}</span>
+                </div>
+                <p style={{ fontSize:14, color:t.text, fontWeight:500 }}>{step}</p>
+              </div>
+            ))}
+          </div>
+          <button onClick={completeOnboarding} style={{ width:"100%", padding:"14px 0", borderRadius:12, border:"none", background:t.accent, color:"#0a0a0a", fontWeight:700, fontSize:15, cursor:"pointer", boxShadow:"0 0 28px rgba(232,245,66,0.22)" }}>
+            Commencer →
+          </button>
+          <button onClick={completeOnboarding} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:13 }}>{T.onboardingSkip}</button>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main style={{ display:"flex", flexDirection:"column", alignItems:"center", minHeight:"100vh", width:"100%", background:t.bg, position:"relative", overflowX:"hidden" }}
       onClick={() => { setClipMenu(null); setFolderMenu(null); setShowPromptHistory(false); setShowLangMenu(false) }}>
 
-      {/* BACKGROUNDS */}
       {dark && <>
         <NoiseBg/>
         <div style={{ position:"fixed", top:"-20%", left:"10%", width:"55vw", height:"55vw", borderRadius:"50%", background:"radial-gradient(circle, rgba(232,245,66,0.022) 0%, transparent 70%)", pointerEvents:"none", zIndex:0 }}/>
@@ -423,7 +518,6 @@ export default function Home() {
       </>}
       <MountainBg dark={dark}/>
 
-      {/* COLD START */}
       {serverAwake === false && (
         <div style={{ width:"100%", background:"rgba(232,245,66,0.04)", borderBottom:"1px solid rgba(232,245,66,0.11)", padding:"10px 24px", display:"flex", alignItems:"center", gap:10, position:"relative", zIndex:10 }}>
           <div style={{ width:6, height:6, borderRadius:"50%", background:t.accent, opacity:0.8 }}/>
@@ -433,46 +527,58 @@ export default function Home() {
       )}
 
       {/* NAV */}
-      <nav style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 32px", borderBottom:t.border, background:t.bgNav, backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", position:"sticky", top:0, zIndex:50 }}>
-        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-          <ClimbLogo size={30}/>
+      <nav style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 16px", borderBottom:t.border, background:t.bgNav, backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", position:"sticky", top:0, zIndex:50 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <ClimbLogo size={26}/>
           <div style={{ display:"flex", flexDirection:"column", lineHeight:1, gap:1 }}>
-            <span style={{ color:t.text, fontWeight:700, fontSize:13, letterSpacing:"0.1em" }}>CLIMB</span>
-            <span style={{ color:t.textMuted, fontSize:8, letterSpacing:"0.2em" }}>CLIP</span>
+            <span style={{ color:t.text, fontWeight:700, fontSize:12, letterSpacing:"0.1em" }}>CLIMB</span>
+            <span style={{ color:t.textMuted, fontSize:7, letterSpacing:"0.2em" }}>CLIP</span>
           </div>
-          {serverAwake === true && <div style={{ width:5, height:5, borderRadius:"50%", background:"#4ade80" }} title={T.serverActive}/>}
+          {serverAwake === true && <div style={{ width:5, height:5, borderRadius:"50%", background:"#4ade80" }}/>}
         </div>
-        <div style={{ display:"flex", alignItems:"center", gap:20 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:16 }}>
           <button onClick={() => setCurrentPage("home")} style={{ fontSize:13, color:currentPage === "home" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "home" ? 600 : 400 }}>{T.home}</button>
           <button onClick={() => { setCurrentPage("library"); loadLibrary() }} style={{ fontSize:13, color:currentPage === "library" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "library" ? 600 : 400 }}>{T.library}</button>
         </div>
-        <div style={{ display:"flex", alignItems:"center", gap:7 }}>
-          <button onClick={() => setShowStats(true)} style={{ fontSize:12, color:t.textSub, border:t.border, borderRadius:7, padding:"5px 9px", background:t.bgInput, cursor:"pointer" }}>📊</button>
-          <button onClick={() => setShowQueue(true)} style={{ fontSize:12, color:queue.length > 0 ? t.accent : t.textSub, border:queue.length > 0 ? "1px solid rgba(232,245,66,0.3)" : t.border, borderRadius:7, padding:"5px 9px", background:t.bgInput, cursor:"pointer" }}>⏱{queue.length > 0 ? ` ${queue.length}` : ""}</button>
+        <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+          <button onClick={() => setShowStats(true)} style={{ fontSize:12, color:t.textSub, border:t.border, borderRadius:7, padding:"5px 8px", background:t.bgInput, cursor:"pointer" }}>📊</button>
+          <button onClick={() => setShowQueue(true)} style={{ fontSize:12, color:queue.length > 0 ? t.accent : t.textSub, border:queue.length > 0 ? "1px solid rgba(232,245,66,0.3)" : t.border, borderRadius:7, padding:"5px 8px", background:t.bgInput, cursor:"pointer" }}>⏱{queue.length > 0 ? ` ${queue.length}` : ""}</button>
           <div style={{ position:"relative" }} onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowLangMenu(!showLangMenu)} style={{ fontSize:11, color:t.textSub, background:t.bgInput, border:t.border, borderRadius:7, padding:"5px 9px", cursor:"pointer", letterSpacing:"0.05em" }}>{lang}</button>
+            <button onClick={() => setShowLangMenu(!showLangMenu)} style={{ fontSize:11, color:t.textSub, background:t.bgInput, border:t.border, borderRadius:7, padding:"5px 8px", cursor:"pointer" }}>{lang}</button>
             {showLangMenu && (
               <div style={{ position:"absolute", right:0, top:"calc(100% + 4px)", background:t.bgModal, border:t.border, borderRadius:8, padding:"4px 0", minWidth:70, boxShadow:"0 8px 24px rgba(0,0,0,0.5)", zIndex:100 }}>
                 {(["EN","FR","ES","IT","DE"] as Lang[]).map(l => (
-                  <button key={l} onClick={() => setLangAndSave(l)} style={{ width:"100%", padding:"7px 12px", background:lang === l ? "rgba(232,245,66,0.07)" : "none", border:"none", color:lang === l ? t.accent : t.text, cursor:"pointer", fontSize:12, textAlign:"left", letterSpacing:"0.04em" }}>{l}</button>
+                  <button key={l} onClick={() => setLangAndSave(l)} style={{ width:"100%", padding:"7px 12px", background:lang === l ? "rgba(232,245,66,0.07)" : "none", border:"none", color:lang === l ? t.accent : t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{l}</button>
                 ))}
               </div>
             )}
           </div>
-          <button onClick={() => setShowSettings(true)} style={{ fontSize:12, color:t.textSub, border:t.borderMed, borderRadius:7, padding:"6px 13px", background:t.bgInput, cursor:"pointer" }}>{T.settings}</button>
-          {user && <button onClick={async () => { await supabase.auth.signOut(); setUser(null) }} style={{ fontSize:12, color:"#e8453a", border:"1px solid rgba(232,69,58,0.2)", borderRadius:7, padding:"6px 11px", background:"none", cursor:"pointer" }}>{T.logout}</button>}
+          <button onClick={() => setShowSettings(true)} style={{ fontSize:12, color:t.textSub, border:t.borderMed, borderRadius:7, padding:"6px 10px", background:t.bgInput, cursor:"pointer" }}>⚙</button>
         </div>
       </nav>
 
       {/* HOME */}
       {currentPage === "home" && (
-        <div style={{ width:"100%", maxWidth:640, display:"flex", flexDirection:"column", gap:26, padding:"44px 24px 120px", position:"relative", zIndex:1 }}>
+        <div style={{ width:"100%", maxWidth:600, display:"flex", flexDirection:"column", gap:22, padding:"32px 16px 120px", position:"relative", zIndex:1 }}>
+
+          {/* AUTO / MANUAL TOGGLE */}
+          <div style={{ display:"flex", alignItems:"center", gap:8, background:t.bgCard, border:t.border, borderRadius:12, padding:"12px 16px" }}>
+            <div style={{ flex:1 }}>
+              <p style={{ fontSize:13, fontWeight:600, color:autoMode ? t.accent : t.text, marginBottom:2 }}>
+                {autoMode ? `✦ ${T.autoMode}` : T.manualMode}
+              </p>
+              <p style={{ fontSize:11, color:t.textMuted }}>{autoMode ? T.autoModeDesc : "Contrôle total sur les paramètres"}</p>
+            </div>
+            <button onClick={() => setAutoMode(!autoMode)} style={{ width:44, height:24, borderRadius:12, border:"none", background:autoMode ? t.accent : "rgba(255,255,255,0.1)", cursor:"pointer", position:"relative", transition:"background 0.2s", flexShrink:0 }}>
+              <div style={{ width:18, height:18, borderRadius:"50%", background:autoMode ? "#0a0a0a" : "#888", position:"absolute", top:3, left:autoMode ? 23 : 3, transition:"left 0.2s" }}/>
+            </button>
+          </div>
 
           {/* VIDEOS */}
           <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
               <p style={{ fontSize:12, color:t.textSub }}>{T.videos} ({videos.length})</p>
-              <button onClick={() => document.getElementById("fileInput")?.click()} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"5px 11px", fontSize:11, color:t.textSub, cursor:"pointer" }}>{T.addFile}</button>
+              <button onClick={() => document.getElementById("fileInput")?.click()} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"5px 10px", fontSize:11, color:t.textSub, cursor:"pointer" }}>{T.addFile}</button>
             </div>
             <input id="fileInput" type="file" accept="video/*" multiple style={{ display:"none" }} onChange={async e => { if (e.target.files) for (const f of Array.from(e.target.files)) await handleFileAdd(f) }}/>
             {videos.length > 0 ? (
@@ -481,27 +587,27 @@ export default function Home() {
                   <div key={v.id} style={{ display:"flex", alignItems:"center", gap:10, background:t.bgCard, border:t.border, borderRadius:9, padding:"9px 12px" }}>
                     {v.thumbnail ? <img src={v.thumbnail} style={{ width:46, height:30, borderRadius:4, objectFit:"cover", flexShrink:0 }}/> : <div style={{ width:46, height:30, borderRadius:4, background:t.bgThumb, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}><span style={{ fontSize:12, color:t.textMuted }}>▶</span></div>}
                     <p style={{ flex:1, fontSize:12, color:t.text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{v.name}</p>
-                    <button onClick={() => removeVideo(v.id)} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15 }}>✕</button>
+                    <button onClick={() => removeVideo(v.id)} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15, flexShrink:0 }}>✕</button>
                   </div>
                 ))}
-                <div style={{ border:`1px dashed ${dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.1)"}`, borderRadius:9, padding:"12px 20px", display:"flex", alignItems:"center", justifyContent:"center", gap:7, cursor:"pointer", color:t.textMuted, fontSize:12 }} onClick={() => document.getElementById("fileInput")?.click()}>
-                  <span style={{ fontSize:14 }}>{compressing ? "⚙" : "↑"}</span> {compressing ? T.compressing : T.addAnother}
+                <div style={{ border:`1px dashed ${dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.1)"}`, borderRadius:9, padding:"12px", display:"flex", alignItems:"center", justifyContent:"center", gap:7, cursor:"pointer", color:t.textMuted, fontSize:12 }} onClick={() => document.getElementById("fileInput")?.click()}>
+                  {compressing ? T.compressing : T.addAnother}
                 </div>
               </div>
             ) : (
-              <div style={{ border:`1px dashed ${dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.11)"}`, borderRadius:14, padding:"50px 24px", display:"flex", flexDirection:"column", alignItems:"center", gap:14, cursor:"pointer", background:dark ? "rgba(255,255,255,0.008)" : "rgba(0,0,0,0.01)" }} onClick={() => document.getElementById("fileInput")?.click()}>
-                <div style={{ width:54, height:54, borderRadius:15, background:"rgba(232,245,66,0.05)", border:"1px solid rgba(232,245,66,0.1)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <div style={{ border:`1px dashed ${dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.11)"}`, borderRadius:14, padding:"44px 20px", display:"flex", flexDirection:"column", alignItems:"center", gap:12, cursor:"pointer", background:dark ? "rgba(255,255,255,0.008)" : "rgba(0,0,0,0.01)" }} onClick={() => document.getElementById("fileInput")?.click()}>
+                <div style={{ width:52, height:52, borderRadius:14, background:"rgba(232,245,66,0.05)", border:"1px solid rgba(232,245,66,0.1)", display:"flex", alignItems:"center", justifyContent:"center" }}>
                   <span style={{ fontSize:20, color:t.accent }}>↑</span>
                 </div>
                 <div style={{ textAlign:"center" }}>
-                  <p style={{ fontSize:14, color:t.textSub, marginBottom:4, fontWeight:500 }}>{T.dragVideo}</p>
+                  <p style={{ fontSize:14, color:t.textSub, marginBottom:3, fontWeight:500 }}>{T.dragVideo}</p>
                   <p style={{ fontSize:12, color:t.textMuted }}>{T.dragSub}</p>
                 </div>
               </div>
             )}
             <div style={{ display:"flex", gap:7 }} onClick={e => e.stopPropagation()}>
-              <input value={linkInput} onChange={e => setLinkInput(e.target.value)} onKeyDown={e => e.key === "Enter" && handleLinkImport()} style={{ flex:1, background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"9px 13px", fontSize:13, color:t.text, outline:"none" }} placeholder={T.pasteLink}/>
-              <button onClick={handleLinkImport} disabled={importingLink} style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"9px 13px", fontSize:13, color:t.textSub, cursor:"pointer", whiteSpace:"nowrap", opacity:importingLink ? 0.6 : 1 }}>{importingLink ? "⏳" : T.import}</button>
+              <input value={linkInput} onChange={e => setLinkInput(e.target.value)} onKeyDown={e => e.key === "Enter" && handleLinkImport()} style={{ flex:1, background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"9px 12px", fontSize:13, color:t.text, outline:"none" }} placeholder={T.pasteLink}/>
+              <button onClick={handleLinkImport} disabled={importingLink} style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"9px 12px", fontSize:13, color:t.textSub, cursor:"pointer", opacity:importingLink ? 0.6 : 1 }}>{importingLink ? "⏳" : T.import}</button>
             </div>
           </div>
 
@@ -520,76 +626,83 @@ export default function Home() {
             ))}
             <Pill label={T.capsules} active={false} onClick={() => setShowCapsulesModal(true)}/>
             <Pill label={T.introOutro} active={addIntroOutro} onClick={() => setAddIntroOutro(!addIntroOutro)}/>
-            <Pill label={stabilize ? `✓ ${T.stabilize}` : T.stabilize} active={stabilize} onClick={() => setStabilize(!stabilize)}/>
             <Pill label={watermark ? `✓ ${T.watermark}` : T.watermark} active={watermark} onClick={() => setWatermark(!watermark)}/>
-            <button onClick={() => { setShowMusic(true); fetchTracks(searchQuery || "phonk") }} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:selectedMusic ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:selectedMusic ? "rgba(232,245,66,0.08)" : t.bgPill, color:selectedMusic ? t.accent : t.textSub, display:"flex", alignItems:"center", gap:6, fontWeight:selectedMusic ? 500 : 400 }}>
+            <button onClick={() => { setShowMusic(true); fetchTracks(searchQuery || "phonk") }} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:selectedMusic ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:selectedMusic ? "rgba(232,245,66,0.08)" : t.bgPill, color:selectedMusic ? t.accent : t.textSub, display:"flex", alignItems:"center", gap:6, whiteSpace:"nowrap" }}>
               {selectedMusic ? <><img src={selectedMusic.album.cover_small} style={{ width:15, height:15, borderRadius:3 }}/>{selectedMusic.title}</> : T.addMusic}
             </button>
           </div>
 
-          {/* ADVANCED */}
-          <div style={{ display:"flex", flexDirection:"column", gap:14, background:t.bgCard, border:t.border, borderRadius:12, padding:"16px 18px" }}>
-            <div style={{ display:"flex", gap:10 }}>
-              <div style={{ flex:1 }}>
-                <p style={{ fontSize:11, color:t.textMuted, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.colorGrade}</p>
-                <select value={colorGrade} onChange={e => setColorGrade(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 10px", fontSize:12, color:t.text, outline:"none", cursor:"pointer", appearance:"none", WebkitAppearance:"none" }}>
-                  {colorGrades.map(g => <option key={g} value={g}>{CGL[g]}</option>)}
-                </select>
-              </div>
-              <div style={{ flex:1 }}>
-                <p style={{ fontSize:11, color:t.textMuted, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.transition}</p>
-                <select value={transition} onChange={e => setTransition(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 10px", fontSize:12, color:t.text, outline:"none", cursor:"pointer", appearance:"none", WebkitAppearance:"none" }}>
-                  {transitions.map(tr => <option key={tr} value={tr}>{TRL[tr]}</option>)}
-                </select>
-              </div>
-            </div>
-            <div style={{ display:"flex", gap:10 }}>
-              <div style={{ flex:1 }}>
-                <p style={{ fontSize:11, color:t.textMuted, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.exportQuality}</p>
-                <select value={exportQuality} onChange={e => setExportQuality(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 10px", fontSize:12, color:t.text, outline:"none", cursor:"pointer", appearance:"none", WebkitAppearance:"none" }}>
-                  {["720p","1080p","4K"].map(q => <option key={q} value={q}>{q}</option>)}
-                </select>
-              </div>
-              <div style={{ flex:1 }}>
-                <p style={{ fontSize:11, color:t.textMuted, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.exportCodec}</p>
-                <select value={exportCodec} onChange={e => setExportCodec(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 10px", fontSize:12, color:t.text, outline:"none", cursor:"pointer", appearance:"none", WebkitAppearance:"none" }}>
-                  {["H264","H265","VP9"].map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-            </div>
-            <div>
-              <p style={{ fontSize:11, color:t.textMuted, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.textOverlay}</p>
-              <input value={textOverlay} onChange={e => setTextOverlay(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 12px", fontSize:12, color:t.text, outline:"none" }} placeholder="Ex: CLIMB AGENCY"/>
-            </div>
-            {(activeOptions.includes("Auto-zoom") || activeOptions.includes("Speed ramp") || selectedMusic) && (
-              <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-                {activeOptions.includes("Auto-zoom") && (
-                  <div>
-                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}><p style={{ fontSize:11, color:t.textMuted }}>{T.zoomIntensity}</p><span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{zoomIntensity}%</span></div>
-                    <input type="range" min={10} max={100} value={zoomIntensity} onChange={e => setZoomIntensity(Number(e.target.value))} style={{ width:"100%", accentColor:t.accent }}/>
-                  </div>
-                )}
-                {activeOptions.includes("Speed ramp") && (
-                  <div>
-                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}><p style={{ fontSize:11, color:t.textMuted }}>{T.speedIntensity}</p><span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{speedIntensity}%</span></div>
-                    <input type="range" min={10} max={100} value={speedIntensity} onChange={e => setSpeedIntensity(Number(e.target.value))} style={{ width:"100%", accentColor:t.accent }}/>
-                  </div>
-                )}
-                {selectedMusic && (
-                  <div>
-                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}><p style={{ fontSize:11, color:t.textMuted }}>{T.vocalVolume}</p><span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{vocalVolume}%</span></div>
-                    <input type="range" min={0} max={100} value={vocalVolume} onChange={e => setVocalVolume(Number(e.target.value))} style={{ width:"100%", accentColor:t.accent }}/>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          {/* ADVANCED SETTINGS TOGGLE */}
+          {!autoMode && (
+            <button onClick={() => setShowAdvanced(!showAdvanced)} style={{ display:"flex", alignItems:"center", gap:7, background:"none", border:t.border, borderRadius:9, padding:"10px 14px", cursor:"pointer", color:t.textSub, fontSize:12, width:"100%" }}>
+              <span style={{ flex:1, textAlign:"left" }}>⚙ {T.advancedSettings}</span>
+              <span style={{ fontSize:10 }}>{showAdvanced ? "▲" : "▼"}</span>
+            </button>
+          )}
 
-          {/* PRESETS BAR */}
-          <div style={{ display:"flex", gap:6 }}>
-            <button onClick={() => setShowPresets(true)} style={{ padding:"6px 12px", borderRadius:8, fontSize:11, border:t.borderMed, background:t.bgInput, color:t.textSub, cursor:"pointer" }}>⚡ {T.presets}{presets.length > 0 ? ` (${presets.length})` : ""}</button>
-            <button onClick={() => setShowSavePreset(true)} style={{ padding:"6px 12px", borderRadius:8, fontSize:11, border:t.borderMed, background:t.bgInput, color:t.textSub, cursor:"pointer" }}>+ {T.savePreset}</button>
-          </div>
+          {(!autoMode && showAdvanced) && (
+            <div style={{ display:"flex", flexDirection:"column", gap:14, background:t.bgCard, border:t.border, borderRadius:12, padding:"16px" }}>
+              <div style={{ display:"flex", gap:10 }}>
+                <div style={{ flex:1 }}>
+                  <p style={{ fontSize:11, color:t.textMuted, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.colorGrade}</p>
+                  <select value={colorGrade} onChange={e => setColorGrade(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 10px", fontSize:12, color:t.text, outline:"none", cursor:"pointer", appearance:"none", WebkitAppearance:"none" }}>
+                    {colorGrades.map(g => <option key={g} value={g}>{CGL[g]}</option>)}
+                  </select>
+                </div>
+                <div style={{ flex:1 }}>
+                  <p style={{ fontSize:11, color:t.textMuted, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.transition}</p>
+                  <select value={transition} onChange={e => setTransition(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 10px", fontSize:12, color:t.text, outline:"none", cursor:"pointer", appearance:"none", WebkitAppearance:"none" }}>
+                    {transitions.map(tr => <option key={tr} value={tr}>{TRL[tr]}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div style={{ display:"flex", gap:10 }}>
+                <div style={{ flex:1 }}>
+                  <p style={{ fontSize:11, color:t.textMuted, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.exportQuality}</p>
+                  <select value={exportQuality} onChange={e => setExportQuality(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 10px", fontSize:12, color:t.text, outline:"none", cursor:"pointer", appearance:"none", WebkitAppearance:"none" }}>
+                    {["720p","1080p","4K"].map(q => <option key={q} value={q}>{q}</option>)}
+                  </select>
+                </div>
+                <div style={{ flex:1 }}>
+                  <p style={{ fontSize:11, color:t.textMuted, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.exportCodec}</p>
+                  <select value={exportCodec} onChange={e => setExportCodec(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 10px", fontSize:12, color:t.text, outline:"none", cursor:"pointer", appearance:"none", WebkitAppearance:"none" }}>
+                    {["H264","H265","VP9"].map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <p style={{ fontSize:11, color:t.textMuted, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.textOverlay}</p>
+                <input value={textOverlay} onChange={e => setTextOverlay(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 12px", fontSize:12, color:t.text, outline:"none" }} placeholder="Ex: CLIMB AGENCY"/>
+              </div>
+              <Pill label={stabilize ? `✓ ${T.stabilize}` : T.stabilize} active={stabilize} onClick={() => setStabilize(!stabilize)}/>
+              {(activeOptions.includes("Auto-zoom") || activeOptions.includes("Speed ramp") || selectedMusic) && (
+                <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+                  {activeOptions.includes("Auto-zoom") && (
+                    <div>
+                      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}><p style={{ fontSize:11, color:t.textMuted }}>{T.zoomIntensity}</p><span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{zoomIntensity}%</span></div>
+                      <input type="range" min={10} max={100} value={zoomIntensity} onChange={e => setZoomIntensity(Number(e.target.value))} style={{ width:"100%", accentColor:t.accent }}/>
+                    </div>
+                  )}
+                  {activeOptions.includes("Speed ramp") && (
+                    <div>
+                      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}><p style={{ fontSize:11, color:t.textMuted }}>{T.speedIntensity}</p><span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{speedIntensity}%</span></div>
+                      <input type="range" min={10} max={100} value={speedIntensity} onChange={e => setSpeedIntensity(Number(e.target.value))} style={{ width:"100%", accentColor:t.accent }}/>
+                    </div>
+                  )}
+                  {selectedMusic && (
+                    <div>
+                      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}><p style={{ fontSize:11, color:t.textMuted }}>{T.vocalVolume}</p><span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{vocalVolume}%</span></div>
+                      <input type="range" min={0} max={100} value={vocalVolume} onChange={e => setVocalVolume(Number(e.target.value))} style={{ width:"100%", accentColor:t.accent }}/>
+                    </div>
+                  )}
+                </div>
+              )}
+              <div style={{ display:"flex", gap:6 }}>
+                <button onClick={() => setShowPresets(true)} style={{ padding:"6px 12px", borderRadius:8, fontSize:11, border:t.borderMed, background:t.bgInput, color:t.textSub, cursor:"pointer" }}>⚡ {T.presets}{presets.length > 0 ? ` (${presets.length})` : ""}</button>
+                <button onClick={() => setShowSavePreset(true)} style={{ padding:"6px 12px", borderRadius:8, fontSize:11, border:t.borderMed, background:t.bgInput, color:t.textSub, cursor:"pointer" }}>+ {T.savePreset}</button>
+              </div>
+            </div>
+          )}
 
           {/* PROMPT */}
           <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
@@ -608,30 +721,32 @@ export default function Home() {
                 {promptHistory.map((h, i) => <button key={i} onClick={() => { setPromptText(h); setShowPromptHistory(false) }} style={{ width:"100%", padding:"8px 13px", background:"none", border:"none", borderBottom:i < promptHistory.length-1 ? t.border : "none", color:t.textSub, cursor:"pointer", fontSize:12, textAlign:"left", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{h}</button>)}
               </div>
             )}
-            <div style={{ display:"flex", gap:7, alignItems:"flex-end" }}>
-              <textarea value={promptText} onChange={e => setPromptText(e.target.value)} style={{ flex:1, background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"11px 13px", fontSize:13, color:t.text, outline:"none", resize:"none", height:46, lineHeight:"1.5", fontFamily:"sans-serif" }} placeholder="Ex : 1 clip 20s edit foot, cuts sur le beat, dribbles Dybala..."/>
-              <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
-                <button onClick={handleGenerate} disabled={generating || videos.length === 0} style={{ background:generating ? "rgba(232,245,66,0.35)" : videos.length === 0 ? "rgba(232,245,66,0.15)" : t.accent, color:"#0a0a0a", fontWeight:700, fontSize:13, borderRadius:8, padding:"11px 18px", border:"none", cursor:generating || videos.length === 0 ? "not-allowed" : "pointer", whiteSpace:"nowrap", boxShadow:videos.length > 0 && !generating ? "0 0 22px rgba(232,245,66,0.18)" : "none" }}>
-                  {generating ? T.generating : `✦ ${T.generate}`}
-                </button>
-                <button onClick={addToQueue} disabled={videos.length === 0} style={{ background:"none", border:t.borderMed, borderRadius:8, padding:"5px 10px", fontSize:11, color:t.textSub, cursor:"pointer", opacity:videos.length === 0 ? 0.35 : 1, whiteSpace:"nowrap" }}>{T.addToQueue}</button>
-              </div>
+            <textarea value={promptText} onChange={e => setPromptText(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"11px 13px", fontSize:13, color:t.text, outline:"none", resize:"none", height:52, lineHeight:"1.5", fontFamily:"sans-serif", boxSizing:"border-box" }}
+              placeholder={autoMode ? "Ex : edit foot Dybala, highlights basket... (optionnel en mode auto)" : "Ex : 1 clip 20s edit foot, cuts sur le beat, dribbles Dybala..."}/>
+            <div style={{ display:"flex", gap:7 }}>
+              <button onClick={handleGenerate} disabled={generating || videos.length === 0} style={{ flex:1, background:generating ? "rgba(232,245,66,0.35)" : videos.length === 0 ? "rgba(232,245,66,0.15)" : t.accent, color:"#0a0a0a", fontWeight:700, fontSize:14, borderRadius:10, padding:"13px", border:"none", cursor:generating || videos.length === 0 ? "not-allowed" : "pointer", boxShadow:videos.length > 0 && !generating ? "0 0 24px rgba(232,245,66,0.2)" : "none" }}>
+                {generating ? T.generating : `✦ ${T.generate}`}
+              </button>
+              <button onClick={addToQueue} disabled={videos.length === 0} style={{ background:"none", border:t.borderMed, borderRadius:10, padding:"13px 14px", fontSize:12, color:t.textSub, cursor:"pointer", opacity:videos.length === 0 ? 0.35 : 1, whiteSpace:"nowrap" }}>{T.addToQueue}</button>
             </div>
             <p style={{ fontSize:10, color:t.textHint, textAlign:"right" }}>{T.cmdEnterHint}</p>
           </div>
 
+          {/* GENERATING */}
           {generating && (
-            <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
-              <div style={{ display:"flex", justifyContent:"space-between" }}>
-                <p style={{ fontSize:12, color:t.textSub }}>{progress < 20 ? T.preparingVideos : progress < 40 ? T.analyzingAI : progress < 50 ? T.detectingEffects : T.renderingClips}</p>
-                <p style={{ fontSize:12, color:t.accent, fontWeight:600 }}>{progress}%</p>
-              </div>
-              <div style={{ width:"100%", height:3, background:dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)", borderRadius:4 }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:10, background:t.bgCard, border:t.border, borderRadius:12, padding:"16px" }}>
+              <p style={{ fontSize:13, color:t.text, fontWeight:500 }}>{generatingMsgs[generatingMsgIndex]}</p>
+              <div style={{ width:"100%", height:4, background:dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)", borderRadius:4 }}>
                 <div style={{ width:`${progress}%`, height:"100%", background:`linear-gradient(90deg, ${t.accent}, rgba(232,245,66,0.5))`, borderRadius:4, transition:"width 0.5s ease", boxShadow:"0 0 8px rgba(232,245,66,0.35)" }}/>
+              </div>
+              <div style={{ display:"flex", justifyContent:"space-between" }}>
+                <span style={{ fontSize:11, color:t.textMuted }}>{autoMode && detectedContentType ? `Mode Auto · ${detectedContentType}` : "Mode Manuel"}</span>
+                <span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{progress}%</span>
               </div>
             </div>
           )}
 
+          {/* RESULTS */}
           {hasGenerated && generatedClips.length > 0 && (
             <>
               <div style={{ width:"100%", height:1, background:dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)" }}/>
@@ -640,16 +755,17 @@ export default function Home() {
                   <p style={{ fontSize:11, color:t.textHint, textTransform:"uppercase", letterSpacing:"0.07em" }}>{T.generatedClips} — {generatedClips.length}</p>
                   {generatedClips.length > 1 && <button onClick={downloadAllClips} style={{ fontSize:11, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.18)", borderRadius:6, padding:"4px 9px", cursor:"pointer" }}>↓ {T.downloadAll}</button>}
                 </div>
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:10 }}>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(160px, 1fr))", gap:10 }}>
                   {generatedClips.map((clip, i) => (
                     <div key={i} style={{ background:t.bgCard, border:t.border, borderRadius:11, overflow:"hidden", display:"flex", flexDirection:"column" }}>
                       <div style={{ aspectRatio:"9/16", background:t.bgThumb, overflow:"hidden" }}>
-                        <video src={clip.base64} style={{ width:"100%", height:"100%", objectFit:"cover" }} controls/>
+                        <video src={clip.base64} style={{ width:"100%", height:"100%", objectFit:"cover" }} controls playsInline/>
                       </div>
                       <div style={{ padding:"9px 10px 11px", display:"flex", flexDirection:"column", gap:6 }}>
-                        <p style={{ fontSize:12, color:t.text, fontWeight:500 }}>{clip.name}</p>
-                        <a href={clip.base64} download={`climbclip_${i+1}.mp4`} style={{ padding:7, borderRadius:7, fontSize:11, fontWeight:500, border:"1px solid rgba(232,245,66,0.25)", background:"rgba(232,245,66,0.06)", color:t.accent, display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none" }}>↓ {T.download}</a>
-                        <button onClick={() => shareClipPublic(clip)} style={{ padding:7, borderRadius:7, fontSize:11, border:t.border, background:t.bgInput, color:copiedId === clip.name ? "#4ade80" : t.textSub, cursor:"pointer" }}>{copiedId === clip.name ? `✓ ${T.copied}` : T.copyLink}</button>
+                        <p style={{ fontSize:11, color:t.text, fontWeight:500 }}>{clip.name}</p>
+                        <a href={clip.base64} download={`climbclip_${i+1}.mp4`} style={{ padding:"7px", borderRadius:7, fontSize:11, fontWeight:500, border:"1px solid rgba(232,245,66,0.25)", background:"rgba(232,245,66,0.06)", color:t.accent, display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none" }}>↓ {T.download}</a>
+                        <button onClick={() => shareNative(clip)} style={{ padding:"7px", borderRadius:7, fontSize:11, border:t.border, background:t.bgInput, color:t.textSub, cursor:"pointer" }}>↗ {T.shareNative}</button>
+                        <button onClick={() => shareClipPublic(clip)} style={{ padding:"7px", borderRadius:7, fontSize:11, border:t.border, background:t.bgInput, color:copiedId === clip.name ? "#4ade80" : t.textMuted, cursor:"pointer" }}>{copiedId === clip.name ? `✓ ${T.copied}` : `🔗 ${T.copyLink}`}</button>
                       </div>
                     </div>
                   ))}
@@ -662,26 +778,26 @@ export default function Home() {
 
       {/* LIBRARY */}
       {currentPage === "library" && (
-        <div style={{ width:"100%", maxWidth:800, display:"flex", flexDirection:"column", gap:22, padding:"44px 24px 120px", position:"relative", zIndex:1 }}>
+        <div style={{ width:"100%", maxWidth:800, display:"flex", flexDirection:"column", gap:22, padding:"32px 16px 120px", position:"relative", zIndex:1 }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <div style={{ display:"flex", alignItems:"center", gap:9 }}>
               {folderStack.length > 0 && <button onClick={() => setFolderStack(prev => prev.slice(0,-1))} style={{ background:"none", border:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>← {T.back}</button>}
               <p style={{ fontSize:16, fontWeight:600, color:t.text }}>{currentFolderData ? currentFolderData.name : T.library}</p>
             </div>
             <div style={{ display:"flex", gap:7 }}>
-              {currentFolder && <button onClick={() => { setNewFolderParent(currentFolder); setShowNewFolder(true) }} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"6px 11px", fontSize:11, color:t.textSub, cursor:"pointer" }}>{T.newSubfolder}</button>}
-              <button onClick={() => { setNewFolderParent(null); setShowNewFolder(true) }} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"6px 13px", fontSize:12, color:t.textSub, cursor:"pointer" }}>{T.newFolder}</button>
+              {currentFolder && <button onClick={() => { setNewFolderParent(currentFolder); setShowNewFolder(true) }} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"6px 10px", fontSize:11, color:t.textSub, cursor:"pointer" }}>{T.newSubfolder}</button>}
+              <button onClick={() => { setNewFolderParent(null); setShowNewFolder(true) }} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"6px 11px", fontSize:12, color:t.textSub, cursor:"pointer" }}>{T.newFolder}</button>
             </div>
           </div>
 
           {displayedFolders.length > 0 && (
             <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
               <p style={{ fontSize:10, color:t.textHint, textTransform:"uppercase", letterSpacing:"0.06em" }}>{currentFolder ? T.subfolders : T.folders}</p>
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(170px, 1fr))", gap:9 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(150px, 1fr))", gap:9 }}>
                 {displayedFolders.map(folder => (
                   <div key={folder.id} style={{ position:"relative" }}>
-                    <div onClick={() => setFolderStack(prev => [...prev, folder.id])} style={{ background:t.bgCard, border:t.border, borderRadius:9, padding:"13px 15px", cursor:"pointer", display:"flex", alignItems:"center", gap:9 }}>
-                      <div style={{ width:32, height:32, borderRadius:8, background:"rgba(232,245,66,0.05)", border:"1px solid rgba(232,245,66,0.08)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}><span style={{ fontSize:14, opacity:0.6 }}>▣</span></div>
+                    <div onClick={() => setFolderStack(prev => [...prev, folder.id])} style={{ background:t.bgCard, border:t.border, borderRadius:9, padding:"12px 13px", cursor:"pointer", display:"flex", alignItems:"center", gap:8 }}>
+                      <div style={{ width:28, height:28, borderRadius:7, background:"rgba(232,245,66,0.05)", border:"1px solid rgba(232,245,66,0.08)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}><span style={{ fontSize:12, opacity:0.6 }}>▣</span></div>
                       <div style={{ flex:1, minWidth:0 }}>
                         <p style={{ fontSize:12, color:t.text, fontWeight:500, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{folder.name}</p>
                         <p style={{ fontSize:10, color:t.textMuted }}>{clips.filter(c => c.folder_id === folder.id).length} clip(s)</p>
@@ -689,7 +805,7 @@ export default function Home() {
                       <button onClick={e => { e.stopPropagation(); setFolderMenu(folderMenu === folder.id ? null : folder.id) }} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15 }}>⋯</button>
                     </div>
                     {folderMenu === folder.id && (
-                      <div onClick={e => e.stopPropagation()} style={{ position:"absolute", right:0, top:"100%", zIndex:50, background:t.bgModal, border:t.border, borderRadius:8, padding:"4px 0", minWidth:130, boxShadow:"0 6px 24px rgba(0,0,0,0.4)" }}>
+                      <div onClick={e => e.stopPropagation()} style={{ position:"absolute", right:0, top:"100%", zIndex:50, background:t.bgModal, border:t.border, borderRadius:8, padding:"4px 0", minWidth:120, boxShadow:"0 6px 24px rgba(0,0,0,0.4)" }}>
                         <button onClick={() => { setShowShareModal(folder.id); setFolderMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.share}</button>
                         <button onClick={() => deleteFolder(folder.id)} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:"#e8453a", cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.delete}</button>
                       </div>
@@ -709,11 +825,11 @@ export default function Home() {
                 <button onClick={() => setCurrentPage("home")} style={{ fontSize:12, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.15)", borderRadius:8, padding:"7px 15px", cursor:"pointer" }}>{T.generateFirst}</button>
               </div>
             ) : (
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:10 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(150px, 1fr))", gap:10 }}>
                 {displayedClips.map(clip => (
                   <div key={clip.id} style={{ background:t.bgCard, border:t.border, borderRadius:11, overflow:"hidden", display:"flex", flexDirection:"column", position:"relative" }}>
                     <div style={{ aspectRatio:"9/16", background:t.bgThumb, overflow:"hidden" }}>
-                      {clip.thumbnail ? <img src={clip.thumbnail} style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : <video src={clip.base64} style={{ width:"100%", height:"100%", objectFit:"cover" }} controls/>}
+                      {clip.thumbnail ? <img src={clip.thumbnail} style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : <video src={clip.base64} style={{ width:"100%", height:"100%", objectFit:"cover" }} controls playsInline/>}
                     </div>
                     <div style={{ padding:"9px 10px 11px", display:"flex", flexDirection:"column", gap:6 }}>
                       {renamingClip === clip.id ? (
@@ -723,14 +839,15 @@ export default function Home() {
                         </div>
                       ) : (
                         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                          <p style={{ fontSize:11, color:t.text, fontWeight:500 }}>{clip.name}</p>
-                          <button onClick={e => { e.stopPropagation(); setClipMenu(clipMenu === clip.id ? null : clip.id) }} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15 }}>⋯</button>
+                          <p style={{ fontSize:11, color:t.text, fontWeight:500, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", flex:1 }}>{clip.name}</p>
+                          <button onClick={e => { e.stopPropagation(); setClipMenu(clipMenu === clip.id ? null : clip.id) }} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15, flexShrink:0 }}>⋯</button>
                         </div>
                       )}
                       {clipMenu === clip.id && (
                         <div onClick={e => e.stopPropagation()} style={{ position:"absolute", right:7, bottom:46, zIndex:50, background:t.bgModal, border:t.border, borderRadius:8, padding:"4px 0", minWidth:130, boxShadow:"0 6px 24px rgba(0,0,0,0.4)" }}>
                           <button onClick={() => { setRenamingClip(clip.id); setRenameValue(clip.name); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.rename}</button>
                           <a href={clip.base64} download={`${clip.name}.mp4`} style={{ display:"block", padding:"7px 13px", color:t.text, fontSize:12, textDecoration:"none" }}>{T.download}</a>
+                          <button onClick={() => shareNative(clip)} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.shareNative}</button>
                           <button onClick={() => { setShowMoveModal(clip.id); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.move}</button>
                           <button onClick={() => shareClipPublic(clip)} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.textSub, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.copyLink}</button>
                           <button onClick={() => deleteClip(clip.id)} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:"#e8453a", cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.delete}</button>
@@ -748,22 +865,23 @@ export default function Home() {
 
       {/* STATUS BAR */}
       {lastGeneratedClip && (
-        <div style={{ position:"fixed", bottom:0, left:0, right:0, background:dark ? "rgba(11,11,11,0.96)" : "rgba(229,229,224,0.96)", borderTop:t.border, backdropFilter:"blur(14px)", padding:"9px 28px", display:"flex", alignItems:"center", gap:11, zIndex:40 }}>
-          {lastGeneratedClip.thumbnail && <img src={lastGeneratedClip.thumbnail} style={{ width:34, height:22, borderRadius:4, objectFit:"cover" }}/>}
-          <div style={{ flex:1 }}>
+        <div style={{ position:"fixed", bottom:0, left:0, right:0, background:dark ? "rgba(11,11,11,0.96)" : "rgba(229,229,224,0.96)", borderTop:t.border, backdropFilter:"blur(14px)", padding:"9px 16px", display:"flex", alignItems:"center", gap:10, zIndex:40 }}>
+          {lastGeneratedClip.thumbnail && <img src={lastGeneratedClip.thumbnail} style={{ width:34, height:22, borderRadius:4, objectFit:"cover", flexShrink:0 }}/>}
+          <div style={{ flex:1, minWidth:0 }}>
             <p style={{ fontSize:10, color:t.textMuted }}>{T.lastGenerated}</p>
-            <p style={{ fontSize:12, color:t.text, fontWeight:500 }}>{lastGeneratedClip.name}</p>
+            <p style={{ fontSize:12, color:t.text, fontWeight:500, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{lastGeneratedClip.name}</p>
           </div>
-          <a href={lastGeneratedClip.base64} download={`${lastGeneratedClip.name}.mp4`} style={{ fontSize:11, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.18)", borderRadius:7, padding:"5px 11px", textDecoration:"none" }}>↓ {T.download}</a>
-          <button onClick={() => setLastGeneratedClip(null)} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15 }}>✕</button>
+          <button onClick={() => shareNative(lastGeneratedClip)} style={{ fontSize:11, color:t.textSub, background:t.bgInput, border:t.border, borderRadius:7, padding:"5px 9px", cursor:"pointer", whiteSpace:"nowrap" }}>↗ {T.shareNative}</button>
+          <a href={lastGeneratedClip.base64} download={`${lastGeneratedClip.name}.mp4`} style={{ fontSize:11, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.18)", borderRadius:7, padding:"5px 9px", textDecoration:"none", whiteSpace:"nowrap" }}>↓</a>
+          <button onClick={() => setLastGeneratedClip(null)} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15, flexShrink:0 }}>✕</button>
         </div>
       )}
 
       {/* MODALES */}
 
       {showStats && (
-        <div onClick={() => setShowStats(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:300 }}>
+        <div onClick={() => setShowStats(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:300 }}>
             <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>📊 {T.stats}</span><button onClick={() => setShowStats(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
             {[[T.totalClips, generatedClips.length + clips.length],[T.clipsInLib, clips.length],[T.queue, queue.length]].map(([label, val]) => (
               <div key={String(label)} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 0", borderBottom:t.border }}>
@@ -777,17 +895,17 @@ export default function Home() {
       )}
 
       {showPresets && (
-        <div onClick={() => setShowPresets(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:360, maxHeight:"75vh", overflowY:"auto" }}>
+        <div onClick={() => setShowPresets(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:360, maxHeight:"75vh", overflowY:"auto" }}>
             <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>⚡ {T.presets}</span><button onClick={() => setShowPresets(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
             {presets.length === 0 ? <p style={{ fontSize:13, color:t.textMuted, textAlign:"center", padding:"20px 0" }}>—</p> : presets.map(p => (
               <div key={p.id} style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 12px", background:t.bgInput, border:t.border, borderRadius:9 }}>
-                <div style={{ flex:1 }}>
+                <div style={{ flex:1, minWidth:0 }}>
                   <p style={{ fontSize:13, color:t.text, fontWeight:500 }}>{p.name}</p>
-                  <p style={{ fontSize:10, color:t.textMuted }}>{p.format} · {CGL[p.colorGrade]} · {TRL[p.transition]} · {p.exportQuality}</p>
+                  <p style={{ fontSize:10, color:t.textMuted, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.format} · {CGL[p.colorGrade]} · {TRL[p.transition]} · {p.exportQuality}</p>
                 </div>
-                <button onClick={() => loadPreset(p)} style={{ padding:"4px 10px", borderRadius:6, fontSize:11, border:"1px solid rgba(232,245,66,0.28)", background:"rgba(232,245,66,0.06)", color:t.accent, cursor:"pointer" }}>{T.use}</button>
-                <button onClick={() => deletePreset(p.id)} style={{ padding:"4px 8px", borderRadius:6, fontSize:11, border:"none", background:"none", color:"#e8453a", cursor:"pointer" }}>✕</button>
+                <button onClick={() => loadPreset(p)} style={{ padding:"4px 10px", borderRadius:6, fontSize:11, border:"1px solid rgba(232,245,66,0.28)", background:"rgba(232,245,66,0.06)", color:t.accent, cursor:"pointer", flexShrink:0 }}>{T.use}</button>
+                <button onClick={() => deletePreset(p.id)} style={{ padding:"4px 8px", borderRadius:6, fontSize:11, border:"none", background:"none", color:"#e8453a", cursor:"pointer", flexShrink:0 }}>✕</button>
               </div>
             ))}
             <button onClick={() => setShowPresets(false)} style={{ padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.close}</button>
@@ -796,11 +914,11 @@ export default function Home() {
       )}
 
       {showSavePreset && (
-        <div onClick={() => setShowSavePreset(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:310 }}>
+        <div onClick={() => setShowSavePreset(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:310 }}>
             <p style={{ fontSize:14, fontWeight:600, color:t.text }}>+ {T.savePreset}</p>
             <input value={presetName} onChange={e => setPresetName(e.target.value)} onKeyDown={e => e.key === "Enter" && savePreset()} style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"9px 13px", fontSize:13, color:t.text, outline:"none" }} placeholder={T.presetName} autoFocus/>
-            <p style={{ fontSize:11, color:t.textMuted }}>{selectedFormat} · {CGL[colorGrade]} · {TRL[transition]} · {exportQuality} · {exportCodec}</p>
+            <p style={{ fontSize:11, color:t.textMuted }}>{selectedFormat} · {CGL[colorGrade]} · {TRL[transition]} · {exportQuality}</p>
             <div style={{ display:"flex", gap:7 }}>
               <button onClick={() => setShowSavePreset(false)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.cancel}</button>
               <button onClick={savePreset} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:700 }}>{T.savePreset}</button>
@@ -810,8 +928,8 @@ export default function Home() {
       )}
 
       {showQueue && (
-        <div onClick={() => setShowQueue(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:420, maxHeight:"75vh", overflowY:"auto" }}>
+        <div onClick={() => setShowQueue(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:420, maxHeight:"75vh", overflowY:"auto" }}>
             <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>⏱ {T.queue}</span><button onClick={() => setShowQueue(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
             {queue.length === 0 ? <p style={{ fontSize:13, color:t.textMuted, textAlign:"center", padding:"20px 0" }}>{T.queueEmpty}</p> : queue.map((item, i) => (
               <div key={item.id} style={{ display:"flex", alignItems:"center", gap:9, padding:"10px 12px", background:t.bgInput, border:item.status === "processing" ? "1px solid rgba(232,245,66,0.3)" : t.border, borderRadius:9 }}>
@@ -822,7 +940,7 @@ export default function Home() {
                   <p style={{ fontSize:12, color:t.text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{item.prompt || `Job ${i+1}`}</p>
                   <p style={{ fontSize:10, color:t.textMuted }}>{item.videos.length} vidéo(s)</p>
                 </div>
-                {item.status === "pending" && <button onClick={() => setQueue(prev => prev.filter(q => q.id !== item.id))} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:14 }}>✕</button>}
+                {item.status === "pending" && <button onClick={() => setQueue(prev => prev.filter(q => q.id !== item.id))} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:14, flexShrink:0 }}>✕</button>}
               </div>
             ))}
             <div style={{ display:"flex", gap:7 }}>
@@ -836,10 +954,22 @@ export default function Home() {
       )}
 
       {showTimestampPreview && (
-        <div onClick={() => setShowTimestampPreview(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:460, maxHeight:"80vh", overflowY:"auto" }}>
+        <div onClick={() => setShowTimestampPreview(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:460, maxHeight:"80vh", overflowY:"auto" }}>
             <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>{T.timestampPreview}</span><button onClick={() => setShowTimestampPreview(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
             <p style={{ fontSize:12, color:t.textMuted }}>{T.timestampDesc}</p>
+            {/* Timeline visuelle */}
+            {timestampPreviews.length > 0 && (
+              <div style={{ position:"relative", height:32, background:t.bgInput, borderRadius:8, overflow:"hidden", marginBottom:4 }}>
+                {timestampPreviews.map((ts, i) => {
+                  const total = timestampPreviews.reduce((acc, t) => Math.max(acc, t.start + t.duration), 0)
+                  const colors = ["rgba(232,245,66,0.6)","rgba(100,200,255,0.6)","rgba(255,150,100,0.6)","rgba(150,255,150,0.6)"]
+                  return <div key={i} style={{ position:"absolute", top:4, height:24, left:`${(ts.start / total) * 100}%`, width:`${(ts.duration / total) * 100}%`, background:colors[i % colors.length], borderRadius:4, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <span style={{ fontSize:9, fontWeight:700, color:"#0a0a0a" }}>{i+1}</span>
+                  </div>
+                })}
+              </div>
+            )}
             {timestampPreviews.map((ts, i) => (
               <div key={i} style={{ background:t.bgInput, border:t.border, borderRadius:9, padding:"11px 13px" }}>
                 <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:13, color:t.text, fontWeight:500 }}>{ts.name}</span><span style={{ fontSize:11, color:t.accent }}>{ts.start}s → {ts.start + ts.duration}s</span></div>
@@ -855,8 +985,8 @@ export default function Home() {
       )}
 
       {showCapsulesModal && (
-        <div onClick={() => { setShowCapsulesModal(false); setCapsulesType(null) }} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:370 }}>
+        <div onClick={() => { setShowCapsulesModal(false); setCapsulesType(null) }} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:370 }}>
             <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>{T.capsuleTitle}</span><button onClick={() => { setShowCapsulesModal(false); setCapsulesType(null) }} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
             <div style={{ display:"flex", gap:7 }}>
               {(["courte","longue"] as const).map(type => (
@@ -882,8 +1012,8 @@ export default function Home() {
       )}
 
       {showPromptHelper && (
-        <div onClick={() => setShowPromptHelper(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:450 }}>
+        <div onClick={() => setShowPromptHelper(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:450 }}>
             <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>✦ {T.promptHelper}</span><button onClick={() => setShowPromptHelper(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
             <textarea value={helperInput} onChange={e => setHelperInput(e.target.value)} style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"11px 13px", fontSize:13, color:t.text, outline:"none", resize:"none", height:76, fontFamily:"sans-serif", width:"100%" }} placeholder="Edit de Dybala, style TikTok foot, musique phonk..."/>
             <div style={{ display:"flex", alignItems:"center", gap:8 }}>
@@ -894,13 +1024,13 @@ export default function Home() {
             </div>
             {helperResult && (
               <div style={{ background:"rgba(232,245,66,0.03)", border:"1px solid rgba(232,245,66,0.15)", borderRadius:8, padding:"11px 13px" }}>
-                <p style={{ fontSize:10, color:t.accent, marginBottom:5, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.06em" }}>{T.promptGenerated}</p>
+                <p style={{ fontSize:10, color:t.accent, marginBottom:5, fontWeight:700, textTransform:"uppercase" }}>{T.promptGenerated}</p>
                 <p style={{ fontSize:13, color:t.text, lineHeight:1.55 }}>{helperResult}</p>
               </div>
             )}
             <div style={{ display:"flex", gap:7 }}>
               <button onClick={() => setShowPromptHelper(false)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.close}</button>
-              {helperResult && <button onClick={() => { setPromptText(helperResult); setShowPromptHelper(false) }} style={{ flex:1, padding:9, borderRadius:8, border:"1px solid rgba(232,245,66,0.28)", background:"rgba(232,245,66,0.06)", color:t.accent, cursor:"pointer", fontSize:13, fontWeight:500 }}>{T.use}</button>}
+              {helperResult && <button onClick={() => { setPromptText(helperResult); setShowPromptHelper(false) }} style={{ flex:1, padding:9, borderRadius:8, border:"1px solid rgba(232,245,66,0.28)", background:"rgba(232,245,66,0.06)", color:t.accent, cursor:"pointer", fontSize:13 }}>{T.use}</button>}
               <button onClick={handlePromptHelper} disabled={helperLoading} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:helperLoading ? "rgba(232,245,66,0.35)" : t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:700 }}>{helperLoading ? "⏳" : `✦ ${T.generate}`}</button>
             </div>
           </div>
@@ -908,8 +1038,8 @@ export default function Home() {
       )}
 
       {showNewFolder && (
-        <div onClick={() => setShowNewFolder(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:310 }}>
+        <div onClick={() => setShowNewFolder(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:310 }}>
             <p style={{ fontSize:14, fontWeight:600, color:t.text }}>{newFolderParent ? T.newSubfolder : T.newFolder}</p>
             <input value={newFolderName} onChange={e => setNewFolderName(e.target.value)} onKeyDown={e => e.key === "Enter" && createFolder()} style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"9px 13px", fontSize:13, color:t.text, outline:"none" }} placeholder={T.newFolderName} autoFocus/>
             <div style={{ display:"flex", gap:7 }}>
@@ -921,8 +1051,8 @@ export default function Home() {
       )}
 
       {showMoveModal && (
-        <div onClick={() => setShowMoveModal(null)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:310 }}>
+        <div onClick={() => setShowMoveModal(null)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:310 }}>
             <p style={{ fontSize:14, fontWeight:600, color:t.text }}>{T.move}...</p>
             <button onClick={() => moveClip(showMoveModal, null)} style={{ padding:"9px 13px", borderRadius:8, border:t.border, background:t.bgInput, color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>▣ {T.clipsNoFolder}</button>
             {folders.map(f => <button key={f.id} onClick={() => moveClip(showMoveModal, f.id)} style={{ padding:"9px 13px", borderRadius:8, border:t.border, background:t.bgInput, color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>▣ {f.name}</button>)}
@@ -932,8 +1062,8 @@ export default function Home() {
       )}
 
       {showShareModal && (
-        <div onClick={() => setShowShareModal(null)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:310 }}>
+        <div onClick={() => setShowShareModal(null)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:310 }}>
             <p style={{ fontSize:14, fontWeight:600, color:t.text }}>{T.shareFolder}</p>
             <p style={{ fontSize:11, color:t.textMuted }}>{T.sharedWith} : {folders.find(f => f.id === showShareModal)?.shared_with?.join(", ") || "—"}</p>
             <input value={shareEmail} onChange={e => setShareEmail(e.target.value)} style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"9px 13px", fontSize:13, color:t.text, outline:"none" }} placeholder={T.emailMember}/>
@@ -946,8 +1076,8 @@ export default function Home() {
       )}
 
       {showCompressModal && (
-        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", zIndex:300, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <div style={{ ...modalBase, width:330 }}>
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", zIndex:300, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div style={{ ...modalBase, width:"100%", maxWidth:330 }}>
             <p style={{ fontSize:15, fontWeight:600, color:t.text }}>{T.compressTitle}</p>
             <p style={{ fontSize:13, color:t.textMuted }}>{T.compressMsg}</p>
             <div style={{ display:"flex", gap:7 }}>
@@ -959,23 +1089,23 @@ export default function Home() {
       )}
 
       {showMusic && (
-        <div onClick={closeMusic} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:450, maxHeight:"80vh" }}>
+        <div onClick={closeMusic} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:450, maxHeight:"85vh" }}>
             <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>{T.chooseMusic}</span><button onClick={closeMusic} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
             <input value={searchQuery} onChange={e => handleSearch(e.target.value)} style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"9px 13px", fontSize:13, color:t.text, outline:"none" }} placeholder={T.searchMusic}/>
             <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>{defaultQueries.map(q => <button key={q} onClick={() => { setSearchQuery(q); fetchTracks(q) }} style={{ padding:"3px 9px", borderRadius:20, fontSize:11, cursor:"pointer", border:t.border, background:t.bgPill, color:t.textMuted }}>{q}</button>)}</div>
-            <div style={{ overflowY:"auto", display:"flex", flexDirection:"column", gap:5 }}>
+            <div style={{ overflowY:"auto", display:"flex", flexDirection:"column", gap:5, maxHeight:"50vh" }}>
               {loadingTracks ? <p style={{ fontSize:13, color:t.textMuted, textAlign:"center", padding:"18px 0" }}>...</p>
-                : tracks.length === 0 ? <p style={{ fontSize:13, color:t.textMuted, textAlign:"center", padding:"18px 0" }}>Aucun résultat</p>
+                : tracks.length === 0 ? <p style={{ fontSize:13, color:t.textMuted, textAlign:"center", padding:"18px 0" }}>—</p>
                 : tracks.map(track => (
-                  <div key={track.id} style={{ display:"flex", alignItems:"center", gap:11, padding:"7px 9px", borderRadius:8, background:selectedMusic?.id === track.id ? "rgba(232,245,66,0.06)" : t.bgInput, border:selectedMusic?.id === track.id ? "1px solid rgba(232,245,66,0.28)" : "1px solid transparent" }}>
-                    <img src={track.album.cover_small} style={{ width:38, height:38, borderRadius:5, flexShrink:0 }}/>
+                  <div key={track.id} style={{ display:"flex", alignItems:"center", gap:10, padding:"7px 9px", borderRadius:8, background:selectedMusic?.id === track.id ? "rgba(232,245,66,0.06)" : t.bgInput, border:selectedMusic?.id === track.id ? "1px solid rgba(232,245,66,0.28)" : "1px solid transparent" }}>
+                    <img src={track.album.cover_small} style={{ width:36, height:36, borderRadius:5, flexShrink:0 }}/>
                     <div style={{ flex:1, minWidth:0 }}>
                       <p style={{ fontSize:12, color:t.text, fontWeight:500, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{track.title}</p>
                       <p style={{ fontSize:10, color:t.textMuted }}>{track.artist.name}</p>
                     </div>
-                    <button onClick={() => togglePlay(track)} style={{ width:30, height:30, borderRadius:"50%", border:t.border, background:t.bgInput, color:t.textSub, cursor:"pointer", fontSize:11, flexShrink:0 }}>{playingId === track.id ? "⏸" : "▶"}</button>
-                    <button onClick={() => selectTrack(track)} style={{ padding:"4px 10px", borderRadius:5, fontSize:11, fontWeight:600, cursor:"pointer", border:"1px solid rgba(232,245,66,0.28)", background:"rgba(232,245,66,0.06)", color:t.accent, flexShrink:0 }}>OK</button>
+                    <button onClick={() => togglePlay(track)} style={{ width:28, height:28, borderRadius:"50%", border:t.border, background:t.bgInput, color:t.textSub, cursor:"pointer", fontSize:11, flexShrink:0 }}>{playingId === track.id ? "⏸" : "▶"}</button>
+                    <button onClick={() => selectTrack(track)} style={{ padding:"4px 9px", borderRadius:5, fontSize:11, fontWeight:600, cursor:"pointer", border:"1px solid rgba(232,245,66,0.28)", background:"rgba(232,245,66,0.06)", color:t.accent, flexShrink:0 }}>OK</button>
                   </div>
                 ))}
             </div>
@@ -985,7 +1115,7 @@ export default function Home() {
 
       {showSettings && (
         <div onClick={() => setShowSettings(false)} style={{ position:"fixed", inset:0, background:t.overlay, zIndex:100, display:"flex" }}>
-          <div onClick={e => e.stopPropagation()} style={{ position:"absolute", right:0, top:0, bottom:0, width:270, background:dark ? "rgba(11,11,11,0.98)" : t.bgPanel, borderLeft:t.border, padding:"20px 17px", display:"flex", flexDirection:"column", gap:18, overflowY:"auto", backdropFilter:"blur(16px)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ position:"absolute", right:0, top:0, bottom:0, width:260, background:dark ? "rgba(11,11,11,0.98)" : t.bgModal, borderLeft:t.border, padding:"20px 16px", display:"flex", flexDirection:"column", gap:18, overflowY:"auto", backdropFilter:"blur(16px)" }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>{T.settings}</span><button onClick={() => setShowSettings(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
             <div style={{ height:1, background:dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)" }}/>
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
@@ -995,6 +1125,7 @@ export default function Home() {
                 <button onClick={() => setDark(true)} style={{ flex:1, padding:7, border:dark ? `1px solid ${t.accent}` : t.border, borderRadius:7, background:dark ? "rgba(232,245,66,0.07)" : "none", color:dark ? t.accent : t.textMuted, fontSize:11, cursor:"pointer" }}>☾ Sombre</button>
               </div>
             </div>
+            <button onClick={() => { setOnboardingDone(false); localStorage.removeItem("climbOnboarding"); setShowSettings(false) }} style={{ background:"none", border:t.border, borderRadius:8, padding:9, fontSize:12, color:t.textSub, cursor:"pointer" }}>↺ Revoir l'intro</button>
             {user?.email === "nolanrochette26@gmail.com" && (
               <>
                 <div style={{ height:1, background:dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)" }}/>
@@ -1008,14 +1139,15 @@ export default function Home() {
               </>
             )}
             <div style={{ height:1, background:dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)" }}/>
-            <button onClick={() => { setShowSettings(false); setShowReport(true) }} style={{ background:"none", border:"1px solid rgba(232,69,58,0.25)", borderRadius:8, padding:9, fontSize:12, fontWeight:500, color:"#e8453a", cursor:"pointer" }}>⚠ {T.reportProblem}</button>
+            <button onClick={async () => { await supabase.auth.signOut(); setUser(null) }} style={{ background:"none", border:"1px solid rgba(232,69,58,0.25)", borderRadius:8, padding:9, fontSize:12, fontWeight:500, color:"#e8453a", cursor:"pointer" }}>{T.logout}</button>
+            <button onClick={() => { setShowSettings(false); setShowReport(true) }} style={{ background:"none", border:"1px solid rgba(255,255,255,0.07)", borderRadius:8, padding:9, fontSize:12, color:t.textSub, cursor:"pointer" }}>⚠ {T.reportProblem}</button>
           </div>
         </div>
       )}
 
       {showReport && (
-        <div onClick={() => setShowReport(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:330 }}>
+        <div onClick={() => setShowReport(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:330 }}>
             <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>⚠ {T.reportProblem}</span><button onClick={() => setShowReport(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
             <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>{problems.map(p => <button key={p} onClick={() => toggleProblem(p)} style={{ padding:"5px 11px", borderRadius:20, fontSize:11, cursor:"pointer", border:selectedProblems.includes(p) ? "1px solid rgba(232,69,58,0.4)" : t.border, background:selectedProblems.includes(p) ? "rgba(232,69,58,0.06)" : t.bgPill, color:selectedProblems.includes(p) ? "#e8453a" : t.textSub }}>{p}</button>)}</div>
             <textarea style={{ background:t.bgInput, border:t.border, borderRadius:8, padding:"9px 11px", fontSize:12, color:t.text, outline:"none", resize:"none", height:70, fontFamily:"sans-serif", width:"100%" }} placeholder="Détails..."/>
