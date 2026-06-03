@@ -32,19 +32,19 @@ const TR_LABELS: Record<Lang, Record<string, string>> = {
 }
 
 const TRANSLATIONS: Record<Lang, Record<string, string>> = {
-  EN: { home:"Home",library:"Library",settings:"Settings",logout:"Logout",videos:"Videos",addFile:"+ Add file",dragVideo:"Drop a video or click to import",dragSub:"TikTok, Instagram, local file • max 50MB",addAnother:"Add another video",pasteLink:"Paste a TikTok / Instagram link...",import:"Import",outputFormat:"Output format",beatSync:"Beat sync",subtitles:"Subtitles",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsules",introOutro:"Intro / Outro",addMusic:"Add music",zoomIntensity:"Zoom intensity",speedIntensity:"Speed ramp intensity",description:"Description",promptHistory:"History",preview:"Preview",promptHelper:"Prompt help",generating:"Generating...",generate:"Generate",preparingVideos:"Preparing videos...",analyzingAI:"AI analysis...",detectingEffects:"Detecting effects...",renderingClips:"Rendering clips...",generatedClips:"Generated clips",downloadAll:"Download all",download:"Download",serverStarting:"Server starting — may take 30-50s...",check:"Check",newFolder:"+ New folder",folders:"Folders",clipsInFolder:"Clips in this folder",clipsNoFolder:"Clips without folder",noClips:"No clips here",generateFirst:"Generate your first clip",back:"Back",rename:"Rename",move:"Move",delete:"Delete",shareFolder:"Share folder",sharedWith:"Shared with",cancel:"Cancel",create:"Create",apply:"Apply",close:"Close",use:"Use",newFolderName:"Folder name...",emailMember:"Member email...",addMember:"Add a member",createAccount:"Create account",creating:"Creating...",reportProblem:"Report a problem",send:"Send",compressTitle:"File too large",compressMsg:"Compress automatically?",no:"No",yesCompress:"Yes, compress",compressing:"Compressing...",chooseMusic:"Choose music",searchMusic:"Search artist, title...",timestampPreview:"Timestamp preview",timestampDesc:"Moments the AI will cut.",useTimestamps:"Use these timestamps",capsuleTitle:"Capsules",shortVideo:"Short video",shortSub:"sequential clips",longVideo:"Long video",longSub:"best moments",capsuleCount:"Number of capsules",promptGenerated:"Generated prompt:",refVideo:"Reference video",optional:"optional",addRefVideo:"+ Add reference video",lastGenerated:"Last generated",serverActive:"Server active",cmdEnterHint:"Cmd+Enter to generate",subfolders:"Subfolders",newSubfolder:"+ Subfolder",share:"Share",colorGrade:"Color grade",transition:"Transition",textOverlay:"Text overlay",stabilize:"Stabilize",vocalVolume:"Vocal volume",none:"None",exportQuality:"Export quality",exportCodec:"Codec",watermark:"Watermark",presets:"Presets",savePreset:"Save preset",presetName:"Preset name...",stats:"Stats",totalClips:"Total clips",clipsInLib:"In library",queue:"Queue",addToQueue:"+ Queue",runQueue:"Run queue",queueEmpty:"Queue is empty",copyLink:"Copy link",copied:"Copied!",autoMode:"Auto mode",autoModeDesc:"The AI chooses everything for you",manualMode:"Manual",step1:"Import your video",step2:"Describe your edit",step3:"Generate",onboardingSkip:"Skip",shareNative:"Share",advancedSettings:"Advanced settings",generatingMsg1:"Analyzing your best sequences... 🔍",generatingMsg2:"Detecting scene changes... 🎬",generatingMsg3:"Syncing to the beat... 🎵",generatingMsg4:"Applying color grade... 🎨",generatingMsg5:"Rendering your clips... ✨",generatingMsg6:"Almost there... 🚀" },
-  FR: { home:"Accueil",library:"Bibliothèque",settings:"Paramètres",logout:"Déconnexion",videos:"Vidéos",addFile:"+ Ajouter",dragVideo:"Glisse une vidéo ou clique",dragSub:"TikTok, Instagram, fichier local • max 50MB",addAnother:"Ajouter une autre vidéo",pasteLink:"Coller un lien TikTok / Instagram...",import:"Importer",outputFormat:"Format de sortie",beatSync:"Beat sync",subtitles:"Sous-titres",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsules",introOutro:"Intro / Outro",addMusic:"Ajouter musique",zoomIntensity:"Intensité zoom",speedIntensity:"Intensité speed ramp",description:"Description",promptHistory:"Historique",preview:"Aperçu",promptHelper:"Aide prompt",generating:"Génération...",generate:"Générer",preparingVideos:"Préparation des vidéos...",analyzingAI:"Analyse IA...",detectingEffects:"Détection des effets...",renderingClips:"Rendu des clips...",generatedClips:"Clips générés",downloadAll:"Tout télécharger",download:"Télécharger",serverStarting:"Serveur en démarrage — 30-50 secondes...",check:"Vérifier",newFolder:"+ Dossier",folders:"Dossiers",clipsInFolder:"Clips dans ce dossier",clipsNoFolder:"Clips sans dossier",noClips:"Aucun clip ici",generateFirst:"Générer un premier clip",back:"Retour",rename:"Renommer",move:"Déplacer",delete:"Supprimer",shareFolder:"Partager le dossier",sharedWith:"Partagé avec",cancel:"Annuler",create:"Créer",apply:"Appliquer",close:"Fermer",use:"Utiliser",newFolderName:"Nom du dossier...",emailMember:"Email du membre...",addMember:"Ajouter un membre",createAccount:"Créer le compte",creating:"Création...",reportProblem:"Signaler un problème",send:"Envoyer",compressTitle:"Vidéo trop lourde",compressMsg:"Compresser automatiquement ?",no:"Non",yesCompress:"Oui, compresser",compressing:"Compression...",chooseMusic:"Choisir une musique",searchMusic:"Rechercher artiste, titre...",timestampPreview:"Aperçu timestamps",timestampDesc:"Moments que l'IA va découper.",useTimestamps:"Utiliser ces timestamps",capsuleTitle:"Capsules",shortVideo:"Vidéo courte",shortSub:"clips qui se suivent",longVideo:"Vidéo longue",longSub:"meilleurs moments",capsuleCount:"Nombre",promptGenerated:"Prompt généré :",refVideo:"Vidéo référence",optional:"optionnel",addRefVideo:"+ Ajouter",lastGenerated:"Dernier clip",serverActive:"Serveur actif",cmdEnterHint:"Cmd+Entrée pour générer",subfolders:"Sous-dossiers",newSubfolder:"+ Sous-dossier",share:"Partager",colorGrade:"Color grade",transition:"Transition",textOverlay:"Texte overlay",stabilize:"Stabiliser",vocalVolume:"Volume voix",none:"Aucun",exportQuality:"Qualité export",exportCodec:"Codec",watermark:"Watermark",presets:"Presets",savePreset:"Sauvegarder",presetName:"Nom du preset...",stats:"Stats",totalClips:"Clips générés",clipsInLib:"En bibliothèque",queue:"File d'attente",addToQueue:"+ File",runQueue:"Lancer la file",queueEmpty:"File vide",copyLink:"Copier le lien",copied:"Copié !",autoMode:"Mode Auto",autoModeDesc:"L'IA choisit tout pour toi",manualMode:"Manuel",step1:"Importe ta vidéo",step2:"Décris ton edit",step3:"Génère",onboardingSkip:"Passer",shareNative:"Partager",advancedSettings:"Paramètres avancés",generatingMsg1:"Analyse de tes meilleures séquences... 🔍",generatingMsg2:"Détection des changements de scène... 🎬",generatingMsg3:"Synchronisation sur le beat... 🎵",generatingMsg4:"Application du color grade... 🎨",generatingMsg5:"Rendu de tes clips... ✨",generatingMsg6:"Presque terminé... 🚀" },
-  ES: { home:"Inicio",library:"Biblioteca",settings:"Ajustes",logout:"Salir",videos:"Vídeos",addFile:"+ Añadir",dragVideo:"Arrastra un vídeo",dragSub:"TikTok, Instagram • máx 50MB",addAnother:"Añadir otro",pasteLink:"Enlace TikTok / Instagram...",import:"Importar",outputFormat:"Formato",beatSync:"Beat sync",subtitles:"Subtítulos",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Cápsulas",introOutro:"Intro / Outro",addMusic:"Música",zoomIntensity:"Zoom",speedIntensity:"Speed",description:"Descripción",promptHistory:"Historial",preview:"Vista previa",promptHelper:"Ayuda",generating:"Generando...",generate:"Generar",preparingVideos:"Preparando...",analyzingAI:"IA...",detectingEffects:"Efectos...",renderingClips:"Render...",generatedClips:"Clips",downloadAll:"Descargar todo",download:"Descargar",serverStarting:"Servidor iniciando...",check:"Verificar",newFolder:"+ Carpeta",folders:"Carpetas",clipsInFolder:"Clips en carpeta",clipsNoFolder:"Sin carpeta",noClips:"Sin clips",generateFirst:"Generar clip",back:"Volver",rename:"Renombrar",move:"Mover",delete:"Eliminar",shareFolder:"Compartir",sharedWith:"Compartido",cancel:"Cancelar",create:"Crear",apply:"Aplicar",close:"Cerrar",use:"Usar",newFolderName:"Nombre...",emailMember:"Email...",addMember:"Añadir",createAccount:"Crear cuenta",creating:"Creando...",reportProblem:"Reportar",send:"Enviar",compressTitle:"Archivo grande",compressMsg:"¿Comprimir?",no:"No",yesCompress:"Sí",compressing:"Comprimiendo...",chooseMusic:"Música",searchMusic:"Buscar...",timestampPreview:"Timestamps",timestampDesc:"La IA cortará aquí.",useTimestamps:"Usar",capsuleTitle:"Cápsulas",shortVideo:"Corto",shortSub:"clips seguidos",longVideo:"Largo",longSub:"mejores momentos",capsuleCount:"Número",promptGenerated:"Prompt:",refVideo:"Referencia",optional:"opcional",addRefVideo:"+ Añadir",lastGenerated:"Último",serverActive:"Activo",cmdEnterHint:"Cmd+Enter",subfolders:"Subcarpetas",newSubfolder:"+ Subcarpeta",share:"Compartir",colorGrade:"Color",transition:"Transición",textOverlay:"Texto",stabilize:"Estabilizar",vocalVolume:"Voz",none:"Ninguno",exportQuality:"Calidad",exportCodec:"Codec",watermark:"Marca",presets:"Presets",savePreset:"Guardar",presetName:"Nombre...",stats:"Stats",totalClips:"Clips",clipsInLib:"Biblioteca",queue:"Cola",addToQueue:"+ Cola",runQueue:"Ejecutar",queueEmpty:"Vacía",copyLink:"Copiar",copied:"¡Copiado!",autoMode:"Modo Auto",autoModeDesc:"La IA elige todo",manualMode:"Manual",step1:"Importa tu vídeo",step2:"Describe tu edit",step3:"Genera",onboardingSkip:"Saltar",shareNative:"Compartir",advancedSettings:"Ajustes avanzados",generatingMsg1:"Analizando tus mejores secuencias... 🔍",generatingMsg2:"Detectando cambios de escena... 🎬",generatingMsg3:"Sincronizando con el beat... 🎵",generatingMsg4:"Aplicando color grade... 🎨",generatingMsg5:"Renderizando tus clips... ✨",generatingMsg6:"Casi listo... 🚀" },
-  IT: { home:"Home",library:"Libreria",settings:"Impostazioni",logout:"Esci",videos:"Video",addFile:"+ Aggiungi",dragVideo:"Trascina un video",dragSub:"TikTok, Instagram • max 50MB",addAnother:"Aggiungi altro",pasteLink:"Link TikTok / Instagram...",import:"Importa",outputFormat:"Formato",beatSync:"Beat sync",subtitles:"Sottotitoli",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsule",introOutro:"Intro / Outro",addMusic:"Musica",zoomIntensity:"Zoom",speedIntensity:"Speed",description:"Descrizione",promptHistory:"Cronologia",preview:"Anteprima",promptHelper:"Aiuto",generating:"Generazione...",generate:"Genera",preparingVideos:"Preparazione...",analyzingAI:"IA...",detectingEffects:"Effetti...",renderingClips:"Rendering...",generatedClips:"Clip",downloadAll:"Scarica tutto",download:"Scarica",serverStarting:"Server in avvio...",check:"Verifica",newFolder:"+ Cartella",folders:"Cartelle",clipsInFolder:"Clip in cartella",clipsNoFolder:"Senza cartella",noClips:"Nessuna clip",generateFirst:"Genera clip",back:"Indietro",rename:"Rinomina",move:"Sposta",delete:"Elimina",shareFolder:"Condividi",sharedWith:"Condiviso",cancel:"Annulla",create:"Crea",apply:"Applica",close:"Chiudi",use:"Usa",newFolderName:"Nome...",emailMember:"Email...",addMember:"Aggiungi",createAccount:"Crea account",creating:"Creazione...",reportProblem:"Segnala",send:"Invia",compressTitle:"File grande",compressMsg:"Comprimi?",no:"No",yesCompress:"Sì",compressing:"Compressione...",chooseMusic:"Musica",searchMusic:"Cerca...",timestampPreview:"Timestamp",timestampDesc:"L'IA taglierà qui.",useTimestamps:"Usa",capsuleTitle:"Capsule",shortVideo:"Corto",shortSub:"clip consecutive",longVideo:"Lungo",longSub:"momenti migliori",capsuleCount:"Numero",promptGenerated:"Prompt:",refVideo:"Riferimento",optional:"opzionale",addRefVideo:"+ Aggiungi",lastGenerated:"Ultimo",serverActive:"Attivo",cmdEnterHint:"Cmd+Invio",subfolders:"Sottocartelle",newSubfolder:"+ Sottocartella",share:"Condividi",colorGrade:"Colore",transition:"Transizione",textOverlay:"Testo",stabilize:"Stabilizza",vocalVolume:"Voce",none:"Nessuno",exportQuality:"Qualità",exportCodec:"Codec",watermark:"Watermark",presets:"Preset",savePreset:"Salva",presetName:"Nome...",stats:"Stats",totalClips:"Clip",clipsInLib:"Libreria",queue:"Coda",addToQueue:"+ Coda",runQueue:"Avvia",queueEmpty:"Vuota",copyLink:"Copia",copied:"Copiato!",autoMode:"Modalità Auto",autoModeDesc:"L'IA sceglie tutto",manualMode:"Manuale",step1:"Importa il video",step2:"Descrivi il tuo edit",step3:"Genera",onboardingSkip:"Salta",shareNative:"Condividi",advancedSettings:"Impostazioni avanzate",generatingMsg1:"Analisi delle migliori sequenze... 🔍",generatingMsg2:"Rilevamento cambi scena... 🎬",generatingMsg3:"Sincronizzazione sul beat... 🎵",generatingMsg4:"Applicazione color grade... 🎨",generatingMsg5:"Rendering dei clip... ✨",generatingMsg6:"Quasi finito... 🚀" },
-  DE: { home:"Start",library:"Bibliothek",settings:"Einstellungen",logout:"Abmelden",videos:"Videos",addFile:"+ Hinzufügen",dragVideo:"Video ziehen",dragSub:"TikTok, Instagram • max 50MB",addAnother:"Weiteres Video",pasteLink:"TikTok / Instagram Link...",import:"Importieren",outputFormat:"Format",beatSync:"Beat sync",subtitles:"Untertitel",autoZoom:"Auto-Zoom",speedRamp:"Speed ramp",capsules:"Kapseln",introOutro:"Intro / Outro",addMusic:"Musik",zoomIntensity:"Zoom",speedIntensity:"Speed",description:"Beschreibung",promptHistory:"Verlauf",preview:"Vorschau",promptHelper:"Hilfe",generating:"Generierung...",generate:"Generieren",preparingVideos:"Vorbereitung...",analyzingAI:"KI...",detectingEffects:"Effekte...",renderingClips:"Rendern...",generatedClips:"Clips",downloadAll:"Alle laden",download:"Laden",serverStarting:"Server startet...",check:"Prüfen",newFolder:"+ Ordner",folders:"Ordner",clipsInFolder:"Clips in Ordner",clipsNoFolder:"Ohne Ordner",noClips:"Keine Clips",generateFirst:"Clip erstellen",back:"Zurück",rename:"Umbenennen",move:"Verschieben",delete:"Löschen",shareFolder:"Teilen",sharedWith:"Geteilt mit",cancel:"Abbrechen",create:"Erstellen",apply:"Anwenden",close:"Schließen",use:"Verwenden",newFolderName:"Name...",emailMember:"E-Mail...",addMember:"Hinzufügen",createAccount:"Konto erstellen",creating:"Erstelle...",reportProblem:"Melden",send:"Senden",compressTitle:"Datei groß",compressMsg:"Komprimieren?",no:"Nein",yesCompress:"Ja",compressing:"Komprimierung...",chooseMusic:"Musik",searchMusic:"Suchen...",timestampPreview:"Timestamps",timestampDesc:"KI schneidet hier.",useTimestamps:"Verwenden",capsuleTitle:"Kapseln",shortVideo:"Kurz",shortSub:"aufeinanderfolgend",longVideo:"Lang",longSub:"beste Momente",capsuleCount:"Anzahl",promptGenerated:"Prompt:",refVideo:"Referenz",optional:"optional",addRefVideo:"+ Hinzufügen",lastGenerated:"Letzter",serverActive:"Aktiv",cmdEnterHint:"Cmd+Enter",subfolders:"Unterordner",newSubfolder:"+ Unterordner",share:"Teilen",colorGrade:"Farbe",transition:"Übergang",textOverlay:"Text",stabilize:"Stabilisieren",vocalVolume:"Stimme",none:"Keiner",exportQuality:"Qualität",exportCodec:"Codec",watermark:"Wasserzeichen",presets:"Presets",savePreset:"Speichern",presetName:"Name...",stats:"Stats",totalClips:"Clips",clipsInLib:"Bibliothek",queue:"Warteschlange",addToQueue:"+ Warte",runQueue:"Starten",queueEmpty:"Leer",copyLink:"Kopieren",copied:"Kopiert!",autoMode:"Auto-Modus",autoModeDesc:"KI wählt alles",manualMode:"Manuell",step1:"Video importieren",step2:"Edit beschreiben",step3:"Generieren",onboardingSkip:"Überspringen",shareNative:"Teilen",advancedSettings:"Erweiterte Einstellungen",generatingMsg1:"Beste Sequenzen analysieren... 🔍",generatingMsg2:"Szenenwechsel erkennen... 🎬",generatingMsg3:"Beat synchronisieren... 🎵",generatingMsg4:"Color grade anwenden... 🎨",generatingMsg5:"Clips rendern... ✨",generatingMsg6:"Fast fertig... 🚀" },
+  EN: { home:"Home",library:"Library",settings:"Settings",logout:"Logout",videos:"Videos",addFile:"+ Add file",dragVideo:"Drop a video or click to import",dragSub:"TikTok, Instagram, local file • max 50MB",addAnother:"Add another video",pasteLink:"Paste a TikTok / Instagram link...",import:"Import",outputFormat:"Output format",beatSync:"Beat sync",subtitles:"Subtitles",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsules",introOutro:"Intro / Outro",addMusic:"Add music",zoomIntensity:"Zoom intensity",speedIntensity:"Speed ramp intensity",description:"Description",promptHistory:"History",preview:"Preview",promptHelper:"Prompt help",generating:"Generating...",generate:"Generate",preparingVideos:"Preparing videos...",analyzingAI:"AI analysis...",detectingEffects:"Detecting effects...",renderingClips:"Rendering clips...",generatedClips:"Generated clips",downloadAll:"Download all",download:"Download",serverStarting:"Server starting — may take 30-50s...",check:"Check",newFolder:"+ New folder",folders:"Folders",clipsInFolder:"Clips in this folder",clipsNoFolder:"Clips without folder",noClips:"No clips here",generateFirst:"Generate your first clip",back:"Back",rename:"Rename",move:"Move",delete:"Delete",shareFolder:"Share folder",sharedWith:"Shared with",cancel:"Cancel",create:"Create",apply:"Apply",close:"Close",use:"Use",newFolderName:"Folder name...",emailMember:"Member email...",addMember:"Add a member",createAccount:"Create account",creating:"Creating...",reportProblem:"Report a problem",send:"Send",compressTitle:"File too large",compressMsg:"Compress automatically?",no:"No",yesCompress:"Yes, compress",compressing:"Compressing...",chooseMusic:"Choose music",searchMusic:"Search artist, title...",timestampPreview:"Timestamp preview",timestampDesc:"Moments the AI will cut.",useTimestamps:"Use these timestamps",capsuleTitle:"Capsules",shortVideo:"Short video",shortSub:"sequential clips",longVideo:"Long video",longSub:"best moments",capsuleCount:"Number of capsules",promptGenerated:"Generated prompt:",refVideo:"Reference video",optional:"optional",addRefVideo:"+ Add reference video",lastGenerated:"Last generated",serverActive:"Server active",cmdEnterHint:"Cmd+Enter to generate",subfolders:"Subfolders",newSubfolder:"+ Subfolder",share:"Share",colorGrade:"Color grade",transition:"Transition",textOverlay:"Text overlay",stabilize:"Stabilize",vocalVolume:"Vocal volume",none:"None",exportQuality:"Export quality",exportCodec:"Codec",watermark:"Watermark",presets:"Presets",savePreset:"Save preset",presetName:"Preset name...",stats:"Stats",totalClips:"Total clips",clipsInLib:"In library",queue:"Queue",addToQueue:"+ Queue",runQueue:"Run queue",queueEmpty:"Queue is empty",copyLink:"Copy link",copied:"Copied!",autoMode:"Auto mode",autoModeDesc:"The AI chooses everything for you",manualMode:"Manual",step1:"Import your video",step2:"Describe your edit",step3:"Generate",onboardingSkip:"Skip",shareNative:"Share",advancedSettings:"Advanced settings",generatingMsg1:"Analyzing your best sequences... 🔍",generatingMsg2:"Detecting scene changes... 🎬",generatingMsg3:"Syncing to the beat... 🎵",generatingMsg4:"Applying color grade... 🎨",generatingMsg5:"Rendering your clips... ✨",generatingMsg6:"Almost there... 🚀",subtitleStyle:"Subtitle style",historyTitle:"History" },
+  FR: { home:"Accueil",library:"Bibliothèque",settings:"Paramètres",logout:"Déconnexion",videos:"Vidéos",addFile:"+ Ajouter",dragVideo:"Glisse une vidéo ou clique",dragSub:"TikTok, Instagram, fichier local • max 50MB",addAnother:"Ajouter une autre vidéo",pasteLink:"Coller un lien TikTok / Instagram...",import:"Importer",outputFormat:"Format de sortie",beatSync:"Beat sync",subtitles:"Sous-titres",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsules",introOutro:"Intro / Outro",addMusic:"Ajouter musique",zoomIntensity:"Intensité zoom",speedIntensity:"Intensité speed ramp",description:"Description",promptHistory:"Historique",preview:"Aperçu",promptHelper:"Aide prompt",generating:"Génération...",generate:"Générer",preparingVideos:"Préparation des vidéos...",analyzingAI:"Analyse IA...",detectingEffects:"Détection des effets...",renderingClips:"Rendu des clips...",generatedClips:"Clips générés",downloadAll:"Tout télécharger",download:"Télécharger",serverStarting:"Serveur en démarrage — 30-50 secondes...",check:"Vérifier",newFolder:"+ Dossier",folders:"Dossiers",clipsInFolder:"Clips dans ce dossier",clipsNoFolder:"Clips sans dossier",noClips:"Aucun clip ici",generateFirst:"Générer un premier clip",back:"Retour",rename:"Renommer",move:"Déplacer",delete:"Supprimer",shareFolder:"Partager le dossier",sharedWith:"Partagé avec",cancel:"Annuler",create:"Créer",apply:"Appliquer",close:"Fermer",use:"Utiliser",newFolderName:"Nom du dossier...",emailMember:"Email du membre...",addMember:"Ajouter un membre",createAccount:"Créer le compte",creating:"Création...",reportProblem:"Signaler un problème",send:"Envoyer",compressTitle:"Vidéo trop lourde",compressMsg:"Compresser automatiquement ?",no:"Non",yesCompress:"Oui, compresser",compressing:"Compression...",chooseMusic:"Choisir une musique",searchMusic:"Rechercher artiste, titre...",timestampPreview:"Aperçu timestamps",timestampDesc:"Moments que l'IA va découper.",useTimestamps:"Utiliser ces timestamps",capsuleTitle:"Capsules",shortVideo:"Vidéo courte",shortSub:"clips qui se suivent",longVideo:"Vidéo longue",longSub:"meilleurs moments",capsuleCount:"Nombre",promptGenerated:"Prompt généré :",refVideo:"Vidéo référence",optional:"optionnel",addRefVideo:"+ Ajouter",lastGenerated:"Dernier clip",serverActive:"Serveur actif",cmdEnterHint:"Cmd+Entrée pour générer",subfolders:"Sous-dossiers",newSubfolder:"+ Sous-dossier",share:"Partager",colorGrade:"Color grade",transition:"Transition",textOverlay:"Texte overlay",stabilize:"Stabiliser",vocalVolume:"Volume voix",none:"Aucun",exportQuality:"Qualité export",exportCodec:"Codec",watermark:"Watermark",presets:"Presets",savePreset:"Sauvegarder",presetName:"Nom du preset...",stats:"Stats",totalClips:"Clips générés",clipsInLib:"En bibliothèque",queue:"File d'attente",addToQueue:"+ File",runQueue:"Lancer la file",queueEmpty:"File vide",copyLink:"Copier le lien",copied:"Copié !",autoMode:"Mode Auto",autoModeDesc:"L'IA choisit tout pour toi",manualMode:"Manuel",step1:"Importe ta vidéo",step2:"Décris ton edit",step3:"Génère",onboardingSkip:"Passer",shareNative:"Partager",advancedSettings:"Paramètres avancés",generatingMsg1:"Analyse de tes meilleures séquences... 🔍",generatingMsg2:"Détection des changements de scène... 🎬",generatingMsg3:"Synchronisation sur le beat... 🎵",generatingMsg4:"Application du color grade... 🎨",generatingMsg5:"Rendu de tes clips... ✨",generatingMsg6:"Presque terminé... 🚀",subtitleStyle:"Style sous-titres",historyTitle:"Historique" },
+  ES: { home:"Inicio",library:"Biblioteca",settings:"Ajustes",logout:"Salir",videos:"Vídeos",addFile:"+ Añadir",dragVideo:"Arrastra un vídeo",dragSub:"TikTok, Instagram • máx 50MB",addAnother:"Añadir otro",pasteLink:"Enlace TikTok / Instagram...",import:"Importar",outputFormat:"Formato",beatSync:"Beat sync",subtitles:"Subtítulos",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Cápsulas",introOutro:"Intro / Outro",addMusic:"Música",zoomIntensity:"Zoom",speedIntensity:"Speed",description:"Descripción",promptHistory:"Historial",preview:"Vista previa",promptHelper:"Ayuda",generating:"Generando...",generate:"Generar",preparingVideos:"Preparando...",analyzingAI:"IA...",detectingEffects:"Efectos...",renderingClips:"Render...",generatedClips:"Clips",downloadAll:"Descargar todo",download:"Descargar",serverStarting:"Servidor iniciando...",check:"Verificar",newFolder:"+ Carpeta",folders:"Carpetas",clipsInFolder:"Clips en carpeta",clipsNoFolder:"Sin carpeta",noClips:"Sin clips",generateFirst:"Generar clip",back:"Volver",rename:"Renombrar",move:"Mover",delete:"Eliminar",shareFolder:"Compartir",sharedWith:"Compartido",cancel:"Cancelar",create:"Crear",apply:"Aplicar",close:"Cerrar",use:"Usar",newFolderName:"Nombre...",emailMember:"Email...",addMember:"Añadir",createAccount:"Crear cuenta",creating:"Creando...",reportProblem:"Reportar",send:"Enviar",compressTitle:"Archivo grande",compressMsg:"¿Comprimir?",no:"No",yesCompress:"Sí",compressing:"Comprimiendo...",chooseMusic:"Música",searchMusic:"Buscar...",timestampPreview:"Timestamps",timestampDesc:"La IA cortará aquí.",useTimestamps:"Usar",capsuleTitle:"Cápsulas",shortVideo:"Corto",shortSub:"clips seguidos",longVideo:"Largo",longSub:"mejores momentos",capsuleCount:"Número",promptGenerated:"Prompt:",refVideo:"Referencia",optional:"opcional",addRefVideo:"+ Añadir",lastGenerated:"Último",serverActive:"Activo",cmdEnterHint:"Cmd+Enter",subfolders:"Subcarpetas",newSubfolder:"+ Subcarpeta",share:"Compartir",colorGrade:"Color",transition:"Transición",textOverlay:"Texto",stabilize:"Estabilizar",vocalVolume:"Voz",none:"Ninguno",exportQuality:"Calidad",exportCodec:"Codec",watermark:"Marca",presets:"Presets",savePreset:"Guardar",presetName:"Nombre...",stats:"Stats",totalClips:"Clips",clipsInLib:"Biblioteca",queue:"Cola",addToQueue:"+ Cola",runQueue:"Ejecutar",queueEmpty:"Vacía",copyLink:"Copiar",copied:"¡Copiado!",autoMode:"Modo Auto",autoModeDesc:"La IA elige todo",manualMode:"Manual",step1:"Importa tu vídeo",step2:"Describe tu edit",step3:"Genera",onboardingSkip:"Saltar",shareNative:"Compartir",advancedSettings:"Ajustes avanzados",generatingMsg1:"Analizando... 🔍",generatingMsg2:"Escenas... 🎬",generatingMsg3:"Beat... 🎵",generatingMsg4:"Color... 🎨",generatingMsg5:"Render... ✨",generatingMsg6:"Casi... 🚀",subtitleStyle:"Subtítulos",historyTitle:"Historial" },
+  IT: { home:"Home",library:"Libreria",settings:"Impostazioni",logout:"Esci",videos:"Video",addFile:"+ Aggiungi",dragVideo:"Trascina un video",dragSub:"TikTok, Instagram • max 50MB",addAnother:"Aggiungi altro",pasteLink:"Link TikTok / Instagram...",import:"Importa",outputFormat:"Formato",beatSync:"Beat sync",subtitles:"Sottotitoli",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsule",introOutro:"Intro / Outro",addMusic:"Musica",zoomIntensity:"Zoom",speedIntensity:"Speed",description:"Descrizione",promptHistory:"Cronologia",preview:"Anteprima",promptHelper:"Aiuto",generating:"Generazione...",generate:"Genera",preparingVideos:"Preparazione...",analyzingAI:"IA...",detectingEffects:"Effetti...",renderingClips:"Rendering...",generatedClips:"Clip",downloadAll:"Scarica tutto",download:"Scarica",serverStarting:"Server in avvio...",check:"Verifica",newFolder:"+ Cartella",folders:"Cartelle",clipsInFolder:"Clip in cartella",clipsNoFolder:"Senza cartella",noClips:"Nessuna clip",generateFirst:"Genera clip",back:"Indietro",rename:"Rinomina",move:"Sposta",delete:"Elimina",shareFolder:"Condividi",sharedWith:"Condiviso",cancel:"Annulla",create:"Crea",apply:"Applica",close:"Chiudi",use:"Usa",newFolderName:"Nome...",emailMember:"Email...",addMember:"Aggiungi",createAccount:"Crea account",creating:"Creazione...",reportProblem:"Segnala",send:"Invia",compressTitle:"File grande",compressMsg:"Comprimi?",no:"No",yesCompress:"Sì",compressing:"Compressione...",chooseMusic:"Musica",searchMusic:"Cerca...",timestampPreview:"Timestamp",timestampDesc:"L'IA taglierà qui.",useTimestamps:"Usa",capsuleTitle:"Capsule",shortVideo:"Corto",shortSub:"clip consecutive",longVideo:"Lungo",longSub:"momenti migliori",capsuleCount:"Numero",promptGenerated:"Prompt:",refVideo:"Riferimento",optional:"opzionale",addRefVideo:"+ Aggiungi",lastGenerated:"Ultimo",serverActive:"Attivo",cmdEnterHint:"Cmd+Invio",subfolders:"Sottocartelle",newSubfolder:"+ Sottocartella",share:"Condividi",colorGrade:"Colore",transition:"Transizione",textOverlay:"Testo",stabilize:"Stabilizza",vocalVolume:"Voce",none:"Nessuno",exportQuality:"Qualità",exportCodec:"Codec",watermark:"Watermark",presets:"Preset",savePreset:"Salva",presetName:"Nome...",stats:"Stats",totalClips:"Clip",clipsInLib:"Libreria",queue:"Coda",addToQueue:"+ Coda",runQueue:"Avvia",queueEmpty:"Vuota",copyLink:"Copia",copied:"Copiato!",autoMode:"Modalità Auto",autoModeDesc:"L'IA sceglie tutto",manualMode:"Manuale",step1:"Importa il video",step2:"Descrivi il tuo edit",step3:"Genera",onboardingSkip:"Salta",shareNative:"Condividi",advancedSettings:"Impostazioni avanzate",generatingMsg1:"Analisi... 🔍",generatingMsg2:"Scene... 🎬",generatingMsg3:"Beat... 🎵",generatingMsg4:"Colore... 🎨",generatingMsg5:"Render... ✨",generatingMsg6:"Quasi... 🚀",subtitleStyle:"Sottotitoli",historyTitle:"Cronologia" },
+  DE: { home:"Start",library:"Bibliothek",settings:"Einstellungen",logout:"Abmelden",videos:"Videos",addFile:"+ Hinzufügen",dragVideo:"Video ziehen",dragSub:"TikTok, Instagram • max 50MB",addAnother:"Weiteres Video",pasteLink:"TikTok / Instagram Link...",import:"Importieren",outputFormat:"Format",beatSync:"Beat sync",subtitles:"Untertitel",autoZoom:"Auto-Zoom",speedRamp:"Speed ramp",capsules:"Kapseln",introOutro:"Intro / Outro",addMusic:"Musik",zoomIntensity:"Zoom",speedIntensity:"Speed",description:"Beschreibung",promptHistory:"Verlauf",preview:"Vorschau",promptHelper:"Hilfe",generating:"Generierung...",generate:"Generieren",preparingVideos:"Vorbereitung...",analyzingAI:"KI...",detectingEffects:"Effekte...",renderingClips:"Rendern...",generatedClips:"Clips",downloadAll:"Alle laden",download:"Laden",serverStarting:"Server startet...",check:"Prüfen",newFolder:"+ Ordner",folders:"Ordner",clipsInFolder:"Clips in Ordner",clipsNoFolder:"Ohne Ordner",noClips:"Keine Clips",generateFirst:"Clip erstellen",back:"Zurück",rename:"Umbenennen",move:"Verschieben",delete:"Löschen",shareFolder:"Teilen",sharedWith:"Geteilt mit",cancel:"Abbrechen",create:"Erstellen",apply:"Anwenden",close:"Schließen",use:"Verwenden",newFolderName:"Name...",emailMember:"E-Mail...",addMember:"Hinzufügen",createAccount:"Konto erstellen",creating:"Erstelle...",reportProblem:"Melden",send:"Senden",compressTitle:"Datei groß",compressMsg:"Komprimieren?",no:"Nein",yesCompress:"Ja",compressing:"Komprimierung...",chooseMusic:"Musik",searchMusic:"Suchen...",timestampPreview:"Timestamps",timestampDesc:"KI schneidet hier.",useTimestamps:"Verwenden",capsuleTitle:"Kapseln",shortVideo:"Kurz",shortSub:"aufeinanderfolgend",longVideo:"Lang",longSub:"beste Momente",capsuleCount:"Anzahl",promptGenerated:"Prompt:",refVideo:"Referenz",optional:"optional",addRefVideo:"+ Hinzufügen",lastGenerated:"Letzter",serverActive:"Aktiv",cmdEnterHint:"Cmd+Enter",subfolders:"Unterordner",newSubfolder:"+ Unterordner",share:"Teilen",colorGrade:"Farbe",transition:"Übergang",textOverlay:"Text",stabilize:"Stabilisieren",vocalVolume:"Stimme",none:"Keiner",exportQuality:"Qualität",exportCodec:"Codec",watermark:"Wasserzeichen",presets:"Presets",savePreset:"Speichern",presetName:"Name...",stats:"Stats",totalClips:"Clips",clipsInLib:"Bibliothek",queue:"Warteschlange",addToQueue:"+ Warte",runQueue:"Starten",queueEmpty:"Leer",copyLink:"Kopieren",copied:"Kopiert!",autoMode:"Auto-Modus",autoModeDesc:"KI wählt alles",manualMode:"Manuell",step1:"Video importieren",step2:"Edit beschreiben",step3:"Generieren",onboardingSkip:"Überspringen",shareNative:"Teilen",advancedSettings:"Erweiterte Einstellungen",generatingMsg1:"Analysieren... 🔍",generatingMsg2:"Szenen... 🎬",generatingMsg3:"Beat... 🎵",generatingMsg4:"Farbe... 🎨",generatingMsg5:"Rendern... ✨",generatingMsg6:"Fast fertig... 🚀",subtitleStyle:"Untertitel",historyTitle:"Verlauf" },
 }
 
 const AUTO_PRESETS: Record<string, { colorGrade: string; transition: string; options: string[]; prompt: string }> = {
-  sport:     { colorGrade:"vibrant",   transition:"flash",   options:["Beat sync","Auto-zoom","Speed ramp"], prompt:"edit sport dynamique, cuts sur le beat, meilleurs moments" },
-  lifestyle: { colorGrade:"warm",      transition:"fade",    options:["Beat sync","Auto-zoom"],              prompt:"vlog lifestyle, moments naturels, ambiance chill" },
-  gaming:    { colorGrade:"cinematic", transition:"glitch",  options:["Beat sync","Speed ramp"],             prompt:"highlights gaming, moments épiques, cuts rapides" },
-  music:     { colorGrade:"moody",     transition:"fade",    options:["Beat sync","Sous-titres"],            prompt:"clip musical, synchronisé sur le beat, cinématique" },
-  travel:    { colorGrade:"orange_teal", transition:"zoom_in", options:["Beat sync","Auto-zoom"],            prompt:"montage voyage, paysages, ambiance aventure" },
+  sport:     { colorGrade:"vibrant",     transition:"flash",   options:["Beat sync","Auto-zoom","Speed ramp"], prompt:"edit sport dynamique, cuts sur le beat, meilleurs moments" },
+  lifestyle: { colorGrade:"warm",        transition:"fade",    options:["Beat sync","Auto-zoom"],              prompt:"vlog lifestyle, moments naturels, ambiance chill" },
+  gaming:    { colorGrade:"cinematic",   transition:"glitch",  options:["Beat sync","Speed ramp"],             prompt:"highlights gaming, moments épiques, cuts rapides" },
+  music:     { colorGrade:"moody",       transition:"fade",    options:["Beat sync","Sous-titres"],            prompt:"clip musical, synchronisé sur le beat, cinématique" },
+  travel:    { colorGrade:"orange_teal", transition:"zoom_in", options:["Beat sync","Auto-zoom"],              prompt:"montage voyage, paysages, ambiance aventure" },
 }
 
 const ClimbLogo = ({ size = 30 }: { size?: number }) => (
@@ -95,7 +95,7 @@ export default function Home() {
   const [dark, setDark] = useState(true)
   const [lang, setLang] = useState<Lang>("FR")
   const [user, setUser] = useState<any>(null)
-  const [currentPage, setCurrentPage] = useState<"home"|"library">("home")
+  const [currentPage, setCurrentPage] = useState<"home"|"library"|"history">("home")
   const [activeOptions, setActiveOptions] = useState<string[]>(["Beat sync"])
   const [showSettings, setShowSettings] = useState(false)
   const [showReport, setShowReport] = useState(false)
@@ -118,6 +118,7 @@ export default function Home() {
   const [generating, setGenerating] = useState(false)
   const [progress, setProgress] = useState(0)
   const [generatingMsgIndex, setGeneratingMsgIndex] = useState(0)
+  const [generatingServerMsg, setGeneratingServerMsg] = useState("")
   const [promptText, setPromptText] = useState("")
   const [generatedClips, setGeneratedClips] = useState<any[]>([])
   const [selectedMusic, setSelectedMusic] = useState<Track|null>(null)
@@ -148,6 +149,7 @@ export default function Home() {
   const [watermark, setWatermark] = useState(false)
   const [exportQuality, setExportQuality] = useState("1080p")
   const [exportCodec, setExportCodec] = useState("H264")
+  const [subtitleStyle, setSubtitleStyle] = useState("tiktok")
   const [timestampPreviews, setTimestampPreviews] = useState<TimestampPreview[]>([])
   const [loadingTimestamps, setLoadingTimestamps] = useState(false)
   const [customTimestamps, setCustomTimestamps] = useState<TimestampPreview[]|null>(null)
@@ -176,8 +178,10 @@ export default function Home() {
   const [copiedId, setCopiedId] = useState<string|null>(null)
   const [autoMode, setAutoMode] = useState(true)
   const [onboardingDone, setOnboardingDone] = useState(false)
-  const [onboardingStep, setOnboardingStep] = useState(0)
   const [detectedContentType, setDetectedContentType] = useState<string|null>(null)
+  const [analyzing, setAnalyzing] = useState(false)
+  const [autoAnalysisDesc, setAutoAnalysisDesc] = useState<string|null>(null)
+  const [generationHistory, setGenerationHistory] = useState<any[]>([])
 
   const audioRef = useRef<HTMLAudioElement|null>(null)
   const searchTimeout = useRef<ReturnType<typeof setTimeout>|null>(null)
@@ -187,7 +191,6 @@ export default function Home() {
   const CGL = CG_LABELS[lang]
   const TRL = TR_LABELS[lang]
   const currentFolder = folderStack.length > 0 ? folderStack[folderStack.length-1] : null
-
   const generatingMsgs = [T.generatingMsg1, T.generatingMsg2, T.generatingMsg3, T.generatingMsg4, T.generatingMsg5, T.generatingMsg6]
 
   const t = {
@@ -222,6 +225,7 @@ export default function Home() {
     const savedLang = localStorage.getItem("lang") as Lang|null; if (savedLang && TRANSLATIONS[savedLang]) setLang(savedLang)
     const savedPresets = localStorage.getItem("climbPresets"); if (savedPresets) setPresets(JSON.parse(savedPresets))
     const savedOnboarding = localStorage.getItem("climbOnboarding"); if (savedOnboarding) setOnboardingDone(true)
+    const savedHistory = localStorage.getItem("climbHistory"); if (savedHistory) setGenerationHistory(JSON.parse(savedHistory))
   }, [])
 
   useEffect(() => { if (user) loadLibrary() }, [user])
@@ -229,14 +233,12 @@ export default function Home() {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && !generating && currentPage === "home") handleGenerate() }
     window.addEventListener("keydown", handler); return () => window.removeEventListener("keydown", handler)
-  }, [generating, currentPage, promptText, videos, activeOptions, selectedMusic, selectedFormat, zoomIntensity, speedIntensity, addIntroOutro, customTimestamps, colorGrade, transition, textOverlay, stabilize, vocalVolume, watermark, exportQuality, exportCodec, autoMode])
+  }, [generating, currentPage, promptText, videos, activeOptions, selectedMusic, selectedFormat, zoomIntensity, speedIntensity, addIntroOutro, customTimestamps, colorGrade, transition, textOverlay, stabilize, vocalVolume, watermark, exportQuality, exportCodec, autoMode, subtitleStyle])
 
   useEffect(() => {
     if (generating) {
       setGeneratingMsgIndex(0)
-      generatingMsgRef.current = setInterval(() => {
-        setGeneratingMsgIndex(prev => (prev + 1) % generatingMsgs.length)
-      }, 4000)
+      generatingMsgRef.current = setInterval(() => setGeneratingMsgIndex(prev => (prev + 1) % generatingMsgs.length), 4000)
     } else {
       if (generatingMsgRef.current) clearInterval(generatingMsgRef.current)
     }
@@ -267,7 +269,18 @@ export default function Home() {
     const p = await uploadFile(file)
     if (p) {
       setVideos(prev => [...prev, { id:Date.now().toString(), type:"file", path:p, name:file.name }])
-      if (!onboardingDone) setOnboardingStep(1)
+      if (autoMode) {
+        setAnalyzing(true); setAutoAnalysisDesc(null)
+        try {
+          const res = await fetch(`${SERVER_URL}/analyze-video`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ videoPath: p }) })
+          const analysis = await res.json()
+          if (analysis.prompt) setPromptText(analysis.prompt)
+          if (analysis.contentType) setDetectedContentType(analysis.contentType)
+          if (analysis.suggestedFormat) setSelectedFormat(analysis.suggestedFormat)
+          if (analysis.description) setAutoAnalysisDesc(analysis.description)
+        } catch {}
+        setAnalyzing(false)
+      }
     }
   }
 
@@ -292,13 +305,26 @@ export default function Home() {
         fetch(`${SERVER_URL}/download`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ url }) })
       ])
       const [thumbData, data] = await Promise.all([thumbRes.json(), res.json()])
-      if (data.path) { setVideos(prev => [...prev, { id:Date.now().toString(), type:"link", path:data.path, url, name:url.slice(0,40)+"...", thumbnail:thumbData.thumbnail||undefined }]); setLinkInput(""); if (!onboardingDone) setOnboardingStep(1) }
-      else alert("Erreur")
+      if (data.path) {
+        setVideos(prev => [...prev, { id:Date.now().toString(), type:"link", path:data.path, url, name:url.slice(0,40)+"...", thumbnail:thumbData.thumbnail||undefined }])
+        setLinkInput("")
+        if (autoMode) {
+          setAnalyzing(true); setAutoAnalysisDesc(null)
+          try {
+            const analysis = await (await fetch(`${SERVER_URL}/analyze-video`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ videoPath: data.path }) })).json()
+            if (analysis.prompt) setPromptText(analysis.prompt)
+            if (analysis.contentType) setDetectedContentType(analysis.contentType)
+            if (analysis.suggestedFormat) setSelectedFormat(analysis.suggestedFormat)
+            if (analysis.description) setAutoAnalysisDesc(analysis.description)
+          } catch {}
+          setAnalyzing(false)
+        }
+      } else alert("Erreur")
     } catch (err: any) { alert(`Erreur: ${err.message}`) }
     setImportingLink(false)
   }
 
-  const removeVideo = (id: string) => setVideos(prev => prev.filter(v => v.id !== id))
+  const removeVideo = (id: string) => { setVideos(prev => prev.filter(v => v.id !== id)); setAutoAnalysisDesc(null) }
   const savePromptToHistory = (p: string) => { if (!p.trim()) return; const u = [p, ...promptHistory.filter(h => h !== p)].slice(0,10); setPromptHistory(u); localStorage.setItem("promptHistory", JSON.stringify(u)) }
 
   const detectContentType = async (): Promise<string> => {
@@ -330,49 +356,47 @@ export default function Home() {
     watermark,
     exportQuality,
     exportCodec,
+    subtitleStyle,
   })
 
   const handleGenerate = useCallback(async () => {
     if (videos.length === 0) return
     savePromptToHistory(promptText)
-    setHasGenerated(false); setGenerating(true); setProgress(0); setServerAwake(null)
-
+    setHasGenerated(false); setGenerating(true); setProgress(0); setServerAwake(null); setGeneratingServerMsg("")
     let payload = buildPayload()
-
     if (autoMode) {
-      const contentType = await detectContentType()
+      const contentType = detectedContentType || await detectContentType()
       setDetectedContentType(contentType)
       const preset = AUTO_PRESETS[contentType]
-      payload = buildPayload({ colorGrade: preset.colorGrade, transition: preset.transition, options: [...activeOptions, ...preset.options.filter(o => !activeOptions.includes(o))] })
+      payload = buildPayload({ colorGrade: preset.colorGrade, transition: preset.transition, options: [...new Set([...activeOptions, ...preset.options])] })
       if (!promptText) payload.prompt = preset.prompt
     }
-
     try {
       const res = await fetch(`${SERVER_URL}/generate`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) })
       setServerAwake(true); const { jobId } = await res.json()
       const interval = setInterval(async () => {
         const sr = await fetch(`${SERVER_URL}/status/${jobId}`); const d = await sr.json()
         if (d.progress) setProgress(d.progress)
+        if (d.message) setGeneratingServerMsg(d.message)
         if (d.status === "done") {
           clearInterval(interval)
           setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100)
           if (d.clips.length > 0) setLastGeneratedClip(d.clips[0])
           for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i)
+          const historyEntry = { id:Date.now().toString(), date:new Date().toLocaleDateString(), prompt:promptText, contentType:detectedContentType, settings:{ format:selectedFormat, colorGrade:payload.colorGrade, transition:payload.transition }, clipsCount: d.clips.length }
+          const newHistory = [historyEntry, ...generationHistory].slice(0, 20)
+          setGenerationHistory(newHistory); localStorage.setItem("climbHistory", JSON.stringify(newHistory))
           if (!onboardingDone) completeOnboarding()
         }
         else if (d.status === "error") { clearInterval(interval); alert("Erreur génération"); setGenerating(false) }
       }, 3000)
     } catch { alert("Erreur"); setGenerating(false) }
-  }, [videos, promptText, activeOptions, selectedMusic, selectedFormat, zoomIntensity, speedIntensity, addIntroOutro, customTimestamps, colorGrade, transition, textOverlay, stabilize, vocalVolume, watermark, exportQuality, exportCodec, autoMode, onboardingDone])
+  }, [videos, promptText, activeOptions, selectedMusic, selectedFormat, zoomIntensity, speedIntensity, addIntroOutro, customTimestamps, colorGrade, transition, textOverlay, stabilize, vocalVolume, watermark, exportQuality, exportCodec, autoMode, detectedContentType, subtitleStyle, generationHistory, onboardingDone])
 
-  const addToQueue = () => {
-    if (videos.length === 0) return
-    setQueue(prev => [...prev, { id:Date.now().toString(), videos:[...videos], prompt:promptText, status:"pending" }])
-  }
+  const addToQueue = () => { if (videos.length === 0) return; setQueue(prev => [...prev, { id:Date.now().toString(), videos:[...videos], prompt:promptText, status:"pending" }]) }
 
   const runQueue = async () => {
-    if (queue.length === 0 || queueRunning) return
-    setQueueRunning(true)
+    if (queue.length === 0 || queueRunning) return; setQueueRunning(true)
     for (let i = 0; i < queue.length; i++) {
       if (queue[i].status !== "pending") continue
       setQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status:"processing" } : q))
@@ -418,9 +442,7 @@ export default function Home() {
         const blob = new Blob([arr], { type:"video/mp4" })
         const file = new File([blob], `${clip.name || "clip"}.mp4`, { type:"video/mp4" })
         await navigator.share({ title: clip.name, files: [file] })
-      } else {
-        shareClipPublic(clip)
-      }
+      } else shareClipPublic(clip)
     } catch {}
   }
 
@@ -469,14 +491,11 @@ export default function Home() {
   const displayedFolders = folders.filter(f => f.parent_id === currentFolder)
   const displayedClips = currentFolder ? clips.filter(c => c.folder_id === currentFolder) : clips.filter(c => !c.folder_id)
   const modalBase: React.CSSProperties = { background:t.bgModal, border:t.border, borderRadius:16, padding:24, display:"flex", flexDirection:"column", gap:16 }
-
   const Pill = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
     <button onClick={onClick} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:active ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:active ? "rgba(232,245,66,0.08)" : t.bgPill, color:active ? t.accent : t.textSub, fontWeight:active ? 500 : 400, transition:"all 0.15s", whiteSpace:"nowrap" }}>{label}</button>
   )
 
-  // ONBOARDING
   if (!onboardingDone) {
-    const steps = [T.step1, T.step2, T.step3]
     return (
       <main style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"100vh", background:t.bg, padding:24, position:"relative" }}>
         <MountainBg dark={dark}/>
@@ -488,7 +507,7 @@ export default function Home() {
             <p style={{ fontSize:14, color:t.textSub }}>Génère des clips TikTok/Instagram en quelques secondes grâce à l'IA</p>
           </div>
           <div style={{ display:"flex", flexDirection:"column", gap:12, width:"100%" }}>
-            {steps.map((step, i) => (
+            {[T.step1, T.step2, T.step3].map((step, i) => (
               <div key={i} style={{ display:"flex", alignItems:"center", gap:14, padding:"14px 18px", background:t.bgCard, border:t.border, borderRadius:12 }}>
                 <div style={{ width:32, height:32, borderRadius:"50%", background:"rgba(232,245,66,0.1)", border:"1px solid rgba(232,245,66,0.3)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                   <span style={{ fontSize:14, fontWeight:700, color:t.accent }}>{i+1}</span>
@@ -497,9 +516,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <button onClick={completeOnboarding} style={{ width:"100%", padding:"14px 0", borderRadius:12, border:"none", background:t.accent, color:"#0a0a0a", fontWeight:700, fontSize:15, cursor:"pointer", boxShadow:"0 0 28px rgba(232,245,66,0.22)" }}>
-            Commencer →
-          </button>
+          <button onClick={completeOnboarding} style={{ width:"100%", padding:"14px 0", borderRadius:12, border:"none", background:t.accent, color:"#0a0a0a", fontWeight:700, fontSize:15, cursor:"pointer", boxShadow:"0 0 28px rgba(232,245,66,0.22)" }}>Commencer →</button>
           <button onClick={completeOnboarding} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:13 }}>{T.onboardingSkip}</button>
         </div>
       </main>
@@ -526,7 +543,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* NAV */}
       <nav style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 16px", borderBottom:t.border, background:t.bgNav, backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", position:"sticky", top:0, zIndex:50 }}>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           <ClimbLogo size={26}/>
@@ -536,9 +552,10 @@ export default function Home() {
           </div>
           {serverAwake === true && <div style={{ width:5, height:5, borderRadius:"50%", background:"#4ade80" }}/>}
         </div>
-        <div style={{ display:"flex", alignItems:"center", gap:16 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:14 }}>
           <button onClick={() => setCurrentPage("home")} style={{ fontSize:13, color:currentPage === "home" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "home" ? 600 : 400 }}>{T.home}</button>
           <button onClick={() => { setCurrentPage("library"); loadLibrary() }} style={{ fontSize:13, color:currentPage === "library" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "library" ? 600 : 400 }}>{T.library}</button>
+          <button onClick={() => setCurrentPage("history")} style={{ fontSize:13, color:currentPage === "history" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "history" ? 600 : 400 }}>⏺</button>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:6 }}>
           <button onClick={() => setShowStats(true)} style={{ fontSize:12, color:t.textSub, border:t.border, borderRadius:7, padding:"5px 8px", background:t.bgInput, cursor:"pointer" }}>📊</button>
@@ -557,22 +574,36 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* HOME */}
       {currentPage === "home" && (
         <div style={{ width:"100%", maxWidth:600, display:"flex", flexDirection:"column", gap:22, padding:"32px 16px 120px", position:"relative", zIndex:1 }}>
 
-          {/* AUTO / MANUAL TOGGLE */}
+          {/* AUTO/MANUAL */}
           <div style={{ display:"flex", alignItems:"center", gap:8, background:t.bgCard, border:t.border, borderRadius:12, padding:"12px 16px" }}>
             <div style={{ flex:1 }}>
-              <p style={{ fontSize:13, fontWeight:600, color:autoMode ? t.accent : t.text, marginBottom:2 }}>
-                {autoMode ? `✦ ${T.autoMode}` : T.manualMode}
-              </p>
+              <p style={{ fontSize:13, fontWeight:600, color:autoMode ? t.accent : t.text, marginBottom:2 }}>{autoMode ? `✦ ${T.autoMode}` : T.manualMode}</p>
               <p style={{ fontSize:11, color:t.textMuted }}>{autoMode ? T.autoModeDesc : "Contrôle total sur les paramètres"}</p>
             </div>
-            <button onClick={() => setAutoMode(!autoMode)} style={{ width:44, height:24, borderRadius:12, border:"none", background:autoMode ? t.accent : "rgba(255,255,255,0.1)", cursor:"pointer", position:"relative", transition:"background 0.2s", flexShrink:0 }}>
+            <button onClick={() => setAutoMode(!autoMode)} style={{ width:44, height:24, borderRadius:12, border:"none", background:autoMode ? t.accent : "rgba(255,255,255,0.1)", cursor:"pointer", position:"relative", flexShrink:0 }}>
               <div style={{ width:18, height:18, borderRadius:"50%", background:autoMode ? "#0a0a0a" : "#888", position:"absolute", top:3, left:autoMode ? 23 : 3, transition:"left 0.2s" }}/>
             </button>
           </div>
+
+          {/* ANALYSE IA */}
+          {analyzing && (
+            <div style={{ display:"flex", alignItems:"center", gap:10, padding:"12px 14px", background:"rgba(232,245,66,0.04)", border:"1px solid rgba(232,245,66,0.18)", borderRadius:10 }}>
+              <div style={{ width:16, height:16, borderRadius:"50%", border:`2px solid ${t.accent}`, borderTopColor:"transparent", flexShrink:0, animation:"spin 0.8s linear infinite" }}/>
+              <p style={{ fontSize:12, color:t.accent }}>L'IA analyse ta vidéo... 🔍</p>
+            </div>
+          )}
+          {autoAnalysisDesc && !analyzing && (
+            <div style={{ padding:"12px 14px", background:"rgba(232,245,66,0.04)", border:"1px solid rgba(232,245,66,0.12)", borderRadius:10 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:5 }}>
+                <span style={{ fontSize:10, color:t.accent, textTransform:"uppercase", letterSpacing:"0.06em", fontWeight:700 }}>✦ Analyse IA</span>
+                {detectedContentType && <span style={{ fontSize:10, padding:"2px 7px", borderRadius:10, background:"rgba(232,245,66,0.1)", color:t.accent }}>{detectedContentType}</span>}
+              </div>
+              <p style={{ fontSize:12, color:t.text, lineHeight:1.5 }}>{autoAnalysisDesc}</p>
+            </div>
+          )}
 
           {/* VIDEOS */}
           <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
@@ -632,7 +663,19 @@ export default function Home() {
             </button>
           </div>
 
-          {/* ADVANCED SETTINGS TOGGLE */}
+          {/* STYLE SOUS-TITRES */}
+          {activeOptions.includes("Sous-titres") && (
+            <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+              <p style={{ fontSize:11, color:t.textMuted, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.subtitleStyle}</p>
+              <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+                {[["tiktok","TikTok"],["yellow","Jaune"],["white_box","Fond blanc"],["neon","Néon"]].map(([val,label]) => (
+                  <button key={val} onClick={() => setSubtitleStyle(val)} style={{ padding:"6px 13px", borderRadius:20, fontSize:11, cursor:"pointer", border:subtitleStyle === val ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:subtitleStyle === val ? "rgba(232,245,66,0.08)" : t.bgPill, color:subtitleStyle === val ? t.accent : t.textSub }}>{label}</button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ADVANCED */}
           {!autoMode && (
             <button onClick={() => setShowAdvanced(!showAdvanced)} style={{ display:"flex", alignItems:"center", gap:7, background:"none", border:t.border, borderRadius:9, padding:"10px 14px", cursor:"pointer", color:t.textSub, fontSize:12, width:"100%" }}>
               <span style={{ flex:1, textAlign:"left" }}>⚙ {T.advancedSettings}</span>
@@ -640,7 +683,7 @@ export default function Home() {
             </button>
           )}
 
-          {(!autoMode && showAdvanced) && (
+          {!autoMode && showAdvanced && (
             <div style={{ display:"flex", flexDirection:"column", gap:14, background:t.bgCard, border:t.border, borderRadius:12, padding:"16px" }}>
               <div style={{ display:"flex", gap:10 }}>
                 <div style={{ flex:1 }}>
@@ -722,7 +765,7 @@ export default function Home() {
               </div>
             )}
             <textarea value={promptText} onChange={e => setPromptText(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"11px 13px", fontSize:13, color:t.text, outline:"none", resize:"none", height:52, lineHeight:"1.5", fontFamily:"sans-serif", boxSizing:"border-box" }}
-              placeholder={autoMode ? "Ex : edit foot Dybala, highlights basket... (optionnel en mode auto)" : "Ex : 1 clip 20s edit foot, cuts sur le beat, dribbles Dybala..."}/>
+              placeholder={autoMode ? "Optionnel — l'IA a déjà analysé ta vidéo" : "Ex : 1 clip 20s edit foot, cuts sur le beat..."}/>
             <div style={{ display:"flex", gap:7 }}>
               <button onClick={handleGenerate} disabled={generating || videos.length === 0} style={{ flex:1, background:generating ? "rgba(232,245,66,0.35)" : videos.length === 0 ? "rgba(232,245,66,0.15)" : t.accent, color:"#0a0a0a", fontWeight:700, fontSize:14, borderRadius:10, padding:"13px", border:"none", cursor:generating || videos.length === 0 ? "not-allowed" : "pointer", boxShadow:videos.length > 0 && !generating ? "0 0 24px rgba(232,245,66,0.2)" : "none" }}>
                 {generating ? T.generating : `✦ ${T.generate}`}
@@ -732,21 +775,19 @@ export default function Home() {
             <p style={{ fontSize:10, color:t.textHint, textAlign:"right" }}>{T.cmdEnterHint}</p>
           </div>
 
-          {/* GENERATING */}
           {generating && (
             <div style={{ display:"flex", flexDirection:"column", gap:10, background:t.bgCard, border:t.border, borderRadius:12, padding:"16px" }}>
-              <p style={{ fontSize:13, color:t.text, fontWeight:500 }}>{generatingMsgs[generatingMsgIndex]}</p>
+              <p style={{ fontSize:13, color:t.text, fontWeight:500 }}>{generatingServerMsg || generatingMsgs[generatingMsgIndex]}</p>
               <div style={{ width:"100%", height:4, background:dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)", borderRadius:4 }}>
                 <div style={{ width:`${progress}%`, height:"100%", background:`linear-gradient(90deg, ${t.accent}, rgba(232,245,66,0.5))`, borderRadius:4, transition:"width 0.5s ease", boxShadow:"0 0 8px rgba(232,245,66,0.35)" }}/>
               </div>
               <div style={{ display:"flex", justifyContent:"space-between" }}>
-                <span style={{ fontSize:11, color:t.textMuted }}>{autoMode && detectedContentType ? `Mode Auto · ${detectedContentType}` : "Mode Manuel"}</span>
+                <span style={{ fontSize:11, color:t.textMuted }}>{autoMode && detectedContentType ? `✦ Mode Auto · ${detectedContentType}` : "Mode Manuel"}</span>
                 <span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{progress}%</span>
               </div>
             </div>
           )}
 
-          {/* RESULTS */}
           {hasGenerated && generatedClips.length > 0 && (
             <>
               <div style={{ width:"100%", height:1, background:dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)" }}/>
@@ -776,7 +817,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* LIBRARY */}
       {currentPage === "library" && (
         <div style={{ width:"100%", maxWidth:800, display:"flex", flexDirection:"column", gap:22, padding:"32px 16px 120px", position:"relative", zIndex:1 }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
@@ -789,7 +829,6 @@ export default function Home() {
               <button onClick={() => { setNewFolderParent(null); setShowNewFolder(true) }} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"6px 11px", fontSize:12, color:t.textSub, cursor:"pointer" }}>{T.newFolder}</button>
             </div>
           </div>
-
           {displayedFolders.length > 0 && (
             <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
               <p style={{ fontSize:10, color:t.textHint, textTransform:"uppercase", letterSpacing:"0.06em" }}>{currentFolder ? T.subfolders : T.folders}</p>
@@ -815,7 +854,6 @@ export default function Home() {
               </div>
             </div>
           )}
-
           <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
             <p style={{ fontSize:10, color:t.textHint, textTransform:"uppercase", letterSpacing:"0.06em" }}>{currentFolder ? T.clipsInFolder : T.clipsNoFolder} — {displayedClips.length}</p>
             {displayedClips.length === 0 ? (
@@ -863,7 +901,32 @@ export default function Home() {
         </div>
       )}
 
-      {/* STATUS BAR */}
+      {currentPage === "history" && (
+        <div style={{ width:"100%", maxWidth:600, display:"flex", flexDirection:"column", gap:18, padding:"32px 16px 120px", position:"relative", zIndex:1 }}>
+          <p style={{ fontSize:16, fontWeight:600, color:t.text }}>{T.historyTitle}</p>
+          {generationHistory.length === 0 ? (
+            <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:11, padding:"56px 0" }}>
+              <span style={{ fontSize:32, opacity:0.3 }}>⏺</span>
+              <p style={{ fontSize:13, color:t.textMuted }}>Aucune génération pour l'instant</p>
+              <button onClick={() => setCurrentPage("home")} style={{ fontSize:12, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.15)", borderRadius:8, padding:"7px 15px", cursor:"pointer" }}>{T.generateFirst}</button>
+            </div>
+          ) : generationHistory.map(entry => (
+            <div key={entry.id} style={{ background:t.bgCard, border:t.border, borderRadius:12, padding:"14px 16px", display:"flex", flexDirection:"column", gap:10 }}>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                  <span style={{ fontSize:11, color:t.textMuted }}>{entry.date}</span>
+                  {entry.contentType && <span style={{ fontSize:10, padding:"2px 7px", borderRadius:10, background:"rgba(232,245,66,0.08)", color:t.accent }}>{entry.contentType}</span>}
+                </div>
+                <span style={{ fontSize:11, color:t.textMuted }}>{entry.clipsCount || 0} clip(s)</span>
+              </div>
+              {entry.prompt && <p style={{ fontSize:12, color:t.text, lineHeight:1.4 }}>{entry.prompt}</p>}
+              {entry.settings && <p style={{ fontSize:10, color:t.textMuted }}>{entry.settings.format} · {entry.settings.colorGrade || "auto"} · {entry.settings.transition || "auto"}</p>}
+              <button onClick={() => { if (entry.prompt) setPromptText(entry.prompt); setCurrentPage("home") }} style={{ padding:"7px 12px", borderRadius:8, fontSize:11, border:"1px solid rgba(232,245,66,0.22)", background:"rgba(232,245,66,0.05)", color:t.accent, cursor:"pointer", alignSelf:"flex-start" }}>↺ Réutiliser ces settings</button>
+            </div>
+          ))}
+        </div>
+      )}
+
       {lastGeneratedClip && (
         <div style={{ position:"fixed", bottom:0, left:0, right:0, background:dark ? "rgba(11,11,11,0.96)" : "rgba(229,229,224,0.96)", borderTop:t.border, backdropFilter:"blur(14px)", padding:"9px 16px", display:"flex", alignItems:"center", gap:10, zIndex:40 }}>
           {lastGeneratedClip.thumbnail && <img src={lastGeneratedClip.thumbnail} style={{ width:34, height:22, borderRadius:4, objectFit:"cover", flexShrink:0 }}/>}
@@ -871,19 +934,17 @@ export default function Home() {
             <p style={{ fontSize:10, color:t.textMuted }}>{T.lastGenerated}</p>
             <p style={{ fontSize:12, color:t.text, fontWeight:500, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{lastGeneratedClip.name}</p>
           </div>
-          <button onClick={() => shareNative(lastGeneratedClip)} style={{ fontSize:11, color:t.textSub, background:t.bgInput, border:t.border, borderRadius:7, padding:"5px 9px", cursor:"pointer", whiteSpace:"nowrap" }}>↗ {T.shareNative}</button>
-          <a href={lastGeneratedClip.base64} download={`${lastGeneratedClip.name}.mp4`} style={{ fontSize:11, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.18)", borderRadius:7, padding:"5px 9px", textDecoration:"none", whiteSpace:"nowrap" }}>↓</a>
+          <button onClick={() => shareNative(lastGeneratedClip)} style={{ fontSize:11, color:t.textSub, background:t.bgInput, border:t.border, borderRadius:7, padding:"5px 9px", cursor:"pointer", whiteSpace:"nowrap", flexShrink:0 }}>↗</button>
+          <a href={lastGeneratedClip.base64} download={`${lastGeneratedClip.name}.mp4`} style={{ fontSize:11, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.18)", borderRadius:7, padding:"5px 9px", textDecoration:"none", whiteSpace:"nowrap", flexShrink:0 }}>↓</a>
           <button onClick={() => setLastGeneratedClip(null)} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15, flexShrink:0 }}>✕</button>
         </div>
       )}
-
-      {/* MODALES */}
 
       {showStats && (
         <div onClick={() => setShowStats(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
           <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:300 }}>
             <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>📊 {T.stats}</span><button onClick={() => setShowStats(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
-            {[[T.totalClips, generatedClips.length + clips.length],[T.clipsInLib, clips.length],[T.queue, queue.length]].map(([label, val]) => (
+            {[[T.totalClips, generatedClips.length + clips.length],[T.clipsInLib, clips.length],["Générations", generationHistory.length],[T.queue, queue.length]].map(([label, val]) => (
               <div key={String(label)} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 0", borderBottom:t.border }}>
                 <span style={{ fontSize:13, color:t.textSub }}>{label}</span>
                 <span style={{ fontSize:20, fontWeight:700, color:t.accent }}>{val}</span>
@@ -945,9 +1006,7 @@ export default function Home() {
             ))}
             <div style={{ display:"flex", gap:7 }}>
               <button onClick={() => setShowQueue(false)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.close}</button>
-              {queue.some(q => q.status === "pending") && (
-                <button onClick={() => { setShowQueue(false); runQueue() }} disabled={queueRunning} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:700, opacity:queueRunning ? 0.6 : 1 }}>▶ {T.runQueue}</button>
-              )}
+              {queue.some(q => q.status === "pending") && <button onClick={() => { setShowQueue(false); runQueue() }} disabled={queueRunning} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:700, opacity:queueRunning ? 0.6 : 1 }}>▶ {T.runQueue}</button>}
             </div>
           </div>
         </div>
@@ -958,13 +1017,12 @@ export default function Home() {
           <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:460, maxHeight:"80vh", overflowY:"auto" }}>
             <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>{T.timestampPreview}</span><button onClick={() => setShowTimestampPreview(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
             <p style={{ fontSize:12, color:t.textMuted }}>{T.timestampDesc}</p>
-            {/* Timeline visuelle */}
             {timestampPreviews.length > 0 && (
               <div style={{ position:"relative", height:32, background:t.bgInput, borderRadius:8, overflow:"hidden", marginBottom:4 }}>
                 {timestampPreviews.map((ts, i) => {
-                  const total = timestampPreviews.reduce((acc, t) => Math.max(acc, t.start + t.duration), 0)
+                  const total = timestampPreviews.reduce((acc, t2) => Math.max(acc, t2.start + t2.duration), 0)
                   const colors = ["rgba(232,245,66,0.6)","rgba(100,200,255,0.6)","rgba(255,150,100,0.6)","rgba(150,255,150,0.6)"]
-                  return <div key={i} style={{ position:"absolute", top:4, height:24, left:`${(ts.start / total) * 100}%`, width:`${(ts.duration / total) * 100}%`, background:colors[i % colors.length], borderRadius:4, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                  return <div key={i} style={{ position:"absolute", top:4, height:24, left:`${(ts.start/total)*100}%`, width:`${(ts.duration/total)*100}%`, background:colors[i%colors.length], borderRadius:4, display:"flex", alignItems:"center", justifyContent:"center" }}>
                     <span style={{ fontSize:9, fontWeight:700, color:"#0a0a0a" }}>{i+1}</span>
                   </div>
                 })}
@@ -972,7 +1030,7 @@ export default function Home() {
             )}
             {timestampPreviews.map((ts, i) => (
               <div key={i} style={{ background:t.bgInput, border:t.border, borderRadius:9, padding:"11px 13px" }}>
-                <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:13, color:t.text, fontWeight:500 }}>{ts.name}</span><span style={{ fontSize:11, color:t.accent }}>{ts.start}s → {ts.start + ts.duration}s</span></div>
+                <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:13, color:t.text, fontWeight:500 }}>{ts.name}</span><span style={{ fontSize:11, color:t.accent }}>{ts.start}s → {ts.start+ts.duration}s</span></div>
                 {ts.description && <p style={{ fontSize:11, color:t.textMuted, marginTop:3 }}>{ts.description}</p>}
               </div>
             ))}
@@ -998,9 +1056,9 @@ export default function Home() {
             <div>
               <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}><p style={{ fontSize:12, color:t.textMuted }}>{T.capsuleCount}</p><span style={{ fontSize:15, fontWeight:700, color:t.accent }}>{capsulesCount}</span></div>
               <div style={{ display:"flex", alignItems:"center", gap:9 }}>
-                <button onClick={() => setCapsulesCount(Math.max(1, capsulesCount-1))} style={{ width:30, height:30, borderRadius:7, border:t.borderMed, background:t.bgInput, color:t.text, cursor:"pointer", fontSize:15 }}>−</button>
+                <button onClick={() => setCapsulesCount(Math.max(1,capsulesCount-1))} style={{ width:30, height:30, borderRadius:7, border:t.borderMed, background:t.bgInput, color:t.text, cursor:"pointer", fontSize:15 }}>−</button>
                 <input type="range" min={1} max={10} value={capsulesCount} onChange={e => setCapsulesCount(Number(e.target.value))} style={{ flex:1, accentColor:t.accent }}/>
-                <button onClick={() => setCapsulesCount(Math.min(10, capsulesCount+1))} style={{ width:30, height:30, borderRadius:7, border:t.borderMed, background:t.bgInput, color:t.text, cursor:"pointer", fontSize:15 }}>+</button>
+                <button onClick={() => setCapsulesCount(Math.min(10,capsulesCount+1))} style={{ width:30, height:30, borderRadius:7, border:t.borderMed, background:t.bgInput, color:t.text, cursor:"pointer", fontSize:15 }}>+</button>
               </div>
             </div>
             <div style={{ display:"flex", gap:7 }}>
@@ -1156,6 +1214,7 @@ export default function Home() {
         </div>
       )}
 
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </main>
   )
 }
