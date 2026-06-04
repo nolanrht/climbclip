@@ -6,7 +6,7 @@ import { FFmpeg } from "@ffmpeg/ffmpeg"
 import { fetchFile } from "@ffmpeg/util"
 
 type Track = { id: number; title: string; artist: { name: string }; preview: string; album: { cover_small: string } }
-type Clip = { id: string; name: string; base64: string; owner_email: string; folder_id: string | null; created_at: string; thumbnail?: string }
+type Clip = { id: string; name: string; base64: string; storage_url?: string; owner_email: string; folder_id: string | null; created_at: string; thumbnail?: string }
 type Folder = { id: string; name: string; owner_email: string; shared_with: string[]; created_at: string; parent_id: string | null }
 type VideoItem = { id: string; type: "file" | "link"; path?: string; url?: string; name: string; thumbnail?: string }
 type TimestampPreview = { start: number; duration: number; name: string; description?: string }
@@ -32,11 +32,11 @@ const TR_LABELS: Record<Lang, Record<string, string>> = {
 }
 
 const TRANSLATIONS: Record<Lang, Record<string, string>> = {
-  EN: { home:"Home",library:"Library",settings:"Settings",logout:"Logout",videos:"Videos",addFile:"+ Add file",dragVideo:"Drop a video or click to import",dragSub:"TikTok, Instagram, local file • max 50MB",addAnother:"Add another video",pasteLink:"Paste a TikTok / Instagram link...",import:"Import",outputFormat:"Output format",beatSync:"Beat sync",subtitles:"Subtitles",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsules",introOutro:"Intro / Outro",addMusic:"Add music",zoomIntensity:"Zoom intensity",speedIntensity:"Speed ramp intensity",description:"Description",promptHistory:"History",preview:"Preview",promptHelper:"Prompt help",generating:"Generating...",generate:"Generate",preparingVideos:"Preparing videos...",analyzingAI:"AI analysis...",detectingEffects:"Detecting effects...",renderingClips:"Rendering clips...",generatedClips:"Generated clips",downloadAll:"Download all",download:"Download",serverStarting:"Server starting — may take 30-50s...",check:"Check",newFolder:"+ New folder",folders:"Folders",clipsInFolder:"Clips in this folder",clipsNoFolder:"Clips without folder",noClips:"No clips here",generateFirst:"Generate your first clip",back:"Back",rename:"Rename",move:"Move",delete:"Delete",shareFolder:"Share folder",sharedWith:"Shared with",cancel:"Cancel",create:"Create",apply:"Apply",close:"Close",use:"Use",newFolderName:"Folder name...",emailMember:"Member email...",addMember:"Add a member",createAccount:"Create account",creating:"Creating...",reportProblem:"Report a problem",send:"Send",compressTitle:"File too large",compressMsg:"Compress automatically?",no:"No",yesCompress:"Yes, compress",compressing:"Compressing...",chooseMusic:"Choose music",searchMusic:"Search artist, title...",timestampPreview:"Timestamp preview",timestampDesc:"Moments the AI will cut.",useTimestamps:"Use these timestamps",capsuleTitle:"Capsules",shortVideo:"Short video",shortSub:"sequential clips",longVideo:"Long video",longSub:"best moments",capsuleCount:"Number of capsules",promptGenerated:"Generated prompt:",refVideo:"Reference video",optional:"optional",addRefVideo:"+ Add reference video",lastGenerated:"Last generated",serverActive:"Server active",cmdEnterHint:"Cmd+Enter to generate",subfolders:"Subfolders",newSubfolder:"+ Subfolder",share:"Share",colorGrade:"Color grade",transition:"Transition",textOverlay:"Text overlay",stabilize:"Stabilize",vocalVolume:"Vocal volume",none:"None",exportQuality:"Export quality",exportCodec:"Codec",watermark:"Watermark",presets:"Presets",savePreset:"Save preset",presetName:"Preset name...",stats:"Stats",totalClips:"Total clips",clipsInLib:"In library",queue:"Queue",addToQueue:"+ Queue",runQueue:"Run queue",queueEmpty:"Queue is empty",copyLink:"Copy link",copied:"Copied!",autoMode:"Auto mode",autoModeDesc:"The AI chooses everything for you",manualMode:"Manual",step1:"Import your video",step2:"Describe your edit",step3:"Generate",onboardingSkip:"Skip",shareNative:"Share",advancedSettings:"Advanced settings",generatingMsg1:"Analyzing your best sequences... 🔍",generatingMsg2:"Detecting scene changes... 🎬",generatingMsg3:"Syncing to the beat... 🎵",generatingMsg4:"Applying color grade... 🎨",generatingMsg5:"Rendering your clips... ✨",generatingMsg6:"Almost there... 🚀",subtitleStyle:"Subtitle style",historyTitle:"History" },
-  FR: { home:"Accueil",library:"Bibliothèque",settings:"Paramètres",logout:"Déconnexion",videos:"Vidéos",addFile:"+ Ajouter",dragVideo:"Glisse une vidéo ou clique",dragSub:"TikTok, Instagram, fichier local • max 50MB",addAnother:"Ajouter une autre vidéo",pasteLink:"Coller un lien TikTok / Instagram...",import:"Importer",outputFormat:"Format de sortie",beatSync:"Beat sync",subtitles:"Sous-titres",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsules",introOutro:"Intro / Outro",addMusic:"Ajouter musique",zoomIntensity:"Intensité zoom",speedIntensity:"Intensité speed ramp",description:"Description",promptHistory:"Historique",preview:"Aperçu",promptHelper:"Aide prompt",generating:"Génération...",generate:"Générer",preparingVideos:"Préparation des vidéos...",analyzingAI:"Analyse IA...",detectingEffects:"Détection des effets...",renderingClips:"Rendu des clips...",generatedClips:"Clips générés",downloadAll:"Tout télécharger",download:"Télécharger",serverStarting:"Serveur en démarrage — 30-50 secondes...",check:"Vérifier",newFolder:"+ Dossier",folders:"Dossiers",clipsInFolder:"Clips dans ce dossier",clipsNoFolder:"Clips sans dossier",noClips:"Aucun clip ici",generateFirst:"Générer un premier clip",back:"Retour",rename:"Renommer",move:"Déplacer",delete:"Supprimer",shareFolder:"Partager le dossier",sharedWith:"Partagé avec",cancel:"Annuler",create:"Créer",apply:"Appliquer",close:"Fermer",use:"Utiliser",newFolderName:"Nom du dossier...",emailMember:"Email du membre...",addMember:"Ajouter un membre",createAccount:"Créer le compte",creating:"Création...",reportProblem:"Signaler un problème",send:"Envoyer",compressTitle:"Vidéo trop lourde",compressMsg:"Compresser automatiquement ?",no:"Non",yesCompress:"Oui, compresser",compressing:"Compression...",chooseMusic:"Choisir une musique",searchMusic:"Rechercher artiste, titre...",timestampPreview:"Aperçu timestamps",timestampDesc:"Moments que l'IA va découper.",useTimestamps:"Utiliser ces timestamps",capsuleTitle:"Capsules",shortVideo:"Vidéo courte",shortSub:"clips qui se suivent",longVideo:"Vidéo longue",longSub:"meilleurs moments",capsuleCount:"Nombre",promptGenerated:"Prompt généré :",refVideo:"Vidéo référence",optional:"optionnel",addRefVideo:"+ Ajouter",lastGenerated:"Dernier clip",serverActive:"Serveur actif",cmdEnterHint:"Cmd+Entrée pour générer",subfolders:"Sous-dossiers",newSubfolder:"+ Sous-dossier",share:"Partager",colorGrade:"Color grade",transition:"Transition",textOverlay:"Texte overlay",stabilize:"Stabiliser",vocalVolume:"Volume voix",none:"Aucun",exportQuality:"Qualité export",exportCodec:"Codec",watermark:"Watermark",presets:"Presets",savePreset:"Sauvegarder",presetName:"Nom du preset...",stats:"Stats",totalClips:"Clips générés",clipsInLib:"En bibliothèque",queue:"File d'attente",addToQueue:"+ File",runQueue:"Lancer la file",queueEmpty:"File vide",copyLink:"Copier le lien",copied:"Copié !",autoMode:"Mode Auto",autoModeDesc:"L'IA choisit tout pour toi",manualMode:"Manuel",step1:"Importe ta vidéo",step2:"Décris ton edit",step3:"Génère",onboardingSkip:"Passer",shareNative:"Partager",advancedSettings:"Paramètres avancés",generatingMsg1:"Analyse de tes meilleures séquences... 🔍",generatingMsg2:"Détection des changements de scène... 🎬",generatingMsg3:"Synchronisation sur le beat... 🎵",generatingMsg4:"Application du color grade... 🎨",generatingMsg5:"Rendu de tes clips... ✨",generatingMsg6:"Presque terminé... 🚀",subtitleStyle:"Style sous-titres",historyTitle:"Historique" },
-  ES: { home:"Inicio",library:"Biblioteca",settings:"Ajustes",logout:"Salir",videos:"Vídeos",addFile:"+ Añadir",dragVideo:"Arrastra un vídeo",dragSub:"TikTok, Instagram • máx 50MB",addAnother:"Añadir otro",pasteLink:"Enlace TikTok / Instagram...",import:"Importar",outputFormat:"Formato",beatSync:"Beat sync",subtitles:"Subtítulos",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Cápsulas",introOutro:"Intro / Outro",addMusic:"Música",zoomIntensity:"Zoom",speedIntensity:"Speed",description:"Descripción",promptHistory:"Historial",preview:"Vista previa",promptHelper:"Ayuda",generating:"Generando...",generate:"Generar",preparingVideos:"Preparando...",analyzingAI:"IA...",detectingEffects:"Efectos...",renderingClips:"Render...",generatedClips:"Clips",downloadAll:"Descargar todo",download:"Descargar",serverStarting:"Servidor iniciando...",check:"Verificar",newFolder:"+ Carpeta",folders:"Carpetas",clipsInFolder:"Clips en carpeta",clipsNoFolder:"Sin carpeta",noClips:"Sin clips",generateFirst:"Generar clip",back:"Volver",rename:"Renombrar",move:"Mover",delete:"Eliminar",shareFolder:"Compartir",sharedWith:"Compartido",cancel:"Cancelar",create:"Crear",apply:"Aplicar",close:"Cerrar",use:"Usar",newFolderName:"Nombre...",emailMember:"Email...",addMember:"Añadir",createAccount:"Crear cuenta",creating:"Creando...",reportProblem:"Reportar",send:"Enviar",compressTitle:"Archivo grande",compressMsg:"¿Comprimir?",no:"No",yesCompress:"Sí",compressing:"Comprimiendo...",chooseMusic:"Música",searchMusic:"Buscar...",timestampPreview:"Timestamps",timestampDesc:"La IA cortará aquí.",useTimestamps:"Usar",capsuleTitle:"Cápsulas",shortVideo:"Corto",shortSub:"clips seguidos",longVideo:"Largo",longSub:"mejores momentos",capsuleCount:"Número",promptGenerated:"Prompt:",refVideo:"Referencia",optional:"opcional",addRefVideo:"+ Añadir",lastGenerated:"Último",serverActive:"Activo",cmdEnterHint:"Cmd+Enter",subfolders:"Subcarpetas",newSubfolder:"+ Subcarpeta",share:"Compartir",colorGrade:"Color",transition:"Transición",textOverlay:"Texto",stabilize:"Estabilizar",vocalVolume:"Voz",none:"Ninguno",exportQuality:"Calidad",exportCodec:"Codec",watermark:"Marca",presets:"Presets",savePreset:"Guardar",presetName:"Nombre...",stats:"Stats",totalClips:"Clips",clipsInLib:"Biblioteca",queue:"Cola",addToQueue:"+ Cola",runQueue:"Ejecutar",queueEmpty:"Vacía",copyLink:"Copiar",copied:"¡Copiado!",autoMode:"Modo Auto",autoModeDesc:"La IA elige todo",manualMode:"Manual",step1:"Importa tu vídeo",step2:"Describe tu edit",step3:"Genera",onboardingSkip:"Saltar",shareNative:"Compartir",advancedSettings:"Ajustes avanzados",generatingMsg1:"Analizando... 🔍",generatingMsg2:"Escenas... 🎬",generatingMsg3:"Beat... 🎵",generatingMsg4:"Color... 🎨",generatingMsg5:"Render... ✨",generatingMsg6:"Casi... 🚀",subtitleStyle:"Subtítulos",historyTitle:"Historial" },
-  IT: { home:"Home",library:"Libreria",settings:"Impostazioni",logout:"Esci",videos:"Video",addFile:"+ Aggiungi",dragVideo:"Trascina un video",dragSub:"TikTok, Instagram • max 50MB",addAnother:"Aggiungi altro",pasteLink:"Link TikTok / Instagram...",import:"Importa",outputFormat:"Formato",beatSync:"Beat sync",subtitles:"Sottotitoli",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsule",introOutro:"Intro / Outro",addMusic:"Musica",zoomIntensity:"Zoom",speedIntensity:"Speed",description:"Descrizione",promptHistory:"Cronologia",preview:"Anteprima",promptHelper:"Aiuto",generating:"Generazione...",generate:"Genera",preparingVideos:"Preparazione...",analyzingAI:"IA...",detectingEffects:"Effetti...",renderingClips:"Rendering...",generatedClips:"Clip",downloadAll:"Scarica tutto",download:"Scarica",serverStarting:"Server in avvio...",check:"Verifica",newFolder:"+ Cartella",folders:"Cartelle",clipsInFolder:"Clip in cartella",clipsNoFolder:"Senza cartella",noClips:"Nessuna clip",generateFirst:"Genera clip",back:"Indietro",rename:"Rinomina",move:"Sposta",delete:"Elimina",shareFolder:"Condividi",sharedWith:"Condiviso",cancel:"Annulla",create:"Crea",apply:"Applica",close:"Chiudi",use:"Usa",newFolderName:"Nome...",emailMember:"Email...",addMember:"Aggiungi",createAccount:"Crea account",creating:"Creazione...",reportProblem:"Segnala",send:"Invia",compressTitle:"File grande",compressMsg:"Comprimi?",no:"No",yesCompress:"Sì",compressing:"Compressione...",chooseMusic:"Musica",searchMusic:"Cerca...",timestampPreview:"Timestamp",timestampDesc:"L'IA taglierà qui.",useTimestamps:"Usa",capsuleTitle:"Capsule",shortVideo:"Corto",shortSub:"clip consecutive",longVideo:"Lungo",longSub:"momenti migliori",capsuleCount:"Numero",promptGenerated:"Prompt:",refVideo:"Riferimento",optional:"opzionale",addRefVideo:"+ Aggiungi",lastGenerated:"Ultimo",serverActive:"Attivo",cmdEnterHint:"Cmd+Invio",subfolders:"Sottocartelle",newSubfolder:"+ Sottocartella",share:"Condividi",colorGrade:"Colore",transition:"Transizione",textOverlay:"Testo",stabilize:"Stabilizza",vocalVolume:"Voce",none:"Nessuno",exportQuality:"Qualità",exportCodec:"Codec",watermark:"Watermark",presets:"Preset",savePreset:"Salva",presetName:"Nome...",stats:"Stats",totalClips:"Clip",clipsInLib:"Libreria",queue:"Coda",addToQueue:"+ Coda",runQueue:"Avvia",queueEmpty:"Vuota",copyLink:"Copia",copied:"Copiato!",autoMode:"Modalità Auto",autoModeDesc:"L'IA sceglie tutto",manualMode:"Manuale",step1:"Importa il video",step2:"Descrivi il tuo edit",step3:"Genera",onboardingSkip:"Salta",shareNative:"Condividi",advancedSettings:"Impostazioni avanzate",generatingMsg1:"Analisi... 🔍",generatingMsg2:"Scene... 🎬",generatingMsg3:"Beat... 🎵",generatingMsg4:"Colore... 🎨",generatingMsg5:"Render... ✨",generatingMsg6:"Quasi... 🚀",subtitleStyle:"Sottotitoli",historyTitle:"Cronologia" },
-  DE: { home:"Start",library:"Bibliothek",settings:"Einstellungen",logout:"Abmelden",videos:"Videos",addFile:"+ Hinzufügen",dragVideo:"Video ziehen",dragSub:"TikTok, Instagram • max 50MB",addAnother:"Weiteres Video",pasteLink:"TikTok / Instagram Link...",import:"Importieren",outputFormat:"Format",beatSync:"Beat sync",subtitles:"Untertitel",autoZoom:"Auto-Zoom",speedRamp:"Speed ramp",capsules:"Kapseln",introOutro:"Intro / Outro",addMusic:"Musik",zoomIntensity:"Zoom",speedIntensity:"Speed",description:"Beschreibung",promptHistory:"Verlauf",preview:"Vorschau",promptHelper:"Hilfe",generating:"Generierung...",generate:"Generieren",preparingVideos:"Vorbereitung...",analyzingAI:"KI...",detectingEffects:"Effekte...",renderingClips:"Rendern...",generatedClips:"Clips",downloadAll:"Alle laden",download:"Laden",serverStarting:"Server startet...",check:"Prüfen",newFolder:"+ Ordner",folders:"Ordner",clipsInFolder:"Clips in Ordner",clipsNoFolder:"Ohne Ordner",noClips:"Keine Clips",generateFirst:"Clip erstellen",back:"Zurück",rename:"Umbenennen",move:"Verschieben",delete:"Löschen",shareFolder:"Teilen",sharedWith:"Geteilt mit",cancel:"Abbrechen",create:"Erstellen",apply:"Anwenden",close:"Schließen",use:"Verwenden",newFolderName:"Name...",emailMember:"E-Mail...",addMember:"Hinzufügen",createAccount:"Konto erstellen",creating:"Erstelle...",reportProblem:"Melden",send:"Senden",compressTitle:"Datei groß",compressMsg:"Komprimieren?",no:"Nein",yesCompress:"Ja",compressing:"Komprimierung...",chooseMusic:"Musik",searchMusic:"Suchen...",timestampPreview:"Timestamps",timestampDesc:"KI schneidet hier.",useTimestamps:"Verwenden",capsuleTitle:"Kapseln",shortVideo:"Kurz",shortSub:"aufeinanderfolgend",longVideo:"Lang",longSub:"beste Momente",capsuleCount:"Anzahl",promptGenerated:"Prompt:",refVideo:"Referenz",optional:"optional",addRefVideo:"+ Hinzufügen",lastGenerated:"Letzter",serverActive:"Aktiv",cmdEnterHint:"Cmd+Enter",subfolders:"Unterordner",newSubfolder:"+ Unterordner",share:"Teilen",colorGrade:"Farbe",transition:"Übergang",textOverlay:"Text",stabilize:"Stabilisieren",vocalVolume:"Stimme",none:"Keiner",exportQuality:"Qualität",exportCodec:"Codec",watermark:"Wasserzeichen",presets:"Presets",savePreset:"Speichern",presetName:"Name...",stats:"Stats",totalClips:"Clips",clipsInLib:"Bibliothek",queue:"Warteschlange",addToQueue:"+ Warte",runQueue:"Starten",queueEmpty:"Leer",copyLink:"Kopieren",copied:"Kopiert!",autoMode:"Auto-Modus",autoModeDesc:"KI wählt alles",manualMode:"Manuell",step1:"Video importieren",step2:"Edit beschreiben",step3:"Generieren",onboardingSkip:"Überspringen",shareNative:"Teilen",advancedSettings:"Erweiterte Einstellungen",generatingMsg1:"Analysieren... 🔍",generatingMsg2:"Szenen... 🎬",generatingMsg3:"Beat... 🎵",generatingMsg4:"Farbe... 🎨",generatingMsg5:"Rendern... ✨",generatingMsg6:"Fast fertig... 🚀",subtitleStyle:"Untertitel",historyTitle:"Verlauf" },
+  EN: { home:"Home",library:"Library",settings:"Settings",logout:"Logout",videos:"Videos",addFile:"+ Add file",dragVideo:"Drop a video or click to import",dragSub:"TikTok, Instagram, local file • max 50MB",addAnother:"Add another video",pasteLink:"Paste a TikTok / Instagram link...",import:"Import",outputFormat:"Output format",beatSync:"Beat sync",subtitles:"Subtitles",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsules",introOutro:"Intro / Outro",addMusic:"Add music",zoomIntensity:"Zoom intensity",speedIntensity:"Speed ramp intensity",description:"Description",promptHistory:"History",preview:"Preview",promptHelper:"Prompt help",generating:"Generating...",generate:"Generate",preparingVideos:"Preparing videos...",analyzingAI:"AI analysis...",detectingEffects:"Detecting effects...",renderingClips:"Rendering clips...",generatedClips:"Generated clips",downloadAll:"Download all",download:"Download",serverStarting:"Server starting — may take 30-50s...",check:"Check",newFolder:"+ New folder",folders:"Folders",clipsInFolder:"Clips in this folder",clipsNoFolder:"Clips without folder",noClips:"No clips here",generateFirst:"Generate your first clip",back:"Back",rename:"Rename",move:"Move",delete:"Delete",shareFolder:"Share folder",sharedWith:"Shared with",cancel:"Cancel",create:"Create",apply:"Apply",close:"Close",use:"Use",newFolderName:"Folder name...",emailMember:"Member email...",addMember:"Add a member",createAccount:"Create account",creating:"Creating...",reportProblem:"Report a problem",send:"Send",compressTitle:"File too large",compressMsg:"Compress automatically?",no:"No",yesCompress:"Yes, compress",compressing:"Compressing...",chooseMusic:"Choose music",searchMusic:"Search artist, title...",timestampPreview:"Timestamp preview",timestampDesc:"Moments the AI will cut.",useTimestamps:"Use these timestamps",capsuleTitle:"Capsules",shortVideo:"Short video",shortSub:"sequential clips",longVideo:"Long video",longSub:"best moments",capsuleCount:"Number of capsules",promptGenerated:"Generated prompt:",refVideo:"Reference video",optional:"optional",addRefVideo:"+ Add reference video",lastGenerated:"Last generated",serverActive:"Server active",cmdEnterHint:"Cmd+Enter to generate",subfolders:"Subfolders",newSubfolder:"+ Subfolder",share:"Share",colorGrade:"Color grade",transition:"Transition",textOverlay:"Text overlay",stabilize:"Stabilize",vocalVolume:"Vocal volume",none:"None",exportQuality:"Export quality",exportCodec:"Codec",watermark:"Watermark",presets:"Presets",savePreset:"Save preset",presetName:"Preset name...",stats:"Stats",totalClips:"Total clips",clipsInLib:"In library",queue:"Queue",addToQueue:"+ Queue",runQueue:"Run queue",queueEmpty:"Queue is empty",copyLink:"Copy link",copied:"Copied!",autoMode:"Auto mode",autoModeDesc:"The AI chooses everything for you",manualMode:"Manual",step1:"Import your video",step2:"Describe your edit",step3:"Generate",onboardingSkip:"Skip",shareNative:"Share",advancedSettings:"Advanced settings",generatingMsg1:"Analyzing your best sequences... 🔍",generatingMsg2:"Detecting scene changes... 🎬",generatingMsg3:"Syncing to the beat... 🎵",generatingMsg4:"Applying color grade... 🎨",generatingMsg5:"Rendering your clips... ✨",generatingMsg6:"Almost there... 🚀",subtitleStyle:"Subtitle style",historyTitle:"History",exportDrive:"Export to Drive",exportingDrive:"Exporting..." },
+  FR: { home:"Accueil",library:"Bibliothèque",settings:"Paramètres",logout:"Déconnexion",videos:"Vidéos",addFile:"+ Ajouter",dragVideo:"Glisse une vidéo ou clique",dragSub:"TikTok, Instagram, fichier local • max 50MB",addAnother:"Ajouter une autre vidéo",pasteLink:"Coller un lien TikTok / Instagram...",import:"Importer",outputFormat:"Format de sortie",beatSync:"Beat sync",subtitles:"Sous-titres",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsules",introOutro:"Intro / Outro",addMusic:"Ajouter musique",zoomIntensity:"Intensité zoom",speedIntensity:"Intensité speed ramp",description:"Description",promptHistory:"Historique",preview:"Aperçu",promptHelper:"Aide prompt",generating:"Génération...",generate:"Générer",preparingVideos:"Préparation des vidéos...",analyzingAI:"Analyse IA...",detectingEffects:"Détection des effets...",renderingClips:"Rendu des clips...",generatedClips:"Clips générés",downloadAll:"Tout télécharger",download:"Télécharger",serverStarting:"Serveur en démarrage — 30-50 secondes...",check:"Vérifier",newFolder:"+ Dossier",folders:"Dossiers",clipsInFolder:"Clips dans ce dossier",clipsNoFolder:"Clips sans dossier",noClips:"Aucun clip ici",generateFirst:"Générer un premier clip",back:"Retour",rename:"Renommer",move:"Déplacer",delete:"Supprimer",shareFolder:"Partager le dossier",sharedWith:"Partagé avec",cancel:"Annuler",create:"Créer",apply:"Appliquer",close:"Fermer",use:"Utiliser",newFolderName:"Nom du dossier...",emailMember:"Email du membre...",addMember:"Ajouter un membre",createAccount:"Créer le compte",creating:"Création...",reportProblem:"Signaler un problème",send:"Envoyer",compressTitle:"Vidéo trop lourde",compressMsg:"Compresser automatiquement ?",no:"Non",yesCompress:"Oui, compresser",compressing:"Compression...",chooseMusic:"Choisir une musique",searchMusic:"Rechercher artiste, titre...",timestampPreview:"Aperçu timestamps",timestampDesc:"Moments que l'IA va découper.",useTimestamps:"Utiliser ces timestamps",capsuleTitle:"Capsules",shortVideo:"Vidéo courte",shortSub:"clips qui se suivent",longVideo:"Vidéo longue",longSub:"meilleurs moments",capsuleCount:"Nombre",promptGenerated:"Prompt généré :",refVideo:"Vidéo référence",optional:"optionnel",addRefVideo:"+ Ajouter",lastGenerated:"Dernier clip",serverActive:"Serveur actif",cmdEnterHint:"Cmd+Entrée pour générer",subfolders:"Sous-dossiers",newSubfolder:"+ Sous-dossier",share:"Partager",colorGrade:"Color grade",transition:"Transition",textOverlay:"Texte overlay",stabilize:"Stabiliser",vocalVolume:"Volume voix",none:"Aucun",exportQuality:"Qualité export",exportCodec:"Codec",watermark:"Watermark",presets:"Presets",savePreset:"Sauvegarder",presetName:"Nom du preset...",stats:"Stats",totalClips:"Clips générés",clipsInLib:"En bibliothèque",queue:"File d'attente",addToQueue:"+ File",runQueue:"Lancer la file",queueEmpty:"File vide",copyLink:"Copier le lien",copied:"Copié !",autoMode:"Mode Auto",autoModeDesc:"L'IA choisit tout pour toi",manualMode:"Manuel",step1:"Importe ta vidéo",step2:"Décris ton edit",step3:"Génère",onboardingSkip:"Passer",shareNative:"Partager",advancedSettings:"Paramètres avancés",generatingMsg1:"Analyse de tes meilleures séquences... 🔍",generatingMsg2:"Détection des changements de scène... 🎬",generatingMsg3:"Synchronisation sur le beat... 🎵",generatingMsg4:"Application du color grade... 🎨",generatingMsg5:"Rendu de tes clips... ✨",generatingMsg6:"Presque terminé... 🚀",subtitleStyle:"Style sous-titres",historyTitle:"Historique",exportDrive:"Exporter Drive",exportingDrive:"Export..." },
+  ES: { home:"Inicio",library:"Biblioteca",settings:"Ajustes",logout:"Salir",videos:"Vídeos",addFile:"+ Añadir",dragVideo:"Arrastra un vídeo",dragSub:"TikTok, Instagram • máx 50MB",addAnother:"Añadir otro",pasteLink:"Enlace TikTok / Instagram...",import:"Importar",outputFormat:"Formato",beatSync:"Beat sync",subtitles:"Subtítulos",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Cápsulas",introOutro:"Intro / Outro",addMusic:"Música",zoomIntensity:"Zoom",speedIntensity:"Speed",description:"Descripción",promptHistory:"Historial",preview:"Vista previa",promptHelper:"Ayuda",generating:"Generando...",generate:"Generar",preparingVideos:"Preparando...",analyzingAI:"IA...",detectingEffects:"Efectos...",renderingClips:"Render...",generatedClips:"Clips",downloadAll:"Descargar todo",download:"Descargar",serverStarting:"Servidor iniciando...",check:"Verificar",newFolder:"+ Carpeta",folders:"Carpetas",clipsInFolder:"Clips en carpeta",clipsNoFolder:"Sin carpeta",noClips:"Sin clips",generateFirst:"Generar clip",back:"Volver",rename:"Renombrar",move:"Mover",delete:"Eliminar",shareFolder:"Compartir",sharedWith:"Compartido",cancel:"Cancelar",create:"Crear",apply:"Aplicar",close:"Cerrar",use:"Usar",newFolderName:"Nombre...",emailMember:"Email...",addMember:"Añadir",createAccount:"Crear cuenta",creating:"Creando...",reportProblem:"Reportar",send:"Enviar",compressTitle:"Archivo grande",compressMsg:"¿Comprimir?",no:"No",yesCompress:"Sí",compressing:"Comprimiendo...",chooseMusic:"Música",searchMusic:"Buscar...",timestampPreview:"Timestamps",timestampDesc:"La IA cortará aquí.",useTimestamps:"Usar",capsuleTitle:"Cápsulas",shortVideo:"Corto",shortSub:"clips seguidos",longVideo:"Largo",longSub:"mejores momentos",capsuleCount:"Número",promptGenerated:"Prompt:",refVideo:"Referencia",optional:"opcional",addRefVideo:"+ Añadir",lastGenerated:"Último",serverActive:"Activo",cmdEnterHint:"Cmd+Enter",subfolders:"Subcarpetas",newSubfolder:"+ Subcarpeta",share:"Compartir",colorGrade:"Color",transition:"Transición",textOverlay:"Texto",stabilize:"Estabilizar",vocalVolume:"Voz",none:"Ninguno",exportQuality:"Calidad",exportCodec:"Codec",watermark:"Marca",presets:"Presets",savePreset:"Guardar",presetName:"Nombre...",stats:"Stats",totalClips:"Clips",clipsInLib:"Biblioteca",queue:"Cola",addToQueue:"+ Cola",runQueue:"Ejecutar",queueEmpty:"Vacía",copyLink:"Copiar",copied:"¡Copiado!",autoMode:"Modo Auto",autoModeDesc:"La IA elige todo",manualMode:"Manual",step1:"Importa tu vídeo",step2:"Describe tu edit",step3:"Genera",onboardingSkip:"Saltar",shareNative:"Compartir",advancedSettings:"Ajustes avanzados",generatingMsg1:"Analizando... 🔍",generatingMsg2:"Escenas... 🎬",generatingMsg3:"Beat... 🎵",generatingMsg4:"Color... 🎨",generatingMsg5:"Render... ✨",generatingMsg6:"Casi... 🚀",subtitleStyle:"Subtítulos",historyTitle:"Historial",exportDrive:"Drive",exportingDrive:"Exportando..." },
+  IT: { home:"Home",library:"Libreria",settings:"Impostazioni",logout:"Esci",videos:"Video",addFile:"+ Aggiungi",dragVideo:"Trascina un video",dragSub:"TikTok, Instagram • max 50MB",addAnother:"Aggiungi altro",pasteLink:"Link TikTok / Instagram...",import:"Importa",outputFormat:"Formato",beatSync:"Beat sync",subtitles:"Sottotitoli",autoZoom:"Auto-zoom",speedRamp:"Speed ramp",capsules:"Capsule",introOutro:"Intro / Outro",addMusic:"Musica",zoomIntensity:"Zoom",speedIntensity:"Speed",description:"Descrizione",promptHistory:"Cronologia",preview:"Anteprima",promptHelper:"Aiuto",generating:"Generazione...",generate:"Genera",preparingVideos:"Preparazione...",analyzingAI:"IA...",detectingEffects:"Effetti...",renderingClips:"Rendering...",generatedClips:"Clip",downloadAll:"Scarica tutto",download:"Scarica",serverStarting:"Server in avvio...",check:"Verifica",newFolder:"+ Cartella",folders:"Cartelle",clipsInFolder:"Clip in cartella",clipsNoFolder:"Senza cartella",noClips:"Nessuna clip",generateFirst:"Genera clip",back:"Indietro",rename:"Rinomina",move:"Sposta",delete:"Elimina",shareFolder:"Condividi",sharedWith:"Condiviso",cancel:"Annulla",create:"Crea",apply:"Applica",close:"Chiudi",use:"Usa",newFolderName:"Nome...",emailMember:"Email...",addMember:"Aggiungi",createAccount:"Crea account",creating:"Creazione...",reportProblem:"Segnala",send:"Invia",compressTitle:"File grande",compressMsg:"Comprimi?",no:"No",yesCompress:"Sì",compressing:"Compressione...",chooseMusic:"Musica",searchMusic:"Cerca...",timestampPreview:"Timestamp",timestampDesc:"L'IA taglierà qui.",useTimestamps:"Usa",capsuleTitle:"Capsule",shortVideo:"Corto",shortSub:"clip consecutive",longVideo:"Lungo",longSub:"momenti migliori",capsuleCount:"Numero",promptGenerated:"Prompt:",refVideo:"Riferimento",optional:"opzionale",addRefVideo:"+ Aggiungi",lastGenerated:"Ultimo",serverActive:"Attivo",cmdEnterHint:"Cmd+Invio",subfolders:"Sottocartelle",newSubfolder:"+ Sottocartella",share:"Condividi",colorGrade:"Colore",transition:"Transizione",textOverlay:"Testo",stabilize:"Stabilizza",vocalVolume:"Voce",none:"Nessuno",exportQuality:"Qualità",exportCodec:"Codec",watermark:"Watermark",presets:"Preset",savePreset:"Salva",presetName:"Nome...",stats:"Stats",totalClips:"Clip",clipsInLib:"Libreria",queue:"Coda",addToQueue:"+ Coda",runQueue:"Avvia",queueEmpty:"Vuota",copyLink:"Copia",copied:"Copiato!",autoMode:"Modalità Auto",autoModeDesc:"L'IA sceglie tutto",manualMode:"Manuale",step1:"Importa il video",step2:"Descrivi il tuo edit",step3:"Genera",onboardingSkip:"Salta",shareNative:"Condividi",advancedSettings:"Impostazioni avanzate",generatingMsg1:"Analisi... 🔍",generatingMsg2:"Scene... 🎬",generatingMsg3:"Beat... 🎵",generatingMsg4:"Colore... 🎨",generatingMsg5:"Render... ✨",generatingMsg6:"Quasi... 🚀",subtitleStyle:"Sottotitoli",historyTitle:"Cronologia",exportDrive:"Drive",exportingDrive:"Esportando..." },
+  DE: { home:"Start",library:"Bibliothek",settings:"Einstellungen",logout:"Abmelden",videos:"Videos",addFile:"+ Hinzufügen",dragVideo:"Video ziehen",dragSub:"TikTok, Instagram • max 50MB",addAnother:"Weiteres Video",pasteLink:"TikTok / Instagram Link...",import:"Importieren",outputFormat:"Format",beatSync:"Beat sync",subtitles:"Untertitel",autoZoom:"Auto-Zoom",speedRamp:"Speed ramp",capsules:"Kapseln",introOutro:"Intro / Outro",addMusic:"Musik",zoomIntensity:"Zoom",speedIntensity:"Speed",description:"Beschreibung",promptHistory:"Verlauf",preview:"Vorschau",promptHelper:"Hilfe",generating:"Generierung...",generate:"Generieren",preparingVideos:"Vorbereitung...",analyzingAI:"KI...",detectingEffects:"Effekte...",renderingClips:"Rendern...",generatedClips:"Clips",downloadAll:"Alle laden",download:"Laden",serverStarting:"Server startet...",check:"Prüfen",newFolder:"+ Ordner",folders:"Ordner",clipsInFolder:"Clips in Ordner",clipsNoFolder:"Ohne Ordner",noClips:"Keine Clips",generateFirst:"Clip erstellen",back:"Zurück",rename:"Umbenennen",move:"Verschieben",delete:"Löschen",shareFolder:"Teilen",sharedWith:"Geteilt mit",cancel:"Abbrechen",create:"Erstellen",apply:"Anwenden",close:"Schließen",use:"Verwenden",newFolderName:"Name...",emailMember:"E-Mail...",addMember:"Hinzufügen",createAccount:"Konto erstellen",creating:"Erstelle...",reportProblem:"Melden",send:"Senden",compressTitle:"Datei groß",compressMsg:"Komprimieren?",no:"Nein",yesCompress:"Ja",compressing:"Komprimierung...",chooseMusic:"Musik",searchMusic:"Suchen...",timestampPreview:"Timestamps",timestampDesc:"KI schneidet hier.",useTimestamps:"Verwenden",capsuleTitle:"Kapseln",shortVideo:"Kurz",shortSub:"aufeinanderfolgend",longVideo:"Lang",longSub:"beste Momente",capsuleCount:"Anzahl",promptGenerated:"Prompt:",refVideo:"Referenz",optional:"optional",addRefVideo:"+ Hinzufügen",lastGenerated:"Letzter",serverActive:"Aktiv",cmdEnterHint:"Cmd+Enter",subfolders:"Unterordner",newSubfolder:"+ Unterordner",share:"Teilen",colorGrade:"Farbe",transition:"Übergang",textOverlay:"Text",stabilize:"Stabilisieren",vocalVolume:"Stimme",none:"Keiner",exportQuality:"Qualität",exportCodec:"Codec",watermark:"Wasserzeichen",presets:"Presets",savePreset:"Speichern",presetName:"Name...",stats:"Stats",totalClips:"Clips",clipsInLib:"Bibliothek",queue:"Warteschlange",addToQueue:"+ Warte",runQueue:"Starten",queueEmpty:"Leer",copyLink:"Kopieren",copied:"Kopiert!",autoMode:"Auto-Modus",autoModeDesc:"KI wählt alles",manualMode:"Manuell",step1:"Video importieren",step2:"Edit beschreiben",step3:"Generieren",onboardingSkip:"Überspringen",shareNative:"Teilen",advancedSettings:"Erweiterte Einstellungen",generatingMsg1:"Analysieren... 🔍",generatingMsg2:"Szenen... 🎬",generatingMsg3:"Beat... 🎵",generatingMsg4:"Farbe... 🎨",generatingMsg5:"Rendern... ✨",generatingMsg6:"Fast fertig... 🚀",subtitleStyle:"Untertitel",historyTitle:"Verlauf",exportDrive:"Drive",exportingDrive:"Exportiere..." },
 }
 
 const AUTO_PRESETS: Record<string, { colorGrade: string; transition: string; options: string[]; prompt: string }> = {
@@ -182,6 +182,7 @@ export default function Home() {
   const [analyzing, setAnalyzing] = useState(false)
   const [autoAnalysisDesc, setAutoAnalysisDesc] = useState<string|null>(null)
   const [generationHistory, setGenerationHistory] = useState<any[]>([])
+  const [exportingDrive, setExportingDrive] = useState<string|null>(null)
 
   const audioRef = useRef<HTMLAudioElement|null>(null)
   const searchTimeout = useRef<ReturnType<typeof setTimeout>|null>(null)
@@ -256,7 +257,7 @@ export default function Home() {
   }
 
   const saveClipToLibrary = async (clip: any, index: number) => {
-    await supabase.from("clips").insert({ name: clip.name || `Edit #${index+1}`, base64: clip.base64, owner_email: user.email, folder_id: null, thumbnail: clip.thumbnail || null })
+    await supabase.from("clips").insert({ name: clip.name || `Edit #${index+1}`, base64: clip.base64 || null, storage_url: clip.storageUrl || null, owner_email: user.email, folder_id: null, thumbnail: clip.thumbnail || null })
     loadLibrary()
   }
 
@@ -424,29 +425,105 @@ export default function Home() {
   const loadPreset = (p: Preset) => { setSelectedFormat(p.format); setColorGrade(p.colorGrade); setTransition(p.transition); setPromptText(p.prompt); setActiveOptions(p.options); setExportQuality(p.exportQuality); setExportCodec(p.exportCodec); setWatermark(p.watermark); setShowPresets(false) }
   const deletePreset = (id: string) => { const updated = presets.filter(p => p.id !== id); setPresets(updated); localStorage.setItem("climbPresets", JSON.stringify(updated)) }
 
-  const shareClipPublic = async (clip: any) => {
+  const getClipSrc = (clip: any) => clip.storageUrl || clip.storage_url || clip.base64 || ""
+
+  const exportToDrive = async (clip: any) => {
+    const clipId = clip.id || clip.name
+    setExportingDrive(clipId)
     try {
-      const res = await fetch(`${SERVER_URL}/share`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ base64:clip.base64, name:clip.name }) })
+      const src = getClipSrc(clip)
+      if (!src) { alert("Clip non disponible"); return }
+      // Si storageUrl dispo, on passe l'URL directement à l'API Drive via fetch du blob
+      let blob: Blob
+      if (clip.storageUrl || clip.storage_url) {
+        const r = await fetch(clip.storageUrl || clip.storage_url)
+        blob = await r.blob()
+      } else {
+        const b64 = src.split(",")[1]
+        const bytes = atob(b64); const arr = new Uint8Array(bytes.length)
+        for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
+        blob = new Blob([arr], { type:"video/mp4" })
+      }
+      // Upload vers Google Drive via l'API multipart
+      const session = await supabase.auth.getSession()
+      const providerToken = session.data.session?.provider_token
+      if (!providerToken) {
+        // Fallback: ouvre drive.google.com et copie le lien
+        if (clip.storageUrl || clip.storage_url) {
+          await navigator.clipboard.writeText(clip.storageUrl || clip.storage_url)
+          alert("Lien copié — ouvre Google Drive et importe depuis URL")
+        } else {
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement("a"); a.href = url; a.download = `${clip.name || "clip"}.mp4`; a.click()
+          URL.revokeObjectURL(url)
+        }
+        return
+      }
+      const metadata = { name: `${clip.name || "clip"}.mp4`, mimeType: "video/mp4" }
+      const form = new FormData()
+      form.append("metadata", new Blob([JSON.stringify(metadata)], { type:"application/json" }))
+      form.append("file", blob, `${clip.name || "clip"}.mp4`)
+      const uploadRes = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${providerToken}` },
+        body: form
+      })
+      if (uploadRes.ok) {
+        const driveFile = await uploadRes.json()
+        alert(`✓ Exporté sur Drive : ${driveFile.name}`)
+      } else {
+        const err = await uploadRes.json()
+        // Fallback download si Drive échoue
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a"); a.href = url; a.download = `${clip.name || "clip"}.mp4`; a.click()
+        URL.revokeObjectURL(url)
+        console.error("Drive error:", err)
+      }
+    } catch (err: any) { console.error(err); alert("Erreur export Drive") }
+    setExportingDrive(null)
+  }
+
+  const shareClipPublic = async (clip: any) => {
+    const src = getClipSrc(clip)
+    if (clip.storageUrl || clip.storage_url) {
+      await navigator.clipboard.writeText(clip.storageUrl || clip.storage_url)
+      setCopiedId(clip.name || clip.id); setTimeout(() => setCopiedId(null), 2500); return
+    }
+    try {
+      const res = await fetch(`${SERVER_URL}/share`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ base64: src, name:clip.name }) })
       const data = await res.json()
-      if (data.url) { await navigator.clipboard.writeText(data.url); setCopiedId(clip.name); setTimeout(() => setCopiedId(null), 2500) }
+      if (data.url) { await navigator.clipboard.writeText(data.url); setCopiedId(clip.name || clip.id); setTimeout(() => setCopiedId(null), 2500) }
       else alert(data.error)
     } catch (err: any) { alert(err.message) }
   }
 
   const shareNative = async (clip: any) => {
     try {
-      if (navigator.share) {
-        const b64 = clip.base64.split(",")[1]
+      const storageUrl = clip.storageUrl || clip.storage_url
+      if (navigator.share && storageUrl) {
+        await navigator.share({ title: clip.name, url: storageUrl }); return
+      }
+      const src = getClipSrc(clip)
+      if (navigator.share && src && src.startsWith("data:")) {
+        const b64 = src.split(",")[1]
         const bytes = atob(b64); const arr = new Uint8Array(bytes.length)
         for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
         const blob = new Blob([arr], { type:"video/mp4" })
         const file = new File([blob], `${clip.name || "clip"}.mp4`, { type:"video/mp4" })
-        await navigator.share({ title: clip.name, files: [file] })
-      } else shareClipPublic(clip)
+        await navigator.share({ title: clip.name, files: [file] }); return
+      }
+      shareClipPublic(clip)
     } catch {}
   }
 
-  const downloadAllClips = () => generatedClips.forEach((clip, i) => { const a = document.createElement("a"); a.href = clip.base64; a.download = `climbclip_${i+1}.mp4`; a.click() })
+  const downloadClip = (clip: any) => {
+    const src = getClipSrc(clip)
+    if (!src) return
+    const a = document.createElement("a")
+    a.href = src; a.download = `${clip.name || "clip"}.mp4`; a.click()
+  }
+
+  const downloadAllClips = () => generatedClips.forEach(clip => downloadClip(clip))
 
   const handlePreviewTimestamps = async () => {
     if (videos.length === 0) return; setLoadingTimestamps(true)
@@ -494,6 +571,26 @@ export default function Home() {
   const Pill = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
     <button onClick={onClick} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:active ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:active ? "rgba(232,245,66,0.08)" : t.bgPill, color:active ? t.accent : t.textSub, fontWeight:active ? 500 : 400, transition:"all 0.15s", whiteSpace:"nowrap" }}>{label}</button>
   )
+
+  // Composant carte clip réutilisable
+  const ClipCard = ({ clip, index, showDriveBtn = true }: { clip: any; index: number; showDriveBtn?: boolean }) => {
+    const src = getClipSrc(clip)
+    const clipId = clip.id || clip.name || String(index)
+    return (
+      <div style={{ background:t.bgCard, border:t.border, borderRadius:11, overflow:"hidden", display:"flex", flexDirection:"column" }}>
+        <div style={{ aspectRatio:"9/16", background:t.bgThumb, overflow:"hidden" }}>
+          {clip.thumbnail ? <img src={clip.thumbnail} style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : <video src={src} style={{ width:"100%", height:"100%", objectFit:"cover" }} controls playsInline/>}
+        </div>
+        <div style={{ padding:"9px 10px 11px", display:"flex", flexDirection:"column", gap:5 }}>
+          <p style={{ fontSize:11, color:t.text, fontWeight:500 }}>{clip.name}</p>
+          <button onClick={() => downloadClip(clip)} style={{ padding:"7px", borderRadius:7, fontSize:11, fontWeight:500, border:"1px solid rgba(232,245,66,0.25)", background:"rgba(232,245,66,0.06)", color:t.accent, cursor:"pointer" }}>↓ {T.download}</button>
+          <button onClick={() => shareNative(clip)} style={{ padding:"7px", borderRadius:7, fontSize:11, border:t.border, background:t.bgInput, color:t.textSub, cursor:"pointer" }}>↗ {T.shareNative}</button>
+          <button onClick={() => shareClipPublic(clip)} style={{ padding:"7px", borderRadius:7, fontSize:11, border:t.border, background:t.bgInput, color:copiedId === clipId ? "#4ade80" : t.textMuted, cursor:"pointer" }}>{copiedId === clipId ? `✓ ${T.copied}` : `🔗 ${T.copyLink}`}</button>
+          {showDriveBtn && <button onClick={() => exportToDrive(clip)} disabled={exportingDrive === clipId} style={{ padding:"7px", borderRadius:7, fontSize:11, border:"1px solid rgba(66,133,244,0.35)", background:"rgba(66,133,244,0.06)", color:exportingDrive === clipId ? t.textMuted : "#4285f4", cursor:"pointer", opacity:exportingDrive === clipId ? 0.6 : 1 }}>{exportingDrive === clipId ? T.exportingDrive : `▲ ${T.exportDrive}`}</button>}
+        </div>
+      </div>
+    )
+  }
 
   if (!onboardingDone) {
     return (
@@ -577,7 +674,6 @@ export default function Home() {
       {currentPage === "home" && (
         <div style={{ width:"100%", maxWidth:600, display:"flex", flexDirection:"column", gap:22, padding:"32px 16px 120px", position:"relative", zIndex:1 }}>
 
-          {/* AUTO/MANUAL */}
           <div style={{ display:"flex", alignItems:"center", gap:8, background:t.bgCard, border:t.border, borderRadius:12, padding:"12px 16px" }}>
             <div style={{ flex:1 }}>
               <p style={{ fontSize:13, fontWeight:600, color:autoMode ? t.accent : t.text, marginBottom:2 }}>{autoMode ? `✦ ${T.autoMode}` : T.manualMode}</p>
@@ -588,7 +684,6 @@ export default function Home() {
             </button>
           </div>
 
-          {/* ANALYSE IA */}
           {analyzing && (
             <div style={{ display:"flex", alignItems:"center", gap:10, padding:"12px 14px", background:"rgba(232,245,66,0.04)", border:"1px solid rgba(232,245,66,0.18)", borderRadius:10 }}>
               <div style={{ width:16, height:16, borderRadius:"50%", border:`2px solid ${t.accent}`, borderTopColor:"transparent", flexShrink:0, animation:"spin 0.8s linear infinite" }}/>
@@ -605,7 +700,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* VIDEOS */}
           <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
               <p style={{ fontSize:12, color:t.textSub }}>{T.videos} ({videos.length})</p>
@@ -642,7 +736,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* FORMAT */}
           <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
             <p style={{ fontSize:11, color:t.textMuted, textTransform:"uppercase", letterSpacing:"0.06em" }}>{T.outputFormat}</p>
             <div style={{ display:"flex", gap:6 }}>
@@ -650,7 +743,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* OPTIONS */}
           <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
             {[["Beat sync","Beat sync"],["Sous-titres",T.subtitles],["Auto-zoom",T.autoZoom],["Speed ramp",T.speedRamp]].map(([key,label]) => (
               <Pill key={key} label={label} active={activeOptions.includes(key)} onClick={() => toggleOption(key)}/>
@@ -663,7 +755,6 @@ export default function Home() {
             </button>
           </div>
 
-          {/* STYLE SOUS-TITRES */}
           {activeOptions.includes("Sous-titres") && (
             <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
               <p style={{ fontSize:11, color:t.textMuted, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.subtitleStyle}</p>
@@ -675,7 +766,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* ADVANCED */}
           {!autoMode && (
             <button onClick={() => setShowAdvanced(!showAdvanced)} style={{ display:"flex", alignItems:"center", gap:7, background:"none", border:t.border, borderRadius:9, padding:"10px 14px", cursor:"pointer", color:t.textSub, fontSize:12, width:"100%" }}>
               <span style={{ flex:1, textAlign:"left" }}>⚙ {T.advancedSettings}</span>
@@ -747,7 +837,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* PROMPT */}
           <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
               <div style={{ display:"flex", alignItems:"center", gap:7 }}>
@@ -797,19 +886,7 @@ export default function Home() {
                   {generatedClips.length > 1 && <button onClick={downloadAllClips} style={{ fontSize:11, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.18)", borderRadius:6, padding:"4px 9px", cursor:"pointer" }}>↓ {T.downloadAll}</button>}
                 </div>
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(160px, 1fr))", gap:10 }}>
-                  {generatedClips.map((clip, i) => (
-                    <div key={i} style={{ background:t.bgCard, border:t.border, borderRadius:11, overflow:"hidden", display:"flex", flexDirection:"column" }}>
-                      <div style={{ aspectRatio:"9/16", background:t.bgThumb, overflow:"hidden" }}>
-                        <video src={clip.base64} style={{ width:"100%", height:"100%", objectFit:"cover" }} controls playsInline/>
-                      </div>
-                      <div style={{ padding:"9px 10px 11px", display:"flex", flexDirection:"column", gap:6 }}>
-                        <p style={{ fontSize:11, color:t.text, fontWeight:500 }}>{clip.name}</p>
-                        <a href={clip.base64} download={`climbclip_${i+1}.mp4`} style={{ padding:"7px", borderRadius:7, fontSize:11, fontWeight:500, border:"1px solid rgba(232,245,66,0.25)", background:"rgba(232,245,66,0.06)", color:t.accent, display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none" }}>↓ {T.download}</a>
-                        <button onClick={() => shareNative(clip)} style={{ padding:"7px", borderRadius:7, fontSize:11, border:t.border, background:t.bgInput, color:t.textSub, cursor:"pointer" }}>↗ {T.shareNative}</button>
-                        <button onClick={() => shareClipPublic(clip)} style={{ padding:"7px", borderRadius:7, fontSize:11, border:t.border, background:t.bgInput, color:copiedId === clip.name ? "#4ade80" : t.textMuted, cursor:"pointer" }}>{copiedId === clip.name ? `✓ ${T.copied}` : `🔗 ${T.copyLink}`}</button>
-                      </div>
-                    </div>
-                  ))}
+                  {generatedClips.map((clip, i) => <ClipCard key={i} clip={clip} index={i}/>)}
                 </div>
               </div>
             </>
@@ -864,12 +941,12 @@ export default function Home() {
               </div>
             ) : (
               <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(150px, 1fr))", gap:10 }}>
-                {displayedClips.map(clip => (
+                {displayedClips.map((clip, i) => (
                   <div key={clip.id} style={{ background:t.bgCard, border:t.border, borderRadius:11, overflow:"hidden", display:"flex", flexDirection:"column", position:"relative" }}>
                     <div style={{ aspectRatio:"9/16", background:t.bgThumb, overflow:"hidden" }}>
-                      {clip.thumbnail ? <img src={clip.thumbnail} style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : <video src={clip.base64} style={{ width:"100%", height:"100%", objectFit:"cover" }} controls playsInline/>}
+                      {clip.thumbnail ? <img src={clip.thumbnail} style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : <video src={getClipSrc(clip)} style={{ width:"100%", height:"100%", objectFit:"cover" }} controls playsInline/>}
                     </div>
-                    <div style={{ padding:"9px 10px 11px", display:"flex", flexDirection:"column", gap:6 }}>
+                    <div style={{ padding:"9px 10px 11px", display:"flex", flexDirection:"column", gap:5 }}>
                       {renamingClip === clip.id ? (
                         <div style={{ display:"flex", gap:4 }}>
                           <input value={renameValue} onChange={e => setRenameValue(e.target.value)} onKeyDown={e => { if (e.key === "Enter") renameClip(clip.id); if (e.key === "Escape") setRenamingClip(null) }} style={{ flex:1, background:t.bgInput, border:t.borderMed, borderRadius:5, padding:"4px 7px", fontSize:11, color:t.text, outline:"none" }} autoFocus/>
@@ -884,14 +961,16 @@ export default function Home() {
                       {clipMenu === clip.id && (
                         <div onClick={e => e.stopPropagation()} style={{ position:"absolute", right:7, bottom:46, zIndex:50, background:t.bgModal, border:t.border, borderRadius:8, padding:"4px 0", minWidth:130, boxShadow:"0 6px 24px rgba(0,0,0,0.4)" }}>
                           <button onClick={() => { setRenamingClip(clip.id); setRenameValue(clip.name); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.rename}</button>
-                          <a href={clip.base64} download={`${clip.name}.mp4`} style={{ display:"block", padding:"7px 13px", color:t.text, fontSize:12, textDecoration:"none" }}>{T.download}</a>
-                          <button onClick={() => shareNative(clip)} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.shareNative}</button>
+                          <button onClick={() => { downloadClip(clip); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.download}</button>
+                          <button onClick={() => { shareNative(clip); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.shareNative}</button>
+                          <button onClick={() => { exportToDrive(clip); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:"#4285f4", cursor:"pointer", fontSize:12, textAlign:"left" }}>▲ {T.exportDrive}</button>
                           <button onClick={() => { setShowMoveModal(clip.id); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.move}</button>
-                          <button onClick={() => shareClipPublic(clip)} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.textSub, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.copyLink}</button>
+                          <button onClick={() => { shareClipPublic(clip); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.textSub, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.copyLink}</button>
                           <button onClick={() => deleteClip(clip.id)} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:"#e8453a", cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.delete}</button>
                         </div>
                       )}
-                      <a href={clip.base64} download={`${clip.name}.mp4`} style={{ padding:7, borderRadius:7, fontSize:11, fontWeight:500, border:"1px solid rgba(232,245,66,0.22)", background:"rgba(232,245,66,0.05)", color:t.accent, display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none" }}>↓ {T.download}</a>
+                      <button onClick={() => downloadClip(clip)} style={{ padding:7, borderRadius:7, fontSize:11, fontWeight:500, border:"1px solid rgba(232,245,66,0.22)", background:"rgba(232,245,66,0.05)", color:t.accent, cursor:"pointer" }}>↓ {T.download}</button>
+                      <button onClick={() => exportToDrive(clip)} disabled={exportingDrive === clip.id} style={{ padding:7, borderRadius:7, fontSize:11, border:"1px solid rgba(66,133,244,0.3)", background:"rgba(66,133,244,0.05)", color:exportingDrive === clip.id ? t.textMuted : "#4285f4", cursor:"pointer", opacity:exportingDrive === clip.id ? 0.6 : 1 }}>▲ {exportingDrive === clip.id ? T.exportingDrive : T.exportDrive}</button>
                     </div>
                   </div>
                 ))}
@@ -935,7 +1014,8 @@ export default function Home() {
             <p style={{ fontSize:12, color:t.text, fontWeight:500, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{lastGeneratedClip.name}</p>
           </div>
           <button onClick={() => shareNative(lastGeneratedClip)} style={{ fontSize:11, color:t.textSub, background:t.bgInput, border:t.border, borderRadius:7, padding:"5px 9px", cursor:"pointer", whiteSpace:"nowrap", flexShrink:0 }}>↗</button>
-          <a href={lastGeneratedClip.base64} download={`${lastGeneratedClip.name}.mp4`} style={{ fontSize:11, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.18)", borderRadius:7, padding:"5px 9px", textDecoration:"none", whiteSpace:"nowrap", flexShrink:0 }}>↓</a>
+          <button onClick={() => exportToDrive(lastGeneratedClip)} style={{ fontSize:11, color:"#4285f4", background:"rgba(66,133,244,0.06)", border:"1px solid rgba(66,133,244,0.25)", borderRadius:7, padding:"5px 9px", cursor:"pointer", whiteSpace:"nowrap", flexShrink:0 }}>▲</button>
+          <button onClick={() => downloadClip(lastGeneratedClip)} style={{ fontSize:11, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.18)", borderRadius:7, padding:"5px 9px", cursor:"pointer", whiteSpace:"nowrap", flexShrink:0 }}>↓</button>
           <button onClick={() => setLastGeneratedClip(null)} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15, flexShrink:0 }}>✕</button>
         </div>
       )}
