@@ -375,22 +375,24 @@ export default function Home() {
     try {
       const res = await fetch(`${SERVER_URL}/generate`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) })
       setServerAwake(true); const { jobId } = await res.json()
-      const interval = setInterval(async () => {
-        const sr = await fetch(`${SERVER_URL}/status/${jobId}`); const d = await sr.json()
-        if (d.progress) setProgress(d.progress)
-        if (d.message) setGeneratingServerMsg(d.message)
-        if (d.status === "done") {
-          clearInterval(interval)
-          setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100)
-          if (d.clips.length > 0) setLastGeneratedClip(d.clips[0])
-          for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i)
-          const historyEntry = { id:Date.now().toString(), date:new Date().toLocaleDateString(), prompt:promptText, contentType:detectedContentType, settings:{ format:selectedFormat, colorGrade:payload.colorGrade, transition:payload.transition }, clipsCount: d.clips.length }
-          const newHistory = [historyEntry, ...generationHistory].slice(0, 20)
-          setGenerationHistory(newHistory); localStorage.setItem("climbHistory", JSON.stringify(newHistory))
-          if (!onboardingDone) completeOnboarding()
-        }
-        else if (d.status === "error") { clearInterval(interval); alert("Erreur génération"); setGenerating(false) }
-      }, 3000)
+      const eventSource = new EventSource(`${SERVER_URL}/stream/${jobId}`)
+eventSource.onmessage = async (e) => {
+  const d = JSON.parse(e.data)
+  if (d.progress) setProgress(d.progress)
+  if (d.message) setGeneratingServerMsg(d.message)
+  if (d.status === "done") {
+    eventSource.close()
+    setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100)
+    if (d.clips.length > 0) setLastGeneratedClip(d.clips[0])
+    for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i)
+    const historyEntry = { id:Date.now().toString(), date:new Date().toLocaleDateString(), prompt:promptText, contentType:detectedContentType, settings:{ format:selectedFormat, colorGrade:payload.colorGrade, transition:payload.transition }, clipsCount: d.clips.length }
+    const newHistory = [historyEntry, ...generationHistory].slice(0, 20)
+    setGenerationHistory(newHistory); localStorage.setItem("climbHistory", JSON.stringify(newHistory))
+    if (!onboardingDone) completeOnboarding()
+  }
+  else if (d.status === "error") { eventSource.close(); alert("Erreur génération"); setGenerating(false) }
+}
+eventSource.onerror = () => { eventSource.close(); alert("Connexion perdue"); setGenerating(false) }
     } catch { alert("Erreur"); setGenerating(false) }
   }, [videos, promptText, activeOptions, selectedMusic, selectedFormat, zoomIntensity, speedIntensity, addIntroOutro, customTimestamps, colorGrade, transition, textOverlay, stabilize, vocalVolume, watermark, exportQuality, exportCodec, autoMode, detectedContentType, subtitleStyle, generationHistory, onboardingDone])
 
