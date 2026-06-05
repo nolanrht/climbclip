@@ -654,13 +654,13 @@ eventSource.onerror = () => { eventSource.close(); alert("Connexion perdue"); se
         <div style={{ display:"flex", alignItems:"center", gap:14 }}>
           <button onClick={() => setCurrentPage("home")} style={{ fontSize:13, color:currentPage === "home" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "home" ? 600 : 400 }}>{T.home}</button>
           <button onClick={() => { setCurrentPage("library"); loadLibrary() }} style={{ fontSize:13, color:currentPage === "library" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "library" ? 600 : 400 }}>{T.library}</button>
-          <button onClick={() => setCurrentPage("history")} style={{ fontSize:13, color:currentPage === "history" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "history" ? 600 : 400 }}>⏺</button>
+          <button onClick={() => setCurrentPage("history")} style={{ fontSize:13, color:currentPage === "history" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "history" ? 600 : 400 }}>Historique</button>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-          <button onClick={() => setShowStats(true)} style={{ fontSize:12, color:t.textSub, border:t.border, borderRadius:7, padding:"5px 8px", background:t.bgInput, cursor:"pointer" }}>📊</button>
-          <button onClick={() => setShowQueue(true)} style={{ fontSize:12, color:queue.length > 0 ? t.accent : t.textSub, border:queue.length > 0 ? "1px solid rgba(232,245,66,0.3)" : t.border, borderRadius:7, padding:"5px 8px", background:t.bgInput, cursor:"pointer" }}>⏱{queue.length > 0 ? ` ${queue.length}` : ""}</button>
+          <button onClick={() => setShowStats(true)} style={{ fontSize:13, color:t.textSub, border:t.border, borderRadius:7, padding:"6px 10px", background:t.bgInput, cursor:"pointer" }}>📊</button>
+          <button onClick={() => setShowQueue(true)} style={{ fontSize:13, color:queue.length > 0 ? t.accent : t.textSub, border:queue.length > 0 ? "1px solid rgba(232,245,66,0.3)" : t.border, borderRadius:7, padding:"6px 10px", background:t.bgInput, cursor:"pointer" }}>⏱{queue.length > 0 ? ` ${queue.length}` : ""}</button>
           <div style={{ position:"relative" }} onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowLangMenu(!showLangMenu)} style={{ fontSize:11, color:t.textSub, background:t.bgInput, border:t.border, borderRadius:7, padding:"5px 8px", cursor:"pointer" }}>{lang}</button>
+            <button onClick={() => setShowLangMenu(!showLangMenu)} style={{ fontSize:12, color:t.textSub, background:t.bgInput, border:t.border, borderRadius:7, padding:"6px 10px", cursor:"pointer" }}>{lang}</button>
             {showLangMenu && (
               <div style={{ position:"absolute", right:0, top:"calc(100% + 4px)", background:t.bgModal, border:t.border, borderRadius:8, padding:"4px 0", minWidth:70, boxShadow:"0 8px 24px rgba(0,0,0,0.5)", zIndex:100 }}>
                 {(["EN","FR","ES","IT","DE"] as Lang[]).map(l => (
@@ -669,7 +669,7 @@ eventSource.onerror = () => { eventSource.close(); alert("Connexion perdue"); se
               </div>
             )}
           </div>
-          <button onClick={() => setShowSettings(true)} style={{ fontSize:12, color:t.textSub, border:t.borderMed, borderRadius:7, padding:"6px 10px", background:t.bgInput, cursor:"pointer" }}>⚙</button>
+          <button onClick={() => setShowSettings(true)} style={{ fontSize:13, color:t.textSub, border:t.borderMed, borderRadius:7, padding:"7px 12px", background:t.bgInput, cursor:"pointer" }}>⚙</button>
         </div>
       </nav>
 
