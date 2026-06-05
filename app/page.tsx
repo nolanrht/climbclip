@@ -271,17 +271,10 @@ export default function Home() {
   }
 
   const connectDrive = () => {
-    if (!user) return
-    window.open(`${SERVER_URL}/auth/google?email=${encodeURIComponent(user.email || "")}`, "_blank", "width=500,height=600")
-    const interval = setInterval(async () => {
-      try {
-        const res = await fetch(`${SERVER_URL}/auth/google/status?email=${encodeURIComponent(user.email || "")}`)
-        const data = await res.json()
-        if (data.connected) { setDriveConnected(true); clearInterval(interval) }
-      } catch {}
-    }, 2000)
-    setTimeout(() => clearInterval(interval), 120000)
-  }
+  if (!user?.email) return
+  // Redirige dans le même onglet, pas une popup
+  window.location.href = `${SERVER_URL}/auth/google?email=${encodeURIComponent(user.email)}`
+}
 
   const playDoneSound = () => {
     try {
