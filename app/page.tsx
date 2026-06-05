@@ -183,6 +183,9 @@ export default function Home() {
   const [autoAnalysisDesc, setAutoAnalysisDesc] = useState<string|null>(null)
   const [generationHistory, setGenerationHistory] = useState<any[]>([])
   const [exportingDrive, setExportingDrive] = useState<string|null>(null)
+  const [dragOver, setDragOver] = useState(false)
+  const [generatingStartTime, setGeneratingStartTime] = useState<number|null>(null)
+  const [estimatedRemaining, setEstimatedRemaining] = useState<string|null>(null)
 
   const audioRef = useRef<HTMLAudioElement|null>(null)
   const searchTimeout = useRef<ReturnType<typeof setTimeout>|null>(null)
@@ -227,6 +230,8 @@ export default function Home() {
     const savedPresets = localStorage.getItem("climbPresets"); if (savedPresets) setPresets(JSON.parse(savedPresets))
     const savedOnboarding = localStorage.getItem("climbOnboarding"); if (savedOnboarding) setOnboardingDone(true)
     const savedHistory = localStorage.getItem("climbHistory"); if (savedHistory) setGenerationHistory(JSON.parse(savedHistory))
+    // Demande permission notifications
+    if ("Notification" in window && Notification.permission === "default") Notification.requestPermission()
   }, [])
 
   useEffect(() => { if (user) loadLibrary() }, [user])
@@ -249,6 +254,31 @@ export default function Home() {
   const setLangAndSave = (l: Lang) => { setLang(l); localStorage.setItem("lang", l); setShowLangMenu(false) }
   const checkServerStatus = async () => { try { const res = await fetch(`${SERVER_URL}/health`, { signal: AbortSignal.timeout(5000) }); setServerAwake(res.ok) } catch { setServerAwake(false) } }
   const completeOnboarding = () => { setOnboardingDone(true); localStorage.setItem("climbOnboarding", "1") }
+
+  // ─── Son de fin + notification ────────────────────────────────────────────
+  const playDoneSound = () => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+      const playNote = (freq: number, start: number, duration: number) => {
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.connect(gain); gain.connect(ctx.destination)
+        osc.frequency.value = freq; osc.type = "sine"
+        gain.gain.setValueAtTime(0, ctx.currentTime + start)
+        gain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + start + 0.01)
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + start + duration)
+        osc.start(ctx.currentTime + start); osc.stop(ctx.currentTime + start + duration + 0.1)
+      }
+      playNote(523, 0, 0.15); playNote(659, 0.18, 0.15); playNote(784, 0.36, 0.3)
+    } catch {}
+  }
+
+  const notifyDone = (clipsCount: number) => {
+    playDoneSound()
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification("ClimbClip ✦", { body: `${clipsCount} clip${clipsCount > 1 ? "s" : ""} prêt${clipsCount > 1 ? "s" : ""} !`, icon: "/favicon.ico" })
+    }
+  }
 
   const loadLibrary = async () => {
     const { data: fd } = await supabase.from("folders").select("*").or(`owner_email.eq.${user.email},shared_with.cs.{${user.email}}`).order("created_at", { ascending: false })
@@ -364,6 +394,7 @@ export default function Home() {
     if (videos.length === 0) return
     savePromptToHistory(promptText)
     setHasGenerated(false); setGenerating(true); setProgress(0); setServerAwake(null); setGeneratingServerMsg("")
+    setGeneratingStartTime(Date.now()); setEstimatedRemaining(null)
     let payload = buildPayload()
     if (autoMode) {
       const contentType = detectedContentType || await detectContentType()
@@ -375,24 +406,36 @@ export default function Home() {
     try {
       const res = await fetch(`${SERVER_URL}/generate`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) })
       setServerAwake(true); const { jobId } = await res.json()
+      const startTime = Date.now()
       const eventSource = new EventSource(`${SERVER_URL}/stream/${jobId}`)
-eventSource.onmessage = async (e) => {
-  const d = JSON.parse(e.data)
-  if (d.progress) setProgress(d.progress)
-  if (d.message) setGeneratingServerMsg(d.message)
-  if (d.status === "done") {
-    eventSource.close()
-    setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100)
-    if (d.clips.length > 0) setLastGeneratedClip(d.clips[0])
-    for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i)
-    const historyEntry = { id:Date.now().toString(), date:new Date().toLocaleDateString(), prompt:promptText, contentType:detectedContentType, settings:{ format:selectedFormat, colorGrade:payload.colorGrade, transition:payload.transition }, clipsCount: d.clips.length }
-    const newHistory = [historyEntry, ...generationHistory].slice(0, 20)
-    setGenerationHistory(newHistory); localStorage.setItem("climbHistory", JSON.stringify(newHistory))
-    if (!onboardingDone) completeOnboarding()
-  }
-  else if (d.status === "error") { eventSource.close(); alert("Erreur génération"); setGenerating(false) }
-}
-eventSource.onerror = () => { eventSource.close(); alert("Connexion perdue"); setGenerating(false) }
+      eventSource.onmessage = async (e) => {
+        const d = JSON.parse(e.data)
+        if (d.progress) {
+          setProgress(d.progress)
+          // Calcul timer estimé
+          const elapsed = (Date.now() - startTime) / 1000
+          if (d.progress > 10) {
+            const totalEst = elapsed / (d.progress / 100)
+            const remaining = Math.max(0, Math.round(totalEst - elapsed))
+            setEstimatedRemaining(remaining > 5 ? `~${remaining}s` : null)
+          }
+        }
+        if (d.message) setGeneratingServerMsg(d.message)
+        if (d.status === "done") {
+          eventSource.close()
+          setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100)
+          setEstimatedRemaining(null)
+          if (d.clips.length > 0) setLastGeneratedClip(d.clips[0])
+          notifyDone(d.clips.length)
+          for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i)
+          const historyEntry = { id:Date.now().toString(), date:new Date().toLocaleDateString(), prompt:promptText, contentType:detectedContentType, settings:{ format:selectedFormat, colorGrade:payload.colorGrade, transition:payload.transition }, clipsCount: d.clips.length }
+          const newHistory = [historyEntry, ...generationHistory].slice(0, 20)
+          setGenerationHistory(newHistory); localStorage.setItem("climbHistory", JSON.stringify(newHistory))
+          if (!onboardingDone) completeOnboarding()
+        }
+        else if (d.status === "error") { eventSource.close(); alert("Erreur génération"); setGenerating(false); setEstimatedRemaining(null) }
+      }
+      eventSource.onerror = () => { eventSource.close(); alert("Connexion perdue"); setGenerating(false); setEstimatedRemaining(null) }
     } catch { alert("Erreur"); setGenerating(false) }
   }, [videos, promptText, activeOptions, selectedMusic, selectedFormat, zoomIntensity, speedIntensity, addIntroOutro, customTimestamps, colorGrade, transition, textOverlay, stabilize, vocalVolume, watermark, exportQuality, exportCodec, autoMode, detectedContentType, subtitleStyle, generationHistory, onboardingDone])
 
@@ -434,8 +477,7 @@ eventSource.onerror = () => { eventSource.close(); alert("Connexion perdue"); se
     setExportingDrive(clipId)
     try {
       const src = getClipSrc(clip)
-      if (!src) { alert("Clip non disponible"); return }
-      // Si storageUrl dispo, on passe l'URL directement à l'API Drive via fetch du blob
+      if (!src) { alert("Clip non disponible"); setExportingDrive(null); return }
       let blob: Blob
       if (clip.storageUrl || clip.storage_url) {
         const r = await fetch(clip.storageUrl || clip.storage_url)
@@ -446,41 +488,25 @@ eventSource.onerror = () => { eventSource.close(); alert("Connexion perdue"); se
         for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
         blob = new Blob([arr], { type:"video/mp4" })
       }
-      // Upload vers Google Drive via l'API multipart
-      const session = await supabase.auth.getSession()
-      const providerToken = session.data.session?.provider_token
+      const { data: sessionData } = await supabase.auth.getSession()
+      const providerToken = sessionData?.session?.provider_token
       if (!providerToken) {
-        // Fallback: ouvre drive.google.com et copie le lien
-        if (clip.storageUrl || clip.storage_url) {
-          await navigator.clipboard.writeText(clip.storageUrl || clip.storage_url)
-          alert("Lien copié — ouvre Google Drive et importe depuis URL")
-        } else {
-          const url = URL.createObjectURL(blob)
-          const a = document.createElement("a"); a.href = url; a.download = `${clip.name || "clip"}.mp4`; a.click()
-          URL.revokeObjectURL(url)
-        }
-        return
+        const storageUrl = clip.storageUrl || clip.storage_url
+        if (storageUrl) {
+          await navigator.clipboard.writeText(storageUrl)
+          alert("Token Drive non disponible — lien copié !")
+        } else { downloadClip(clip) }
+        setExportingDrive(null); return
       }
       const metadata = { name: `${clip.name || "clip"}.mp4`, mimeType: "video/mp4" }
       const form = new FormData()
       form.append("metadata", new Blob([JSON.stringify(metadata)], { type:"application/json" }))
       form.append("file", blob, `${clip.name || "clip"}.mp4`)
       const uploadRes = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${providerToken}` },
-        body: form
+        method: "POST", headers: { Authorization: `Bearer ${providerToken}` }, body: form
       })
-      if (uploadRes.ok) {
-        const driveFile = await uploadRes.json()
-        alert(`✓ Exporté sur Drive : ${driveFile.name}`)
-      } else {
-        const err = await uploadRes.json()
-        // Fallback download si Drive échoue
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a"); a.href = url; a.download = `${clip.name || "clip"}.mp4`; a.click()
-        URL.revokeObjectURL(url)
-        console.error("Drive error:", err)
-      }
+      if (uploadRes.ok) { const driveFile = await uploadRes.json(); alert(`✓ Exporté sur Drive : ${driveFile.name}`) }
+      else { downloadClip(clip); console.error("Drive error:", await uploadRes.json()) }
     } catch (err: any) { console.error(err); alert("Erreur export Drive") }
     setExportingDrive(null)
   }
@@ -502,9 +528,7 @@ eventSource.onerror = () => { eventSource.close(); alert("Connexion perdue"); se
   const shareNative = async (clip: any) => {
     try {
       const storageUrl = clip.storageUrl || clip.storage_url
-      if (navigator.share && storageUrl) {
-        await navigator.share({ title: clip.name, url: storageUrl }); return
-      }
+      if (navigator.share && storageUrl) { await navigator.share({ title: clip.name, url: storageUrl }); return }
       const src = getClipSrc(clip)
       if (navigator.share && src && src.startsWith("data:")) {
         const b64 = src.split(",")[1]
@@ -519,10 +543,8 @@ eventSource.onerror = () => { eventSource.close(); alert("Connexion perdue"); se
   }
 
   const downloadClip = (clip: any) => {
-    const src = getClipSrc(clip)
-    if (!src) return
-    const a = document.createElement("a")
-    a.href = src; a.download = `${clip.name || "clip"}.mp4`; a.click()
+    const src = getClipSrc(clip); if (!src) return
+    const a = document.createElement("a"); a.href = src; a.download = `${clip.name || "clip"}.mp4`; a.click()
   }
 
   const downloadAllClips = () => generatedClips.forEach(clip => downloadClip(clip))
@@ -574,8 +596,7 @@ eventSource.onerror = () => { eventSource.close(); alert("Connexion perdue"); se
     <button onClick={onClick} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:active ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:active ? "rgba(232,245,66,0.08)" : t.bgPill, color:active ? t.accent : t.textSub, fontWeight:active ? 500 : 400, transition:"all 0.15s", whiteSpace:"nowrap" }}>{label}</button>
   )
 
-  // Composant carte clip réutilisable
-  const ClipCard = ({ clip, index, showDriveBtn = true }: { clip: any; index: number; showDriveBtn?: boolean }) => {
+  const ClipCard = ({ clip, index }: { clip: any; index: number }) => {
     const src = getClipSrc(clip)
     const clipId = clip.id || clip.name || String(index)
     return (
@@ -588,7 +609,7 @@ eventSource.onerror = () => { eventSource.close(); alert("Connexion perdue"); se
           <button onClick={() => downloadClip(clip)} style={{ padding:"7px", borderRadius:7, fontSize:11, fontWeight:500, border:"1px solid rgba(232,245,66,0.25)", background:"rgba(232,245,66,0.06)", color:t.accent, cursor:"pointer" }}>↓ {T.download}</button>
           <button onClick={() => shareNative(clip)} style={{ padding:"7px", borderRadius:7, fontSize:11, border:t.border, background:t.bgInput, color:t.textSub, cursor:"pointer" }}>↗ {T.shareNative}</button>
           <button onClick={() => shareClipPublic(clip)} style={{ padding:"7px", borderRadius:7, fontSize:11, border:t.border, background:t.bgInput, color:copiedId === clipId ? "#4ade80" : t.textMuted, cursor:"pointer" }}>{copiedId === clipId ? `✓ ${T.copied}` : `🔗 ${T.copyLink}`}</button>
-          {showDriveBtn && <button onClick={() => exportToDrive(clip)} disabled={exportingDrive === clipId} style={{ padding:"7px", borderRadius:7, fontSize:11, border:"1px solid rgba(66,133,244,0.35)", background:"rgba(66,133,244,0.06)", color:exportingDrive === clipId ? t.textMuted : "#4285f4", cursor:"pointer", opacity:exportingDrive === clipId ? 0.6 : 1 }}>{exportingDrive === clipId ? T.exportingDrive : `▲ ${T.exportDrive}`}</button>}
+          <button onClick={() => exportToDrive(clip)} disabled={exportingDrive === clipId} style={{ padding:"7px", borderRadius:7, fontSize:11, border:"1px solid rgba(66,133,244,0.35)", background:"rgba(66,133,244,0.06)", color:exportingDrive === clipId ? t.textMuted : "#4285f4", cursor:"pointer", opacity:exportingDrive === clipId ? 0.6 : 1 }}>{exportingDrive === clipId ? T.exportingDrive : `▲ ${T.exportDrive}`}</button>
         </div>
       </div>
     )
@@ -717,17 +738,29 @@ eventSource.onerror = () => { eventSource.close(); alert("Connexion perdue"); se
                     <button onClick={() => removeVideo(v.id)} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15, flexShrink:0 }}>✕</button>
                   </div>
                 ))}
-                <div style={{ border:`1px dashed ${dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.1)"}`, borderRadius:9, padding:"12px", display:"flex", alignItems:"center", justifyContent:"center", gap:7, cursor:"pointer", color:t.textMuted, fontSize:12 }} onClick={() => document.getElementById("fileInput")?.click()}>
+                <div
+                  style={{ border:`1px dashed ${dragOver ? t.accent : dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.1)"}`, borderRadius:9, padding:"12px", display:"flex", alignItems:"center", justifyContent:"center", gap:7, cursor:"pointer", color:dragOver ? t.accent : t.textMuted, fontSize:12, transition:"all 0.15s" }}
+                  onClick={() => document.getElementById("fileInput")?.click()}
+                  onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={async e => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files) for (const f of Array.from(e.dataTransfer.files)) await handleFileAdd(f) }}
+                >
                   {compressing ? T.compressing : T.addAnother}
                 </div>
               </div>
             ) : (
-              <div style={{ border:`1px dashed ${dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.11)"}`, borderRadius:14, padding:"44px 20px", display:"flex", flexDirection:"column", alignItems:"center", gap:12, cursor:"pointer", background:dark ? "rgba(255,255,255,0.008)" : "rgba(0,0,0,0.01)" }} onClick={() => document.getElementById("fileInput")?.click()}>
-                <div style={{ width:52, height:52, borderRadius:14, background:"rgba(232,245,66,0.05)", border:"1px solid rgba(232,245,66,0.1)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                  <span style={{ fontSize:20, color:t.accent }}>↑</span>
+              <div
+                style={{ border:`1px dashed ${dragOver ? t.accent : dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.11)"}`, borderRadius:14, padding:"44px 20px", display:"flex", flexDirection:"column", alignItems:"center", gap:12, cursor:"pointer", background:dragOver ? "rgba(232,245,66,0.03)" : dark ? "rgba(255,255,255,0.008)" : "rgba(0,0,0,0.01)", transition:"all 0.15s" }}
+                onClick={() => document.getElementById("fileInput")?.click()}
+                onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={async e => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files) for (const f of Array.from(e.dataTransfer.files)) await handleFileAdd(f) }}
+              >
+                <div style={{ width:52, height:52, borderRadius:14, background:dragOver ? "rgba(232,245,66,0.1)" : "rgba(232,245,66,0.05)", border:`1px solid ${dragOver ? "rgba(232,245,66,0.4)" : "rgba(232,245,66,0.1)"}`, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}>
+                  <span style={{ fontSize:20, color:t.accent }}>{dragOver ? "📥" : "↑"}</span>
                 </div>
                 <div style={{ textAlign:"center" }}>
-                  <p style={{ fontSize:14, color:t.textSub, marginBottom:3, fontWeight:500 }}>{T.dragVideo}</p>
+                  <p style={{ fontSize:14, color:dragOver ? t.accent : t.textSub, marginBottom:3, fontWeight:500 }}>{dragOver ? "Lâche ta vidéo ici !" : T.dragVideo}</p>
                   <p style={{ fontSize:12, color:t.textMuted }}>{T.dragSub}</p>
                 </div>
               </div>
@@ -874,7 +907,7 @@ eventSource.onerror = () => { eventSource.close(); alert("Connexion perdue"); se
               </div>
               <div style={{ display:"flex", justifyContent:"space-between" }}>
                 <span style={{ fontSize:11, color:t.textMuted }}>{autoMode && detectedContentType ? `✦ Mode Auto · ${detectedContentType}` : "Mode Manuel"}</span>
-                <span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{progress}%</span>
+                <span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{estimatedRemaining || `${progress}%`}</span>
               </div>
             </div>
           )}
