@@ -218,28 +218,26 @@ export default function Home() {
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
-      const u = data.session?.user ?? null; setUser(u)
-      if (!u) { router.push("/auth"); return }
-      const { data: allowed } = await supabase.from("allowed_users").select("email").eq("email", u.email).single()
-      if (!allowed) { await supabase.auth.signOut(); router.push("/auth") }
-      else if (u.email) checkDriveConnection(u.email)
-    })
-    supabase.auth.onAuthStateChange(async (_e, session) => { const u = session?.user ?? null; setUser(u); if (!u) router.push("/auth") })
-    checkServerStatus()
-    const saved = localStorage.getItem("promptHistory"); if (saved) setPromptHistory(JSON.parse(saved))
-    const savedLang = localStorage.getItem("lang") as Lang|null; if (savedLang && TRANSLATIONS[savedLang]) setLang(savedLang)
-    const savedPresets = localStorage.getItem("climbPresets"); if (savedPresets) setPresets(JSON.parse(savedPresets))
-    const savedOnboarding = localStorage.getItem("climbOnboarding"); if (savedOnboarding) setOnboardingDone(true)
-    const savedHistory = localStorage.getItem("climbHistory"); if (savedHistory) setGenerationHistory(JSON.parse(savedHistory))
-    if ("Notification" in window && Notification.permission === "default") Notification.requestPermission()
-    // Détecte si on revient du callback Drive
-    const params = new URLSearchParams(window.location.search)
-    if (params.get("drive_connected") === "1") {
-      setDriveConnected(true)
-      window.history.replaceState({}, "", window.location.pathname)
-    }
-  }, [])
+  supabase.auth.getSession().then(async ({ data }) => {
+    const u = data.session?.user ?? null; setUser(u)
+    if (!u) { router.push("/auth"); return }
+    const { data: allowed } = await supabase.from("allowed_users").select("email").eq("email", u.email).single()
+    if (!allowed) { await supabase.auth.signOut(); router.push("/auth") }
+    else if (u.email) checkDriveConnection(u.email)
+  })
+  supabase.auth.onAuthStateChange(async (_e, session) => { const u = session?.user ?? null; setUser(u); if (!u) router.push("/auth") })
+  checkServerStatus()
+  const saved = localStorage.getItem("promptHistory"); if (saved) setPromptHistory(JSON.parse(saved))
+  const savedLang = localStorage.getItem("lang") as Lang|null; if (savedLang && TRANSLATIONS[savedLang]) setLang(savedLang)
+  const savedPresets = localStorage.getItem("climbPresets"); if (savedPresets) setPresets(JSON.parse(savedPresets))
+  const savedOnboarding = localStorage.getItem("climbOnboarding"); if (savedOnboarding) setOnboardingDone(true)
+  const savedHistory = localStorage.getItem("climbHistory"); if (savedHistory) setGenerationHistory(JSON.parse(savedHistory))
+  if ("Notification" in window && Notification.permission === "default") Notification.requestPermission()
+  if (window.location.hash === "#drive_connected") {
+    setDriveConnected(true)
+    window.history.replaceState({}, "", window.location.pathname)
+  }
+}, [])
 
   useEffect(() => { if (user) loadLibrary() }, [user])
 
@@ -272,8 +270,8 @@ export default function Home() {
 
   const connectDrive = () => {
   if (!user?.email) return
-  // Redirige dans le même onglet, pas une popup
-  window.location.href = `${SERVER_URL}/auth/google?email=${encodeURIComponent(user.email)}`
+  const currentOrigin = window.location.origin
+  window.location.href = `${SERVER_URL}/auth/google?email=${encodeURIComponent(user.email)}&redirect=${encodeURIComponent(currentOrigin)}`
 }
 
   const playDoneSound = () => {
