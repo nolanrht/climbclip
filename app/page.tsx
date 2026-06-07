@@ -616,10 +616,10 @@ export default function Home() {
 
   const applyCapsules = () => {
   if (!capsulesType) return
+  if (videos.length === 0) { alert("Importe une vidéo d'abord"); return }
   setShowCapsulesModal(false)
   setCapsulesType(null)
-  // Petit délai pour laisser le modal se fermer
-  setTimeout(() => handleGenerateCapsules(), 100)
+  setTimeout(() => handleGenerateCapsules(), 150)
 }
 
   const fetchTracks = async (query: string) => { setLoadingTracks(true); try { const res = await fetch(`/api/music?q=${encodeURIComponent(query)}`); const data = await res.json(); setTracks(data.data || []) } catch { setTracks([]) }; setLoadingTracks(false) }
