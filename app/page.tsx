@@ -615,11 +615,12 @@ export default function Home() {
   }
 
   const applyCapsules = () => {
-    if (!capsulesType) return
-    setShowCapsulesModal(false)
-    setCapsulesType(null)
-    handleGenerateCapsules()
-  }
+  if (!capsulesType) return
+  setShowCapsulesModal(false)
+  setCapsulesType(null)
+  // Petit délai pour laisser le modal se fermer
+  setTimeout(() => handleGenerateCapsules(), 100)
+}
 
   const fetchTracks = async (query: string) => { setLoadingTracks(true); try { const res = await fetch(`/api/music?q=${encodeURIComponent(query)}`); const data = await res.json(); setTracks(data.data || []) } catch { setTracks([]) }; setLoadingTracks(false) }
   const handleSearch = (val: string) => { setSearchQuery(val); if (searchTimeout.current) clearTimeout(searchTimeout.current); searchTimeout.current = setTimeout(() => { if (val.trim()) fetchTracks(val) }, 500) }
