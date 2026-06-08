@@ -221,7 +221,9 @@ export default function Home() {
     supabase.auth.getSession().then(async ({ data }) => {
       const u = data.session?.user ?? null; setUser(u)
       if (!u) { router.push("/auth"); return }
-     if (u.email) checkDriveConnection(u.email)
+     const { data: allowed } = await supabase.from("allowed_users").select("email").eq("email", u.email).single()
+if (!allowed) { await supabase.auth.signOut(); router.push("/auth") }
+else if (u.email) checkDriveConnection(u.email)
     })
     supabase.auth.onAuthStateChange(async (_e, session) => { const u = session?.user ?? null; setUser(u); if (!u) router.push("/auth") })
     checkServerStatus()
