@@ -13,14 +13,19 @@ export default function Auth() {
   const router = useRouter()
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") setIsRecovery(true)
-      if (event === "SIGNED_IN" && !window.location.hash.includes("type=recovery")) router.push("/")
-    })
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session && !window.location.hash.includes("type=recovery")) router.push("/")
-    })
-  }, [])
+  // Détecte recovery depuis le hash AVANT tout
+  if (typeof window !== "undefined" && window.location.hash.includes("type=recovery")) {
+    setIsRecovery(true)
+    return
+  }
+  supabase.auth.getSession().then(({ data }) => {
+    if (data.session) router.push("/")
+  })
+  supabase.auth.onAuthStateChange((event) => {
+    if (event === "PASSWORD_RECOVERY") setIsRecovery(true)
+    else if (event === "SIGNED_IN") router.push("/")
+  })
+}, [])
 
   const handleLogin = async () => {
     setLoading(true); setError(null)
