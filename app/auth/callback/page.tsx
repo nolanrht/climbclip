@@ -7,11 +7,17 @@ export default function AuthCallback() {
   const router = useRouter()
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
+    const run = async () => {
+      const { data, error } = await supabase.auth.exchangeCodeForSession(
+        window.location.search
+      )
+      if (data.session) {
         router.replace("/")
+      } else {
+        router.replace("/auth")
       }
-    })
+    }
+    run()
   }, [])
 
   return (
