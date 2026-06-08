@@ -95,6 +95,7 @@ export default function Home() {
   const [dark, setDark] = useState(true)
   const [lang, setLang] = useState<Lang>("FR")
   const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState<"home"|"library"|"history">("home")
   const [activeOptions, setActiveOptions] = useState<string[]>(["Beat sync"])
   const [showSettings, setShowSettings] = useState(false)
@@ -218,31 +219,33 @@ export default function Home() {
   }
 
   useEffect(() => {
-  supabase.auth.getSession().then(async ({ data }) => {
-    let u = data.session?.user ?? null
-    if (!u) {
-      await new Promise(r => setTimeout(r, 2000))
-      const { data: data2 } = await supabase.auth.getSession()
-      u = data2.session?.user ?? null
-    }
-    if (!u) { router.push("/auth"); return }
-    setUser(u)
-    if (u.email) checkDriveConnection(u.email)
-  })
-  supabase.auth.onAuthStateChange(async (_e, session) => {
-    const u = session?.user ?? null
-    setUser(u)
-    if (!u) router.push("/auth")
-  })
-  checkServerStatus()
-  const saved = localStorage.getItem("promptHistory"); if (saved) setPromptHistory(JSON.parse(saved))
-  const savedLang = localStorage.getItem("lang") as Lang|null; if (savedLang && TRANSLATIONS[savedLang]) setLang(savedLang)
-  const savedPresets = localStorage.getItem("climbPresets"); if (savedPresets) setPresets(JSON.parse(savedPresets))
-  const savedOnboarding = localStorage.getItem("climbOnboarding"); if (savedOnboarding) setOnboardingDone(true)
-  const savedHistory = localStorage.getItem("climbHistory"); if (savedHistory) setGenerationHistory(JSON.parse(savedHistory))
-  if ("Notification" in window && Notification.permission === "default") Notification.requestPermission()
-  if (window.location.hash === "#drive_connected") { setDriveConnected(true); window.history.replaceState({}, "", window.location.pathname) }
-}, [])
+    supabase.auth.getSession().then(async ({ data }) => {
+      let u = data.session?.user ?? null
+      if (!u) {
+        await new Promise(r => setTimeout(r, 2000))
+        const { data: data2 } = await supabase.auth.getSession()
+        u = data2.session?.user ?? null
+      }
+      if (!u) { router.push("/auth"); return }
+      setUser(u)
+      setLoading(false)
+      if (u.email) checkDriveConnection(u.email)
+    })
+    supabase.auth.onAuthStateChange(async (_e, session) => {
+      const u = session?.user ?? null
+      setUser(u)
+      if (!u) router.push("/auth")
+      else setLoading(false)
+    })
+    checkServerStatus()
+    const saved = localStorage.getItem("promptHistory"); if (saved) setPromptHistory(JSON.parse(saved))
+    const savedLang = localStorage.getItem("lang") as Lang|null; if (savedLang && TRANSLATIONS[savedLang]) setLang(savedLang)
+    const savedPresets = localStorage.getItem("climbPresets"); if (savedPresets) setPresets(JSON.parse(savedPresets))
+    const savedOnboarding = localStorage.getItem("climbOnboarding"); if (savedOnboarding) setOnboardingDone(true)
+    const savedHistory = localStorage.getItem("climbHistory"); if (savedHistory) setGenerationHistory(JSON.parse(savedHistory))
+    if ("Notification" in window && Notification.permission === "default") Notification.requestPermission()
+    if (window.location.hash === "#drive_connected") { setDriveConnected(true); window.history.replaceState({}, "", window.location.pathname) }
+  }, [])
 
   useEffect(() => { if (user) loadLibrary() }, [user])
 
@@ -464,15 +467,7 @@ export default function Home() {
     if (videos.length === 0) return
     setHasGenerated(false); setGenerating(true); setProgress(0); setGeneratingServerMsg("")
     setGeneratingStartTime(Date.now()); setEstimatedRemaining(null)
-    const payload = {
-      videoPaths: videos.map(v => v.path).filter(Boolean),
-      videoUrls: [],
-      format: selectedFormat,
-      exportQuality,
-      exportCodec,
-      isCapsule: true,
-      capsulesCount,
-    }
+    const payload = { videoPaths: videos.map(v => v.path).filter(Boolean), videoUrls: [], format: selectedFormat, exportQuality, exportCodec, isCapsule: true, capsulesCount }
     try {
       const res = await fetch(`${SERVER_URL}/generate`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) })
       setServerAwake(true); const { jobId } = await res.json()
@@ -480,27 +475,15 @@ export default function Home() {
       const eventSource = new EventSource(`${SERVER_URL}/stream/${jobId}`)
       eventSource.onmessage = async (e) => {
         const d = JSON.parse(e.data)
-        if (d.progress) {
-          setProgress(d.progress)
-          const elapsed = (Date.now() - startTime) / 1000
-          if (d.progress > 10) {
-            const remaining = Math.max(0, Math.round(elapsed / (d.progress/100) - elapsed))
-            setEstimatedRemaining(remaining > 5 ? `~${remaining}s` : null)
-          }
-        }
+        if (d.progress) { setProgress(d.progress); const elapsed = (Date.now() - startTime) / 1000; if (d.progress > 10) { const remaining = Math.max(0, Math.round(elapsed / (d.progress/100) - elapsed)); setEstimatedRemaining(remaining > 5 ? `~${remaining}s` : null) } }
         if (d.message) setGeneratingServerMsg(d.message)
-        if (d.status === "done") {
-          eventSource.close()
-          setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100); setEstimatedRemaining(null)
-          if (d.clips.length > 0) setLastGeneratedClip(d.clips[0])
-          notifyDone(d.clips.length)
-          for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i)
-        }
+        if (d.status === "done") { eventSource.close(); setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100); setEstimatedRemaining(null); if (d.clips.length > 0) setLastGeneratedClip(d.clips[0]); notifyDone(d.clips.length); for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i) }
         else if (d.status === "error") { eventSource.close(); alert("Erreur capsules"); setGenerating(false); setEstimatedRemaining(null) }
       }
       eventSource.onerror = () => { eventSource.close(); setGenerating(false); setEstimatedRemaining(null) }
     } catch { alert("Erreur"); setGenerating(false) }
   }, [videos, selectedFormat, exportQuality, exportCodec, capsulesCount])
+
   const addToQueue = () => { if (videos.length === 0) return; setQueue(prev => [...prev, { id:Date.now().toString(), videos:[...videos], prompt:promptText, status:"pending" }]) }
 
   const runQueue = async () => {
@@ -531,45 +514,28 @@ export default function Home() {
   }
   const loadPreset = (p: Preset) => { setSelectedFormat(p.format); setColorGrade(p.colorGrade); setTransition(p.transition); setPromptText(p.prompt); setActiveOptions(p.options); setExportQuality(p.exportQuality); setExportCodec(p.exportCodec); setWatermark(p.watermark); setShowPresets(false) }
   const deletePreset = (id: string) => { const updated = presets.filter(p => p.id !== id); setPresets(updated); localStorage.setItem("climbPresets", JSON.stringify(updated)) }
-
   const getClipSrc = (clip: any) => clip.storageUrl || clip.storage_url || clip.base64 || ""
 
   const exportToDrive = async (clip: any) => {
     const storageUrl = clip.storageUrl || clip.storage_url
     if (!storageUrl) { downloadClip(clip); return }
     if (!driveConnected) { connectDrive(); return }
-    const clipId = clip.id || clip.name
-    setExportingDrive(clipId)
+    const clipId = clip.id || clip.name; setExportingDrive(clipId)
     try {
-      const res = await fetch(`${SERVER_URL}/drive/upload`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: user.email || "", storageUrl, fileName: `${clip.name || "clip"}.mp4` })
-      })
+      const res = await fetch(`${SERVER_URL}/drive/upload`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ email: user.email || "", storageUrl, fileName: `${clip.name || "clip"}.mp4` }) })
       const data = await res.json()
-      if (data.success) {
-        alert(`✓ Exporté sur Drive : ${data.fileName}`)
-      } else if (data.error === "not_connected") {
-        setDriveConnected(false); connectDrive()
-      } else {
-        downloadClip(clip)
-      }
+      if (data.success) alert(`✓ Exporté sur Drive : ${data.fileName}`)
+      else if (data.error === "not_connected") { setDriveConnected(false); connectDrive() }
+      else downloadClip(clip)
     } catch { downloadClip(clip) }
     setExportingDrive(null)
   }
 
-  const getDriveButtonLabel = (clipId: string) => {
-    if (exportingDrive === clipId) return T.exportingDrive
-    if (!driveConnected) return `🔗 ${T.connectDrive}`
-    return `▲ ${T.exportDrive}`
-  }
+  const getDriveButtonLabel = (clipId: string) => { if (exportingDrive === clipId) return T.exportingDrive; if (!driveConnected) return `🔗 ${T.connectDrive}`; return `▲ ${T.exportDrive}` }
 
   const shareClipPublic = async (clip: any) => {
     const src = getClipSrc(clip)
-    if (clip.storageUrl || clip.storage_url) {
-      await navigator.clipboard.writeText(clip.storageUrl || clip.storage_url)
-      setCopiedId(clip.name || clip.id); setTimeout(() => setCopiedId(null), 2500); return
-    }
+    if (clip.storageUrl || clip.storage_url) { await navigator.clipboard.writeText(clip.storageUrl || clip.storage_url); setCopiedId(clip.name || clip.id); setTimeout(() => setCopiedId(null), 2500); return }
     try {
       const res = await fetch(`${SERVER_URL}/share`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ base64: src, name:clip.name }) })
       const data = await res.json()
@@ -584,30 +550,22 @@ export default function Home() {
       if (navigator.share && storageUrl) { await navigator.share({ title: clip.name, url: storageUrl }); return }
       const src = getClipSrc(clip)
       if (navigator.share && src && src.startsWith("data:")) {
-        const b64 = src.split(",")[1]
-        const bytes = atob(b64); const arr = new Uint8Array(bytes.length)
+        const b64 = src.split(",")[1]; const bytes = atob(b64); const arr = new Uint8Array(bytes.length)
         for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
-        const blob = new Blob([arr], { type:"video/mp4" })
-        const file = new File([blob], `${clip.name || "clip"}.mp4`, { type:"video/mp4" })
+        const blob = new Blob([arr], { type:"video/mp4" }); const file = new File([blob], `${clip.name || "clip"}.mp4`, { type:"video/mp4" })
         await navigator.share({ title: clip.name, files: [file] }); return
       }
       shareClipPublic(clip)
     } catch {}
   }
 
-  const downloadClip = (clip: any) => {
-    const src = getClipSrc(clip); if (!src) return
-    const a = document.createElement("a"); a.href = src; a.download = `${clip.name || "clip"}.mp4`; a.click()
-  }
-
+  const downloadClip = (clip: any) => { const src = getClipSrc(clip); if (!src) return; const a = document.createElement("a"); a.href = src; a.download = `${clip.name || "clip"}.mp4`; a.click() }
   const downloadAllClips = () => generatedClips.forEach(clip => downloadClip(clip))
 
   const handlePreviewTimestamps = async () => {
     if (videos.length === 0) return; setLoadingTimestamps(true)
-    try {
-      const res = await fetch(`${SERVER_URL}/preview-timestamps`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ videoPaths:videos.map(v => v.path).filter(Boolean), prompt:promptText, options:activeOptions }) })
-      const data = await res.json(); setTimestampPreviews(data.timestamps || []); setShowTimestampPreview(true)
-    } catch (err: any) { alert(err.message) }
+    try { const res = await fetch(`${SERVER_URL}/preview-timestamps`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ videoPaths:videos.map(v => v.path).filter(Boolean), prompt:promptText, options:activeOptions }) }); const data = await res.json(); setTimestampPreviews(data.timestamps || []); setShowTimestampPreview(true) }
+    catch (err: any) { alert(err.message) }
     setLoadingTimestamps(false)
   }
 
@@ -622,14 +580,7 @@ export default function Home() {
     setHelperLoading(false)
   }
 
-  const applyCapsules = () => {
-  if (!capsulesType) return
-  if (videos.length === 0) { alert("Importe une vidéo d'abord"); return }
-  setShowCapsulesModal(false)
-  setCapsulesType(null)
-  setTimeout(() => handleGenerateCapsules(), 150)
-}
-
+  const applyCapsules = () => { if (!capsulesType) return; if (videos.length === 0) { alert("Importe une vidéo d'abord"); return }; setShowCapsulesModal(false); setCapsulesType(null); setTimeout(() => handleGenerateCapsules(), 150) }
   const fetchTracks = async (query: string) => { setLoadingTracks(true); try { const res = await fetch(`/api/music?q=${encodeURIComponent(query)}`); const data = await res.json(); setTracks(data.data || []) } catch { setTracks([]) }; setLoadingTracks(false) }
   const handleSearch = (val: string) => { setSearchQuery(val); if (searchTimeout.current) clearTimeout(searchTimeout.current); searchTimeout.current = setTimeout(() => { if (val.trim()) fetchTracks(val) }, 500) }
   const togglePlay = (track: Track) => { if (playingId === track.id) { audioRef.current?.pause(); audioRef.current = null; setPlayingId(null) } else { if (audioRef.current) { audioRef.current.pause(); audioRef.current = null }; const a = new Audio(track.preview); audioRef.current = a; a.play(); a.onended = () => { audioRef.current = null; setPlayingId(null) }; setPlayingId(track.id) } }
@@ -657,8 +608,7 @@ export default function Home() {
   )
 
   const ClipCard = ({ clip, index }: { clip: any; index: number }) => {
-    const src = getClipSrc(clip)
-    const clipId = clip.id || clip.name || String(index)
+    const src = getClipSrc(clip); const clipId = clip.id || clip.name || String(index)
     return (
       <div style={{ background:t.bgCard, border:t.border, borderRadius:11, overflow:"hidden", display:"flex", flexDirection:"column" }}>
         <div style={{ aspectRatio:"9/16", background:t.bgThumb, overflow:"hidden" }}>
@@ -675,7 +625,14 @@ export default function Home() {
     )
   }
 
+  if (loading) return (
+    <main style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", background:"#0b0b0b" }}>
+      <div style={{ width:24, height:24, borderRadius:"50%", border:"2px solid #e8f542", borderTopColor:"transparent", animation:"spin 0.8s linear infinite" }}/>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </main>
+  )
   if (!onboardingDone) {
+
     return (
       <main style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"100vh", background:t.bg, padding:24, position:"relative" }}>
         <MountainBg dark={dark}/>
@@ -757,7 +714,6 @@ export default function Home() {
 
       {currentPage === "home" && (
         <div style={{ width:"100%", maxWidth:600, display:"flex", flexDirection:"column", gap:22, padding:"32px 16px 120px", position:"relative", zIndex:1 }}>
-
           <div style={{ display:"flex", alignItems:"center", gap:8, background:t.bgCard, border:t.border, borderRadius:12, padding:"12px 16px" }}>
             <div style={{ flex:1 }}>
               <p style={{ fontSize:13, fontWeight:600, color:autoMode ? t.accent : t.text, marginBottom:2 }}>{autoMode ? `✦ ${T.autoMode}` : T.manualMode}</p>
@@ -799,24 +755,20 @@ export default function Home() {
                     <button onClick={() => removeVideo(v.id)} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15, flexShrink:0 }}>✕</button>
                   </div>
                 ))}
-                <div
-                  style={{ border:`1px dashed ${dragOver ? t.accent : dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.1)"}`, borderRadius:9, padding:"12px", display:"flex", alignItems:"center", justifyContent:"center", gap:7, cursor:"pointer", color:dragOver ? t.accent : t.textMuted, fontSize:12, transition:"all 0.15s" }}
+                <div style={{ border:`1px dashed ${dragOver ? t.accent : dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.1)"}`, borderRadius:9, padding:"12px", display:"flex", alignItems:"center", justifyContent:"center", gap:7, cursor:"pointer", color:dragOver ? t.accent : t.textMuted, fontSize:12, transition:"all 0.15s" }}
                   onClick={() => document.getElementById("fileInput")?.click()}
                   onDragOver={e => { e.preventDefault(); setDragOver(true) }}
                   onDragLeave={() => setDragOver(false)}
-                  onDrop={async e => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files) for (const f of Array.from(e.dataTransfer.files)) await handleFileAdd(f) }}
-                >
+                  onDrop={async e => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files) for (const f of Array.from(e.dataTransfer.files)) await handleFileAdd(f) }}>
                   {compressing ? T.compressing : T.addAnother}
                 </div>
               </div>
             ) : (
-              <div
-                style={{ border:`1px dashed ${dragOver ? t.accent : dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.11)"}`, borderRadius:14, padding:"44px 20px", display:"flex", flexDirection:"column", alignItems:"center", gap:12, cursor:"pointer", background:dragOver ? "rgba(232,245,66,0.03)" : dark ? "rgba(255,255,255,0.008)" : "rgba(0,0,0,0.01)", transition:"all 0.15s" }}
+              <div style={{ border:`1px dashed ${dragOver ? t.accent : dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.11)"}`, borderRadius:14, padding:"44px 20px", display:"flex", flexDirection:"column", alignItems:"center", gap:12, cursor:"pointer", background:dragOver ? "rgba(232,245,66,0.03)" : dark ? "rgba(255,255,255,0.008)" : "rgba(0,0,0,0.01)", transition:"all 0.15s" }}
                 onClick={() => document.getElementById("fileInput")?.click()}
                 onDragOver={e => { e.preventDefault(); setDragOver(true) }}
                 onDragLeave={() => setDragOver(false)}
-                onDrop={async e => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files) for (const f of Array.from(e.dataTransfer.files)) await handleFileAdd(f) }}
-              >
+                onDrop={async e => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files) for (const f of Array.from(e.dataTransfer.files)) await handleFileAdd(f) }}>
                 <div style={{ width:52, height:52, borderRadius:14, background:dragOver ? "rgba(232,245,66,0.1)" : "rgba(232,245,66,0.05)", border:`1px solid ${dragOver ? "rgba(232,245,66,0.4)" : "rgba(232,245,66,0.1)"}`, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}>
                   <span style={{ fontSize:20, color:t.accent }}>{dragOver ? "📥" : "↑"}</span>
                 </div>
@@ -906,24 +858,9 @@ export default function Home() {
               <Pill label={stabilize ? `✓ ${T.stabilize}` : T.stabilize} active={stabilize} onClick={() => setStabilize(!stabilize)}/>
               {(activeOptions.includes("Auto-zoom") || activeOptions.includes("Speed ramp") || selectedMusic) && (
                 <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-                  {activeOptions.includes("Auto-zoom") && (
-                    <div>
-                      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}><p style={{ fontSize:11, color:t.textMuted }}>{T.zoomIntensity}</p><span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{zoomIntensity}%</span></div>
-                      <input type="range" min={10} max={100} value={zoomIntensity} onChange={e => setZoomIntensity(Number(e.target.value))} style={{ width:"100%", accentColor:t.accent }}/>
-                    </div>
-                  )}
-                  {activeOptions.includes("Speed ramp") && (
-                    <div>
-                      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}><p style={{ fontSize:11, color:t.textMuted }}>{T.speedIntensity}</p><span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{speedIntensity}%</span></div>
-                      <input type="range" min={10} max={100} value={speedIntensity} onChange={e => setSpeedIntensity(Number(e.target.value))} style={{ width:"100%", accentColor:t.accent }}/>
-                    </div>
-                  )}
-                  {selectedMusic && (
-                    <div>
-                      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}><p style={{ fontSize:11, color:t.textMuted }}>{T.vocalVolume}</p><span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{vocalVolume}%</span></div>
-                      <input type="range" min={0} max={100} value={vocalVolume} onChange={e => setVocalVolume(Number(e.target.value))} style={{ width:"100%", accentColor:t.accent }}/>
-                    </div>
-                  )}
+                  {activeOptions.includes("Auto-zoom") && (<div><div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}><p style={{ fontSize:11, color:t.textMuted }}>{T.zoomIntensity}</p><span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{zoomIntensity}%</span></div><input type="range" min={10} max={100} value={zoomIntensity} onChange={e => setZoomIntensity(Number(e.target.value))} style={{ width:"100%", accentColor:t.accent }}/></div>)}
+                  {activeOptions.includes("Speed ramp") && (<div><div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}><p style={{ fontSize:11, color:t.textMuted }}>{T.speedIntensity}</p><span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{speedIntensity}%</span></div><input type="range" min={10} max={100} value={speedIntensity} onChange={e => setSpeedIntensity(Number(e.target.value))} style={{ width:"100%", accentColor:t.accent }}/></div>)}
+                  {selectedMusic && (<div><div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}><p style={{ fontSize:11, color:t.textMuted }}>{T.vocalVolume}</p><span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{vocalVolume}%</span></div><input type="range" min={0} max={100} value={vocalVolume} onChange={e => setVocalVolume(Number(e.target.value))} style={{ width:"100%", accentColor:t.accent }}/></div>)}
                 </div>
               )}
               <div style={{ display:"flex", gap:6 }}>
@@ -1199,13 +1136,7 @@ export default function Home() {
             <p style={{ fontSize:12, color:t.textMuted }}>{T.timestampDesc}</p>
             {timestampPreviews.length > 0 && (
               <div style={{ position:"relative", height:32, background:t.bgInput, borderRadius:8, overflow:"hidden", marginBottom:4 }}>
-                {timestampPreviews.map((ts, i) => {
-                  const total = timestampPreviews.reduce((acc, t2) => Math.max(acc, t2.start + t2.duration), 0)
-                  const colors = ["rgba(232,245,66,0.6)","rgba(100,200,255,0.6)","rgba(255,150,100,0.6)","rgba(150,255,150,0.6)"]
-                  return <div key={i} style={{ position:"absolute", top:4, height:24, left:`${(ts.start/total)*100}%`, width:`${(ts.duration/total)*100}%`, background:colors[i%colors.length], borderRadius:4, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <span style={{ fontSize:9, fontWeight:700, color:"#0a0a0a" }}>{i+1}</span>
-                  </div>
-                })}
+                {timestampPreviews.map((ts, i) => { const total = timestampPreviews.reduce((acc, t2) => Math.max(acc, t2.start + t2.duration), 0); const colors = ["rgba(232,245,66,0.6)","rgba(100,200,255,0.6)","rgba(255,150,100,0.6)","rgba(150,255,150,0.6)"]; return <div key={i} style={{ position:"absolute", top:4, height:24, left:`${(ts.start/total)*100}%`, width:`${(ts.duration/total)*100}%`, background:colors[i%colors.length], borderRadius:4, display:"flex", alignItems:"center", justifyContent:"center" }}><span style={{ fontSize:9, fontWeight:700, color:"#0a0a0a" }}>{i+1}</span></div> })}
               </div>
             )}
             {timestampPreviews.map((ts, i) => (
@@ -1225,10 +1156,7 @@ export default function Home() {
       {showCapsulesModal && (
         <div onClick={() => { setShowCapsulesModal(false); setCapsulesType(null) }} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
           <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:370 }}>
-            <div style={{ display:"flex", justifyContent:"space-between" }}>
-              <span style={{ fontSize:14, fontWeight:600, color:t.text }}>{T.capsuleTitle}</span>
-              <button onClick={() => { setShowCapsulesModal(false); setCapsulesType(null) }} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button>
-            </div>
+            <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>{T.capsuleTitle}</span><button onClick={() => { setShowCapsulesModal(false); setCapsulesType(null) }} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
             <p style={{ fontSize:12, color:t.textMuted }}>{T.capsuleDesc}</p>
             <div style={{ display:"flex", gap:7 }}>
               {(["courte","longue"] as const).map(type => (
