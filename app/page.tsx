@@ -218,14 +218,20 @@ export default function Home() {
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
-      const u = data.session?.user ?? null; setUser(u)
-      if (!u) { router.push("/auth"); return }
-      const { data: allowed } = await supabase.from("allowed_users").select("email").eq("email", u.email).single()
-      if (!allowed) { await supabase.auth.signOut(); router.push("/auth") }
-      else if (u.email) checkDriveConnection(u.email)
-    })
-    supabase.auth.onAuthStateChange(async (_e, session) => { const u = session?.user ?? null; setUser(u); if (!u) router.push("/auth") })
+  supabase.auth.getSession().then(async ({ data }) => {
+    let u = data.session?.user ?? null
+    if (!u) {
+      await new Promise(r => setTimeout(r, 1200))
+      const { data: data2 } = await supabase.auth.getSession()
+      u = data2.session?.user ?? null
+    }
+    if (!u) { router.push("/auth"); return }
+    setUser(u)
+    const { data: allowed } = await supabase.from("allowed_users").select("email").eq("email", u.email).single()
+    if (!allowed) { await supabase.auth.signOut(); router.push("/auth") }
+    else if (u.email) checkDriveConnection(u.email)
+  })
+  supabase.auth.onAuthStateChange(async (_e, session) => { const u = session?.user ?? null; setUser(u); if (!u) router.push("/auth") })
     checkServerStatus()
     const saved = localStorage.getItem("promptHistory"); if (saved) setPromptHistory(JSON.parse(saved))
     const savedLang = localStorage.getItem("lang") as Lang|null; if (savedLang && TRANSLATIONS[savedLang]) setLang(savedLang)
