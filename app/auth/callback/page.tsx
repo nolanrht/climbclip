@@ -8,10 +8,13 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const handleAuth = async () => {
-      const { data, error } = await supabase.auth.getSession()
-      if (data.session) { router.push("/"); return }
+      const { data } = await supabase.auth.getSession()
+      if (data.session) { 
+        await new Promise(r => setTimeout(r, 500))
+        router.push("/")
+        return 
+      }
       
-      // Exchange le token depuis le hash
       const hash = window.location.hash
       if (hash) {
         const params = new URLSearchParams(hash.replace("#", ""))
@@ -19,7 +22,11 @@ export default function AuthCallback() {
         const refreshToken = params.get("refresh_token")
         if (accessToken && refreshToken) {
           const { error } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
-          if (!error) { router.push("/"); return }
+          if (!error) { 
+            await new Promise(r => setTimeout(r, 500))
+            router.push("/")
+            return 
+          }
         }
       }
       router.push("/auth")
