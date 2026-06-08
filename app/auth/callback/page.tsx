@@ -7,13 +7,24 @@ export default function AuthCallback() {
   const router = useRouter()
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY") {
-        router.push("/auth?recovery=1")
-      } else if (event === "SIGNED_IN" && session) {
-        router.push("/")
+    const handleAuth = async () => {
+      const { data, error } = await supabase.auth.getSession()
+      if (data.session) { router.push("/"); return }
+      
+      // Exchange le token depuis le hash
+      const hash = window.location.hash
+      if (hash) {
+        const params = new URLSearchParams(hash.replace("#", ""))
+        const accessToken = params.get("access_token")
+        const refreshToken = params.get("refresh_token")
+        if (accessToken && refreshToken) {
+          const { error } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
+          if (!error) { router.push("/"); return }
+        }
       }
-    })
+      router.push("/auth")
+    }
+    handleAuth()
   }, [])
 
   return (
