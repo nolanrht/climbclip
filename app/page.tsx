@@ -219,6 +219,10 @@ export default function Home() {
   }
 
   useEffect(() => {
+    // Force refresh si on vient du callback
+if (window.location.search.includes('session_refresh=1')) {
+  window.history.replaceState({}, '', '/')
+}
     supabase.auth.getSession().then(async ({ data }) => {
       let u = data.session?.user ?? null
       if (!u) {
