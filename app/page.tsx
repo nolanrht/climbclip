@@ -219,28 +219,28 @@ export default function Home() {
   }
 
   useEffect(() => {
-    // Force refresh si on vient du callback
-if (window.location.search.includes('session_refresh=1')) {
-  window.history.replaceState({}, '', '/')
-}
-    supabase.auth.getSession().then(async ({ data }) => {
-      let u = data.session?.user ?? null
-      if (!u) {
-        await new Promise(r => setTimeout(r, 2000))
-        const { data: data2 } = await supabase.auth.getSession()
-        u = data2.session?.user ?? null
-      }
-      if (!u) { router.push("/auth"); return }
-      setUser(u)
-      setLoading(false)
-      if (u.email) checkDriveConnection(u.email)
-    })
-    supabase.auth.onAuthStateChange(async (_e, session) => {
-      const u = session?.user ?? null
-      setUser(u)
-      if (!u) router.push("/auth")
-      else setLoading(false)
-    })
+  const init = async () => {
+    // Force refresh session depuis les cookies
+    await supabase.auth.refreshSession()
+    const { data } = await supabase.auth.getSession()
+    let u = data.session?.user ?? null
+    if (!u) {
+      await new Promise(r => setTimeout(r, 1500))
+      const { data: data2 } = await supabase.auth.getSession()
+      u = data2.session?.user ?? null
+    }
+    if (!u) { router.push("/auth"); return }
+    setUser(u)
+    setLoading(false)
+    if (u.email) checkDriveConnection(u.email)
+  }
+  init()
+  supabase.auth.onAuthStateChange(async (_e, session) => {
+    const u = session?.user ?? null
+    setUser(u)
+    if (!u) router.push("/auth")
+    else setLoading(false)
+  })
     checkServerStatus()
     const saved = localStorage.getItem("promptHistory"); if (saved) setPromptHistory(JSON.parse(saved))
     const savedLang = localStorage.getItem("lang") as Lang|null; if (savedLang && TRANSLATIONS[savedLang]) setLang(savedLang)
