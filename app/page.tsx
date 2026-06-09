@@ -219,37 +219,28 @@ export default function Home() {
   }
 
   useEffect(() => {
-  const init = async () => {
-    // Force refresh session depuis les cookies
-    await supabase.auth.refreshSession()
-    const { data } = await supabase.auth.getSession()
-    let u = data.session?.user ?? null
-    if (!u) {
-      await new Promise(r => setTimeout(r, 1500))
-      const { data: data2 } = await supabase.auth.getSession()
-      u = data2.session?.user ?? null
-    }
+  supabase.auth.getSession().then(async ({ data }) => {
+    const u = data.session?.user ?? null
     if (!u) { router.push("/auth"); return }
     setUser(u)
     setLoading(false)
     if (u.email) checkDriveConnection(u.email)
-  }
-  init()
+  })
   supabase.auth.onAuthStateChange(async (_e, session) => {
     const u = session?.user ?? null
     setUser(u)
     if (!u) router.push("/auth")
     else setLoading(false)
   })
-    checkServerStatus()
-    const saved = localStorage.getItem("promptHistory"); if (saved) setPromptHistory(JSON.parse(saved))
-    const savedLang = localStorage.getItem("lang") as Lang|null; if (savedLang && TRANSLATIONS[savedLang]) setLang(savedLang)
-    const savedPresets = localStorage.getItem("climbPresets"); if (savedPresets) setPresets(JSON.parse(savedPresets))
-    const savedOnboarding = localStorage.getItem("climbOnboarding"); if (savedOnboarding) setOnboardingDone(true)
-    const savedHistory = localStorage.getItem("climbHistory"); if (savedHistory) setGenerationHistory(JSON.parse(savedHistory))
-    if ("Notification" in window && Notification.permission === "default") Notification.requestPermission()
-    if (window.location.hash === "#drive_connected") { setDriveConnected(true); window.history.replaceState({}, "", window.location.pathname) }
-  }, [])
+  checkServerStatus()
+  const saved = localStorage.getItem("promptHistory"); if (saved) setPromptHistory(JSON.parse(saved))
+  const savedLang = localStorage.getItem("lang") as Lang|null; if (savedLang && TRANSLATIONS[savedLang]) setLang(savedLang)
+  const savedPresets = localStorage.getItem("climbPresets"); if (savedPresets) setPresets(JSON.parse(savedPresets))
+  const savedOnboarding = localStorage.getItem("climbOnboarding"); if (savedOnboarding) setOnboardingDone(true)
+  const savedHistory = localStorage.getItem("climbHistory"); if (savedHistory) setGenerationHistory(JSON.parse(savedHistory))
+  if ("Notification" in window && Notification.permission === "default") Notification.requestPermission()
+  if (window.location.hash === "#drive_connected") { setDriveConnected(true); window.history.replaceState({}, "", window.location.pathname) }
+}, [])
 
   useEffect(() => { if (user) loadLibrary() }, [user])
 
