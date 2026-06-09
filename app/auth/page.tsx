@@ -11,18 +11,12 @@ export default function Auth() {
   const router = useRouter()
 
   const handleLogin = async () => {
-    setLoading(true); setError(null)
+    setLoading(true)
+    setError(null)
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) setError("Email ou mot de passe incorrect")
     else router.push("/")
     setLoading(false)
-  }
-
-  const handleGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: 'https://climbclip.vercel.app/auth/callback' }
-    })
   }
 
   return (
@@ -36,24 +30,27 @@ export default function Auth() {
         </div>
         <div style={{ background:"#141414", border:"1px solid rgba(255,255,255,0.08)", borderRadius:16, padding:28, display:"flex", flexDirection:"column", gap:16 }}>
           <p style={{ fontSize:15, fontWeight:500, color:"#f0f0f0", textAlign:"center" }}>Connexion</p>
-          <button onClick={handleGoogle} style={{ background:"#fff", border:"none", borderRadius:8, padding:"11px 0", fontSize:13, fontWeight:500, color:"#0a0a0a", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
-            <img src="https://www.google.com/favicon.ico" style={{ width:16, height:16 }}/> Continuer avec Google
-          </button>
-          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-            <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.1)" }}/>
-            <span style={{ fontSize:11, color:"#666" }}>ou</span>
-            <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.1)" }}/>
-          </div>
-          <input value={email} onChange={e => setEmail(e.target.value)} type="email"
+          <input
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            type="email"
             style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"10px 14px", fontSize:13, color:"#f0f0f0", outline:"none" }}
-            placeholder="Adresse e-mail"/>
-          <input value={password} onChange={e => setPassword(e.target.value)} type="password"
+            placeholder="Adresse e-mail"
+          />
+          <input
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            type="password"
             onKeyDown={e => e.key === "Enter" && handleLogin()}
             style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"10px 14px", fontSize:13, color:"#f0f0f0", outline:"none" }}
-            placeholder="Mot de passe"/>
+            placeholder="Mot de passe"
+          />
           {error && <p style={{ fontSize:12, color:"#e8453a", textAlign:"center" }}>{error}</p>}
-          <button onClick={handleLogin} disabled={loading}
-            style={{ background:"#e8f542", border:"none", borderRadius:8, padding:"11px 0", fontSize:13, fontWeight:500, color:"#0a0a0a", cursor:"pointer", opacity:loading ? 0.6 : 1 }}>
+          <button
+            onClick={handleLogin}
+            disabled={loading}
+            style={{ background:"#e8f542", border:"none", borderRadius:8, padding:"11px 0", fontSize:13, fontWeight:500, color:"#0a0a0a", cursor:"pointer", opacity:loading ? 0.6 : 1 }}
+          >
             {loading ? "Connexion..." : "Se connecter"}
           </button>
         </div>

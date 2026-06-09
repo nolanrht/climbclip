@@ -95,7 +95,6 @@ export default function Home() {
   const [dark, setDark] = useState(true)
   const [lang, setLang] = useState<Lang>("FR")
   const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState<"home"|"library"|"history">("home")
   const [activeOptions, setActiveOptions] = useState<string[]>(["Beat sync"])
   const [showSettings, setShowSettings] = useState(false)
@@ -219,18 +218,11 @@ export default function Home() {
   }
 
   useEffect(() => {
-  supabase.auth.getSession().then(async ({ data }) => {
+  supabase.auth.getSession().then(({ data }) => {
     const u = data.session?.user ?? null
     if (!u) { router.push("/auth"); return }
     setUser(u)
-    setLoading(false)
     if (u.email) checkDriveConnection(u.email)
-  })
-  supabase.auth.onAuthStateChange(async (_e, session) => {
-    const u = session?.user ?? null
-    setUser(u)
-    if (!u) router.push("/auth")
-    else setLoading(false)
   })
   checkServerStatus()
   const saved = localStorage.getItem("promptHistory"); if (saved) setPromptHistory(JSON.parse(saved))
@@ -620,12 +612,6 @@ export default function Home() {
     )
   }
 
-  if (loading) return (
-    <main style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", background:"#0b0b0b" }}>
-      <div style={{ width:24, height:24, borderRadius:"50%", border:"2px solid #e8f542", borderTopColor:"transparent", animation:"spin 0.8s linear infinite" }}/>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </main>
-  )
   if (!onboardingDone) {
 
     return (
