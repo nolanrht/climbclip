@@ -308,15 +308,15 @@ export default function Home() {
     const { data: { session }, error: sessErr } = await supabase.auth.getSession()
     const email = session?.user?.email
     if (sessErr) console.error(`[save ${index}] session error:`, sessErr.message)
-    if (!email) { console.warn(`[save ${index}] NO SESSION — skipping insert`); return }
+    if (!email) { console.warn(`[save ${index}] NO SESSION — skipping`); return }
     console.log(`[save ${index}] clip complet:`, JSON.stringify(clip))
     const storage_url = clip.storageUrl || clip.storage_url || null
-    const owner_email = email
-    const payload = { name: clip.name || `Edit #${index+1}`, base64: null, storage_url, owner_email, folder_id: null, thumbnail: clip.thumbnail || null }
-    console.log(`[save ${index}] BEFORE INSERT — owner_email: "${owner_email}", storage_url: "${storage_url?.slice(0,70)}", name: "${payload.name}"`)
+    if (!storage_url) { console.warn(`[save ${index}] no storage_url — skipping`); return }
+    const payload = { name: clip.name || `Edit #${index+1}`, storage_url, owner_email: email, folder_id: null, thumbnail: clip.thumbnail || null }
+    console.log(`[save ${index}] INSERT — owner_email: "${email}", storage_url: "${storage_url.slice(0,70)}"`)
     const { error } = await supabase.from("clips").insert(payload)
-    if (error) console.error(`[save ${index}] INSERT FAILED — message: "${error.message}", code: "${error.code}", hint: "${error.hint}"`)
-    else console.log(`[save ${index}] INSERT OK`)
+    if (error) console.error(`[save ${index}] FAILED — ${error.message} (${error.code}) hint: ${error.hint}`)
+    else console.log(`[save ${index}] OK`)
   }
 
   const uploadFile = async (file: File): Promise<string|null> => {
@@ -584,7 +584,22 @@ export default function Home() {
     } catch {}
   }
 
-  const downloadClip = (clip: any) => { const src = getClipSrc(clip); if (!src) return; const a = document.createElement("a"); a.href = src; a.download = `${clip.name || "clip"}.mp4`; a.click() }
+  const downloadClip = async (clip: any) => {
+    const src = getClipSrc(clip)
+    if (!src) return
+    const filename = `${clip.name || "clip"}.mp4`
+    if (src.startsWith("data:")) {
+      const a = document.createElement("a"); a.href = src; a.download = filename; a.click(); return
+    }
+    try {
+      const res = await fetch(src)
+      const blob = await res.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      const a = document.createElement("a"); a.href = blobUrl; a.download = filename
+      document.body.appendChild(a); a.click(); document.body.removeChild(a)
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 30000)
+    } catch { window.open(src, "_blank") }
+  }
   const downloadAllClips = () => generatedClips.forEach(clip => downloadClip(clip))
 
   const handlePreviewTimestamps = async () => {
