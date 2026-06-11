@@ -318,21 +318,19 @@ export default function Home() {
     setFolders(fd || []); setClips(cd || [])
   }
 
-  const saveClipToLibrary = async (clip: any, index: number) => {
-    const { data: { session }, error: sessErr } = await supabase.auth.getSession()
-    const email = session?.user?.email
-    if (sessErr) console.error(`[save ${index}] session error:`, sessErr.message)
-    if (!email) { console.warn(`[save ${index}] NO SESSION — skipping`); return }
-    console.log(`[save ${index}] clip complet:`, JSON.stringify(clip))
-    const storage_url = clip.storageUrl || clip.storage_url || null
-    console.log("saving clip:", clip.name, "storageUrl:", clip.storageUrl, "storage_url:", clip.storage_url, "user:", user?.email)
-    const payload: any = { name: clip.name || `Edit #${index+1}`, storage_url, owner_email: email, folder_id: null, thumbnail: clip.thumbnail || null }
-    if (!storage_url && clip.base64 && clip.base64.length < 500000) payload.base64 = clip.base64
-    console.log(`[save ${index}] INSERT — owner_email: "${email}", storage_url: ${storage_url ? `"${storage_url.slice(0,60)}"` : "null"}, has_base64: ${!!payload.base64}`)
-    const { data: insertData, error } = await supabase.from("clips").insert(payload).select()
-    console.log("INSERT RESULT:", insertData, "ERROR:", error)
-    if (error) console.error(`[save ${index}] FAILED — ${error.message} (${error.code}) hint: ${error.hint}`)
-    else console.log(`[save ${index}] OK`)
+  const saveClipToLibrary = async (clip: any, _index: number) => {
+    const insertData = {
+      name: clip.name || "clip",
+      base64: null,
+      storage_url: clip.storageUrl || clip.storage_url || null,
+      owner_email: user?.email || null,
+      folder_id: null,
+      thumbnail: clip.thumbnail || null
+    }
+    console.log("INSERTING:", JSON.stringify(insertData))
+    const { data, error } = await supabase.from("clips").insert(insertData).select()
+    console.log("RESULT data:", data, "error:", error?.message, error?.code, error?.details)
+    if (!error) loadLibrary()
   }
 
   const uploadFile = async (file: File): Promise<string|null> => {
@@ -748,7 +746,7 @@ export default function Home() {
               </div>
             )}
           </div>
-          <button onClick={() => setShowSettings(true)} style={{ fontSize:13, color:t.textSub, border:t.borderMed, borderRadius:7, padding:"7px 12px", background:t.bgInput, cursor:"pointer" }}>⚙</button>
+          <button onClick={() => setShowSettings(true)} style={{ fontSize:18, color:t.textSub, border:t.borderMed, borderRadius:7, padding:"7px 11px", background:t.bgInput, cursor:"pointer", lineHeight:1 }}>⚙</button>
         </div>
       </nav>
 
