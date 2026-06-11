@@ -319,11 +319,13 @@ export default function Home() {
   }
 
   const saveClipToLibrary = async (clip: any, _index: number) => {
+    const { data: { session } } = await supabase.auth.getSession()
+    const email = session?.user?.email
     const insertData = {
       name: clip.name || "clip",
       base64: null,
       storage_url: clip.storageUrl || clip.storage_url || null,
-      owner_email: user?.email || null,
+      owner_email: email || null,
       folder_id: null,
       thumbnail: clip.thumbnail || null
     }
