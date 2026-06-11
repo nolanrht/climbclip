@@ -183,6 +183,7 @@ export default function Home() {
   const [analyzing, setAnalyzing] = useState(false)
   const [autoAnalysisDesc, setAutoAnalysisDesc] = useState<string|null>(null)
   const [generationHistory, setGenerationHistory] = useState<any[]>([])
+  const [totalClipsGenerated, setTotalClipsGenerated] = useState(0)
   const [exportingDrive, setExportingDrive] = useState<string|null>(null)
   const [dragOver, setDragOver] = useState(false)
   const [generatingStartTime, setGeneratingStartTime] = useState<number|null>(null)
@@ -232,6 +233,7 @@ export default function Home() {
   const savedPresets = localStorage.getItem("climbPresets"); if (savedPresets) setPresets(JSON.parse(savedPresets))
   const savedOnboarding = localStorage.getItem("climbOnboarding"); if (savedOnboarding) setOnboardingDone(true)
   const savedHistory = localStorage.getItem("climbHistory"); if (savedHistory) setGenerationHistory(JSON.parse(savedHistory))
+  const savedTotal = localStorage.getItem("climbTotalClips"); if (savedTotal) setTotalClipsGenerated(parseInt(savedTotal) || 0)
   if ("Notification" in window && Notification.permission === "default") Notification.requestPermission()
   if (window.location.hash === "#drive_connected") { setDriveConnected(true); window.history.replaceState({}, "", window.location.pathname) }
 }, [])
@@ -307,6 +309,7 @@ export default function Home() {
     const email = session?.user?.email
     if (sessErr) console.error(`[save ${index}] session error:`, sessErr.message)
     if (!email) { console.warn(`[save ${index}] NO SESSION — skipping insert`); return }
+    console.log(`[save ${index}] clip complet:`, JSON.stringify(clip))
     const storage_url = clip.storageUrl || clip.storage_url || null
     const owner_email = email
     const payload = { name: clip.name || `Edit #${index+1}`, base64: null, storage_url, owner_email, folder_id: null, thumbnail: clip.thumbnail || null }
@@ -457,9 +460,11 @@ export default function Home() {
           console.log("[handleGenerate] all saves done — reloading library")
           await loadLibrary()
           console.log("[handleGenerate] library reloaded")
-          const historyEntry = { id:Date.now().toString(), date:new Date().toLocaleDateString(), prompt:promptText, contentType:detectedContentType, settings:{ format:selectedFormat, colorGrade:payload.colorGrade, transition:payload.transition }, clipsCount: d.clips.length }
-          const newHistory = [historyEntry, ...generationHistory].slice(0, 20)
-          setGenerationHistory(newHistory); localStorage.setItem("climbHistory", JSON.stringify(newHistory))
+          if (d.clips.length > 0) {
+            setTotalClipsGenerated(prev => { const n = prev + d.clips.length; localStorage.setItem("climbTotalClips", String(n)); return n })
+            const historyEntry = { id:Date.now().toString(), date:new Date().toLocaleDateString(), prompt:promptText, contentType:detectedContentType, settings:{ format:selectedFormat, colorGrade:payload.colorGrade, transition:payload.transition }, clipsCount: d.clips.length }
+            setGenerationHistory(prev => { const h = [historyEntry, ...prev].slice(0, 20); localStorage.setItem("climbHistory", JSON.stringify(h)); return h })
+          }
           if (!onboardingDone) completeOnboarding()
         }
         else if (d.status === "error") { eventSource.close(); alert("Erreur génération"); setGenerating(false); setEstimatedRemaining(null) }
@@ -492,6 +497,11 @@ export default function Home() {
           console.log("[handleGenerateCapsules] all saves done — reloading library")
           await loadLibrary()
           console.log("[handleGenerateCapsules] library reloaded")
+          if (d.clips.length > 0) {
+            setTotalClipsGenerated(prev => { const n = prev + d.clips.length; localStorage.setItem("climbTotalClips", String(n)); return n })
+            const historyEntry = { id:Date.now().toString(), date:new Date().toLocaleDateString(), prompt:"Capsules", contentType:"capsule", settings:{ format:selectedFormat }, clipsCount: d.clips.length }
+            setGenerationHistory(prev => { const h = [historyEntry, ...prev].slice(0, 20); localStorage.setItem("climbHistory", JSON.stringify(h)); return h })
+          }
         }
         else if (d.status === "error") { eventSource.close(); setCapsuleModeActive(false); alert(`Erreur capsules: ${d.error || "inconnue"}`); setGenerating(false); setEstimatedRemaining(null) }
       }
@@ -1086,7 +1096,7 @@ export default function Home() {
         <div onClick={() => setShowStats(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
           <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:300 }}>
             <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>📊 {T.stats}</span><button onClick={() => setShowStats(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
-            {[[T.totalClips, generatedClips.length],[T.clipsInLib, clips.length],["Générations", generationHistory.length],[T.queue, queue.length]].map(([label, val]) => (
+            {[[T.totalClips, totalClipsGenerated],[T.clipsInLib, clips.length],["Générations", generationHistory.length],[T.queue, queue.length]].map(([label, val]) => (
               <div key={String(label)} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 0", borderBottom:t.border }}>
                 <span style={{ fontSize:13, color:t.textSub }}>{label}</span>
                 <span style={{ fontSize:20, fontWeight:700, color:t.accent }}>{val}</span>
@@ -1094,9 +1104,12 @@ export default function Home() {
             ))}
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 0", borderBottom:t.border }}>
               <span style={{ fontSize:13, color:t.textSub }}>Google Drive</span>
-              <span style={{ fontSize:13, fontWeight:600, color:driveConnected ? "#4ade80" : t.textMuted }}>{driveConnected ? "✓ Connecté" : "Non connecté"}</span>
+              <span style={{ fontSize:13, fontWeight:600, color:driveConnected ? "#4ade80" : t.textMuted }}>{driveConnected ? "Connecté" : "Non connecté"}</span>
             </div>
-            <button onClick={() => setShowStats(false)} style={{ padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.close}</button>
+            <div style={{ display:"flex", flexDirection:"column", gap:7, marginTop:4 }}>
+              <button onClick={() => setShowStats(false)} style={{ padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.close}</button>
+              <button onClick={() => { setTotalClipsGenerated(0); localStorage.removeItem("climbTotalClips"); setGenerationHistory([]); localStorage.removeItem("climbHistory") }} style={{ padding:9, borderRadius:8, border:"1px solid rgba(239,68,68,0.3)", background:"rgba(239,68,68,0.05)", color:"#f87171", cursor:"pointer", fontSize:12 }}>Réinitialiser les statistiques</button>
+            </div>
           </div>
         </div>
       )}
