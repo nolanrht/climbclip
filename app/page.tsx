@@ -290,20 +290,27 @@ export default function Home() {
   }
 
   const loadLibrary = async () => {
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { session }, error: sessErr } = await supabase.auth.getSession()
     const email = session?.user?.email
-    if (!email) return
-    const { data: fd } = await supabase.from("folders").select("*").or(`owner_email.eq.${email},shared_with.cs.{${email}}`).order("created_at", { ascending: false })
-    const { data: cd } = await supabase.from("clips").select("*").eq("owner_email", email).order("created_at", { ascending: false })
+    console.log("[loadLibrary] session email:", email, sessErr ? "sessErr:" + sessErr.message : "")
+    if (!email) { console.warn("[loadLibrary] no session — skipping"); return }
+    const { data: fd, error: fe } = await supabase.from("folders").select("*").or(`owner_email.eq.${email},shared_with.cs.{${email}}`).order("created_at", { ascending: false })
+    if (fe) console.error("[loadLibrary] folders error:", fe.message)
+    const { data: cd, error: ce } = await supabase.from("clips").select("*").eq("owner_email", email).order("created_at", { ascending: false })
+    if (ce) { console.error("[loadLibrary] clips error:", ce.message, ce.code); return }
+    console.log("[loadLibrary] loaded", cd?.length ?? 0, "clips")
     setFolders(fd || []); setClips(cd || [])
   }
 
   const saveClipToLibrary = async (clip: any, index: number) => {
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { session }, error: sessErr } = await supabase.auth.getSession()
     const email = session?.user?.email
-    if (!email) return
-    const { error } = await supabase.from("clips").insert({ name: clip.name || `Edit #${index+1}`, base64: clip.base64 || null, storage_url: clip.storageUrl || null, owner_email: email, folder_id: null, thumbnail: clip.thumbnail || null })
-    if (error) console.error("saveClipToLibrary:", error.message)
+    console.log(`[save ${index}] email:`, email, sessErr ? "sessErr:" + sessErr.message : "", "clip:", clip.name)
+    if (!email) { console.warn(`[save ${index}] no session — skipping`); return }
+    const payload = { name: clip.name || `Edit #${index+1}`, base64: null, storage_url: clip.storageUrl || clip.storage_url || null, owner_email: email, folder_id: null, thumbnail: clip.thumbnail || null }
+    const { error } = await supabase.from("clips").insert(payload)
+    if (error) console.error(`[save ${index}] insert error:`, error.message, error.code)
+    else console.log(`[save ${index}] saved OK — storage_url:`, payload.storage_url?.slice(0, 60))
   }
 
   const uploadFile = async (file: File): Promise<string|null> => {
@@ -437,12 +444,16 @@ export default function Home() {
         if (d.message) setGeneratingServerMsg(d.message)
         if (d.status === "done") {
           eventSource.close()
+          console.log("[handleGenerate] done —", d.clips.length, "clips")
           setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100)
           setEstimatedRemaining(null)
           if (d.clips.length > 0) setLastGeneratedClip(d.clips[0])
           notifyDone(d.clips.length)
+          console.log("[handleGenerate] saving clips to library...")
           for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i)
+          console.log("[handleGenerate] all saves done — reloading library")
           await loadLibrary()
+          console.log("[handleGenerate] library reloaded")
           const historyEntry = { id:Date.now().toString(), date:new Date().toLocaleDateString(), prompt:promptText, contentType:detectedContentType, settings:{ format:selectedFormat, colorGrade:payload.colorGrade, transition:payload.transition }, clipsCount: d.clips.length }
           const newHistory = [historyEntry, ...generationHistory].slice(0, 20)
           setGenerationHistory(newHistory); localStorage.setItem("climbHistory", JSON.stringify(newHistory))
@@ -468,7 +479,17 @@ export default function Home() {
         const d = JSON.parse(e.data)
         if (d.progress) { setProgress(d.progress); const elapsed = (Date.now() - startTime) / 1000; if (d.progress > 10) { const remaining = Math.max(0, Math.round(elapsed / (d.progress/100) - elapsed)); setEstimatedRemaining(remaining > 5 ? `~${remaining}s` : null) } }
         if (d.message) setGeneratingServerMsg(d.message)
-        if (d.status === "done") { eventSource.close(); setCapsuleModeActive(false); setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100); setEstimatedRemaining(null); if (d.clips.length > 0) setLastGeneratedClip(d.clips[0]); notifyDone(d.clips.length); for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i); await loadLibrary() }
+        if (d.status === "done") {
+          eventSource.close(); setCapsuleModeActive(false)
+          console.log("[handleGenerateCapsules] done —", d.clips.length, "clips")
+          setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100); setEstimatedRemaining(null)
+          if (d.clips.length > 0) setLastGeneratedClip(d.clips[0]); notifyDone(d.clips.length)
+          console.log("[handleGenerateCapsules] saving to library...")
+          for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i)
+          console.log("[handleGenerateCapsules] all saves done — reloading library")
+          await loadLibrary()
+          console.log("[handleGenerateCapsules] library reloaded")
+        }
         else if (d.status === "error") { eventSource.close(); setCapsuleModeActive(false); alert(`Erreur capsules: ${d.error || "inconnue"}`); setGenerating(false); setEstimatedRemaining(null) }
       }
       eventSource.onerror = () => { eventSource.close(); setGenerating(false); setEstimatedRemaining(null) }
@@ -1343,23 +1364,25 @@ export default function Home() {
       )}
 
       {videoPlayerClip && (
-        <div onClick={() => setVideoPlayerClip(null)} style={{ position:"fixed", inset:0, zIndex:1000, background:"rgba(0,0,0,0.93)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ display:"flex", flexDirection:"column", alignItems:"center", width:"100%", maxWidth:420, padding:"0 16px", gap:14 }}>
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", width:"100%" }}>
-              <p style={{ fontSize:13, fontWeight:600, color:"#efefef", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", flex:1, marginRight:12 }}>{videoPlayerClip.name}</p>
-              <button onClick={() => setVideoPlayerClip(null)} style={{ background:"rgba(255,255,255,0.08)", border:"none", borderRadius:8, width:34, height:34, color:"#fff", fontSize:18, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✕</button>
+        <div onClick={() => setVideoPlayerClip(null)} style={{ position:"fixed", inset:0, zIndex:1000, background:"rgba(0,0,0,0.85)", display:"flex", alignItems:"center", justifyContent:"center", padding:"16px" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width:"100%", maxWidth:380, background:"#161616", borderRadius:22, overflow:"hidden", boxShadow:"0 32px 96px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.06)" }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"16px 16px 10px" }}>
+              <p style={{ fontSize:13, fontWeight:600, color:"#f0f0f0", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", flex:1, marginRight:10, letterSpacing:"-0.01em" }}>{videoPlayerClip.name}</p>
+              <button onClick={() => setVideoPlayerClip(null)} style={{ background:"rgba(255,255,255,0.08)", border:"none", borderRadius:8, width:32, height:32, color:"#888", fontSize:15, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, lineHeight:1 }}>✕</button>
             </div>
             <video
               src={getClipSrc(videoPlayerClip)}
               controls
               autoPlay
               playsInline
-              style={{ width:"100%", maxHeight:"72vh", borderRadius:12, background:"#000", objectFit:"contain" }}
+              style={{ width:"100%", maxHeight:"72vh", background:"#000", display:"block", objectFit:"contain" }}
             />
-            <div style={{ display:"flex", gap:10, width:"100%" }}>
-              <button onClick={() => downloadClip(videoPlayerClip)} style={{ flex:1, padding:"13px 10px", borderRadius:10, border:"1px solid rgba(232,245,66,0.3)", background:"rgba(232,245,66,0.07)", color:"#e8f542", fontSize:13, fontWeight:600, cursor:"pointer" }}>{T.download}</button>
-              <button onClick={() => shareNative(videoPlayerClip)} style={{ flex:1, padding:"13px 10px", borderRadius:10, border:"1px solid rgba(255,255,255,0.12)", background:"rgba(255,255,255,0.05)", color:"#ccc", fontSize:13, cursor:"pointer" }}>{T.shareNative}</button>
-              <button onClick={() => { exportToDrive(videoPlayerClip) }} disabled={exportingDrive === (videoPlayerClip.id || videoPlayerClip.name)} style={{ flex:1, padding:"13px 10px", borderRadius:10, border:driveConnected ? "1px solid rgba(66,133,244,0.35)" : "1px solid rgba(255,255,255,0.1)", background:driveConnected ? "rgba(66,133,244,0.08)" : "rgba(255,255,255,0.04)", color:driveConnected ? "#4285f4" : "#888", fontSize:13, cursor:"pointer" }}>Drive</button>
+            <div style={{ padding:"14px 14px 18px", display:"flex", flexDirection:"column", gap:10 }}>
+              <button onClick={() => downloadClip(videoPlayerClip)} style={{ width:"100%", padding:"15px", borderRadius:14, border:"none", background:"#e8f542", color:"#0a0a0a", fontSize:14, fontWeight:700, cursor:"pointer", letterSpacing:"-0.01em" }}>{T.download}</button>
+              <div style={{ display:"flex", gap:8 }}>
+                <button onClick={() => shareNative(videoPlayerClip)} style={{ flex:1, padding:"13px", borderRadius:14, border:"1px solid rgba(255,255,255,0.1)", background:"rgba(255,255,255,0.05)", color:"#ccc", fontSize:13, fontWeight:500, cursor:"pointer" }}>{T.shareNative}</button>
+                <button onClick={() => exportToDrive(videoPlayerClip)} disabled={exportingDrive === (videoPlayerClip.id || videoPlayerClip.name)} style={{ flex:1, padding:"13px", borderRadius:14, border:driveConnected ? "1px solid rgba(66,133,244,0.35)" : "1px solid rgba(255,255,255,0.08)", background:driveConnected ? "rgba(66,133,244,0.1)" : "rgba(255,255,255,0.03)", color:driveConnected ? "#4285f4" : "#666", fontSize:13, fontWeight:500, cursor:"pointer" }}>Drive</button>
+              </div>
             </div>
           </div>
         </div>
