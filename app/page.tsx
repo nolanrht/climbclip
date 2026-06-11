@@ -12,7 +12,6 @@ type VideoItem = { id: string; type: "file" | "link"; path?: string; url?: strin
 type TimestampPreview = { start: number; duration: number; name: string; description?: string }
 type Lang = "EN" | "FR" | "ES" | "IT" | "DE"
 type Preset = { id: string; name: string; format: string; colorGrade: string; transition: string; prompt: string; options: string[]; exportQuality: string; exportCodec: string; watermark: boolean }
-type QueueItem = { id: string; videos: VideoItem[]; prompt: string; status: "pending" | "processing" | "done" | "error"; clips?: any[] }
 
 const SERVER_URL = "https://climbclip-server.onrender.com"
 
@@ -107,7 +106,6 @@ export default function Home() {
   const [showStats, setShowStats] = useState(false)
   const [showPresets, setShowPresets] = useState(false)
   const [showSavePreset, setShowSavePreset] = useState(false)
-  const [showQueue, setShowQueue] = useState(false)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [capsulesType, setCapsulesType] = useState<"courte"|"longue"|null>(null)
   const [capsulesCount, setCapsulesCount] = useState(4)
@@ -174,8 +172,6 @@ export default function Home() {
   const [showLangMenu, setShowLangMenu] = useState(false)
   const [presets, setPresets] = useState<Preset[]>([])
   const [presetName, setPresetName] = useState("")
-  const [queue, setQueue] = useState<QueueItem[]>([])
-  const [queueRunning, setQueueRunning] = useState(false)
   const [copiedId, setCopiedId] = useState<string|null>(null)
   const [autoMode, setAutoMode] = useState(true)
   const [onboardingDone, setOnboardingDone] = useState(false)
@@ -313,6 +309,7 @@ export default function Home() {
     const storage_url = clip.storageUrl || clip.storage_url || null
     if (!storage_url) { console.warn(`[save ${index}] no storage_url — skipping`); return }
     const payload = { name: clip.name || `Edit #${index+1}`, storage_url, owner_email: email, folder_id: null, thumbnail: clip.thumbnail || null }
+    console.log("saving clip:", clip.name, "storageUrl:", clip.storageUrl, "storage_url:", clip.storage_url, "user:", user?.email)
     console.log(`[save ${index}] INSERT — owner_email: "${email}", storage_url: "${storage_url.slice(0,70)}"`)
     const { error } = await supabase.from("clips").insert(payload)
     if (error) console.error(`[save ${index}] FAILED — ${error.message} (${error.code}) hint: ${error.hint}`)
@@ -462,9 +459,9 @@ export default function Home() {
           console.log("[handleGenerate] library reloaded")
           if (d.clips.length > 0) {
             setTotalClipsGenerated(prev => { const n = prev + d.clips.length; localStorage.setItem("climbTotalClips", String(n)); return n })
-            const historyEntry = { id:Date.now().toString(), date:new Date().toLocaleDateString(), prompt:promptText, contentType:detectedContentType, settings:{ format:selectedFormat, colorGrade:payload.colorGrade, transition:payload.transition }, clipsCount: d.clips.length }
-            setGenerationHistory(prev => { const h = [historyEntry, ...prev].slice(0, 20); localStorage.setItem("climbHistory", JSON.stringify(h)); return h })
           }
+          const historyEntry = { id:`${Date.now()}_${d.clips.length}`, date:new Date().toLocaleString(), prompt:promptText, contentType:detectedContentType, settings:{ format:selectedFormat, colorGrade:payload.colorGrade, transition:payload.transition }, clipsCount: d.clips.length }
+          setGenerationHistory(prev => { const h = [historyEntry, ...prev].slice(0, 20); localStorage.setItem("climbHistory", JSON.stringify(h)); return h })
           if (!onboardingDone) completeOnboarding()
         }
         else if (d.status === "error") { eventSource.close(); alert("Erreur génération"); setGenerating(false); setEstimatedRemaining(null) }
@@ -499,9 +496,9 @@ export default function Home() {
           console.log("[handleGenerateCapsules] library reloaded")
           if (d.clips.length > 0) {
             setTotalClipsGenerated(prev => { const n = prev + d.clips.length; localStorage.setItem("climbTotalClips", String(n)); return n })
-            const historyEntry = { id:Date.now().toString(), date:new Date().toLocaleDateString(), prompt:"Capsules", contentType:"capsule", settings:{ format:selectedFormat }, clipsCount: d.clips.length }
-            setGenerationHistory(prev => { const h = [historyEntry, ...prev].slice(0, 20); localStorage.setItem("climbHistory", JSON.stringify(h)); return h })
           }
+          const historyEntry = { id:`${Date.now()}_${d.clips.length}`, date:new Date().toLocaleString(), prompt:"Capsules", contentType:"capsule", settings:{ format:selectedFormat }, clipsCount: d.clips.length }
+          setGenerationHistory(prev => { const h = [historyEntry, ...prev].slice(0, 20); localStorage.setItem("climbHistory", JSON.stringify(h)); return h })
         }
         else if (d.status === "error") { eventSource.close(); setCapsuleModeActive(false); alert(`Erreur capsules: ${d.error || "inconnue"}`); setGenerating(false); setEstimatedRemaining(null) }
       }
@@ -509,28 +506,6 @@ export default function Home() {
     } catch { alert("Erreur"); setGenerating(false) }
   }, [videos, selectedFormat, exportQuality, exportCodec, capsulesCount])
 
-  const addToQueue = () => { if (videos.length === 0) return; setQueue(prev => [...prev, { id:Date.now().toString(), videos:[...videos], prompt:promptText, status:"pending" }]) }
-
-  const runQueue = async () => {
-    if (queue.length === 0 || queueRunning) return; setQueueRunning(true)
-    for (let i = 0; i < queue.length; i++) {
-      if (queue[i].status !== "pending") continue
-      setQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status:"processing" } : q))
-      try {
-        const payload = { ...buildPayload(), videoPaths:queue[i].videos.map(v => v.path).filter(Boolean), prompt:queue[i].prompt }
-        const res = await fetch(`${SERVER_URL}/generate`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) })
-        const { jobId } = await res.json()
-        await new Promise<void>(resolve => {
-          const interval = setInterval(async () => {
-            const sr = await fetch(`${SERVER_URL}/status/${jobId}`); const d = await sr.json()
-            if (d.status === "done") { clearInterval(interval); setQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status:"done", clips:d.clips } : q)); for (let j = 0; j < d.clips.length; j++) await saveClipToLibrary(d.clips[j], j); await loadLibrary(); resolve() }
-            else if (d.status === "error") { clearInterval(interval); setQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status:"error" } : q)); resolve() }
-          }, 3000)
-        })
-      } catch { setQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status:"error" } : q)) }
-    }
-    setQueueRunning(false)
-  }
 
   const savePreset = () => {
     if (!presetName.trim()) return
@@ -731,7 +706,6 @@ export default function Home() {
         <div style={{ display:"flex", alignItems:"center", gap:6 }}>
           <button onClick={() => driveConnected ? null : connectDrive()} style={{ fontSize:11, color:driveConnected ? "#4ade80" : t.textMuted, border:driveConnected ? "1px solid rgba(74,222,128,0.3)" : t.border, borderRadius:7, padding:"6px 10px", background:driveConnected ? "rgba(74,222,128,0.06)" : t.bgInput, cursor:driveConnected ? "default" : "pointer" }}>{driveConnected ? "✓ Drive" : "Drive"}</button>
           <button onClick={() => setShowStats(true)} style={{ fontSize:13, color:t.textSub, border:t.border, borderRadius:7, padding:"6px 10px", background:t.bgInput, cursor:"pointer" }}>📊</button>
-          <button onClick={() => setShowQueue(true)} style={{ fontSize:13, color:queue.length > 0 ? t.accent : t.textSub, border:queue.length > 0 ? "1px solid rgba(232,245,66,0.3)" : t.border, borderRadius:7, padding:"6px 10px", background:t.bgInput, cursor:"pointer" }}>⏱{queue.length > 0 ? ` ${queue.length}` : ""}</button>
           <div style={{ position:"relative" }} onClick={e => e.stopPropagation()}>
             <button onClick={() => setShowLangMenu(!showLangMenu)} style={{ fontSize:12, color:t.textSub, background:t.bgInput, border:t.border, borderRadius:7, padding:"6px 10px", cursor:"pointer" }}>{lang}</button>
             {showLangMenu && (
@@ -939,12 +913,9 @@ export default function Home() {
                 <button onClick={() => setCapsuleModeActive(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:13, cursor:"pointer", padding:"0 2px", lineHeight:1 }}>✕</button>
               </div>
             )}
-            <div style={{ display:"flex", gap:7 }}>
-              <button onClick={capsuleModeActive ? handleGenerateCapsules : handleGenerate} disabled={generating || videos.length === 0} style={{ flex:1, background:generating ? "rgba(232,245,66,0.35)" : videos.length === 0 ? "rgba(232,245,66,0.15)" : t.accent, color:"#0a0a0a", fontWeight:700, fontSize:14, borderRadius:10, padding:"13px", border:"none", cursor:generating || videos.length === 0 ? "not-allowed" : "pointer", boxShadow:videos.length > 0 && !generating ? "0 0 24px rgba(232,245,66,0.2)" : "none" }}>
-                {generating ? T.generating : capsuleModeActive ? `✦ Générer capsules (${capsulesCount})` : `✦ ${T.generate}`}
-              </button>
-              <button onClick={addToQueue} disabled={videos.length === 0} style={{ background:"none", border:t.borderMed, borderRadius:10, padding:"13px 14px", fontSize:12, color:t.textSub, cursor:"pointer", opacity:videos.length === 0 ? 0.35 : 1, whiteSpace:"nowrap" }}>{T.addToQueue}</button>
-            </div>
+            <button onClick={capsuleModeActive ? handleGenerateCapsules : handleGenerate} disabled={generating || videos.length === 0} style={{ width:"100%", background:generating ? "rgba(232,245,66,0.35)" : videos.length === 0 ? "rgba(232,245,66,0.15)" : t.accent, color:"#0a0a0a", fontWeight:700, fontSize:14, borderRadius:10, padding:"13px", border:"none", cursor:generating || videos.length === 0 ? "not-allowed" : "pointer", boxShadow:videos.length > 0 && !generating ? "0 0 24px rgba(232,245,66,0.2)" : "none" }}>
+              {generating ? T.generating : capsuleModeActive ? `✦ Générer capsules (${capsulesCount})` : `✦ ${T.generate}`}
+            </button>
             <p style={{ fontSize:10, color:t.textHint, textAlign:"right" }}>{T.cmdEnterHint}</p>
           </div>
 
@@ -1111,7 +1082,7 @@ export default function Home() {
         <div onClick={() => setShowStats(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
           <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:300 }}>
             <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>📊 {T.stats}</span><button onClick={() => setShowStats(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
-            {[[T.totalClips, totalClipsGenerated],[T.clipsInLib, clips.length],["Générations", generationHistory.length],[T.queue, queue.length]].map(([label, val]) => (
+            {[[T.totalClips, totalClipsGenerated],[T.clipsInLib, clips.length],["Générations", generationHistory.length]].map(([label, val]) => (
               <div key={String(label)} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 0", borderBottom:t.border }}>
                 <span style={{ fontSize:13, color:t.textSub }}>{label}</span>
                 <span style={{ fontSize:20, fontWeight:700, color:t.accent }}>{val}</span>
@@ -1162,29 +1133,6 @@ export default function Home() {
         </div>
       )}
 
-      {showQueue && (
-        <div onClick={() => setShowQueue(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
-          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:420, maxHeight:"75vh", overflowY:"auto" }}>
-            <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>⏱ {T.queue}</span><button onClick={() => setShowQueue(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
-            {queue.length === 0 ? <p style={{ fontSize:13, color:t.textMuted, textAlign:"center", padding:"20px 0" }}>{T.queueEmpty}</p> : queue.map((item, i) => (
-              <div key={item.id} style={{ display:"flex", alignItems:"center", gap:9, padding:"10px 12px", background:t.bgInput, border:item.status === "processing" ? "1px solid rgba(232,245,66,0.3)" : t.border, borderRadius:9 }}>
-                <div style={{ width:26, height:26, borderRadius:"50%", background:item.status === "done" ? "rgba(74,222,128,0.15)" : item.status === "error" ? "rgba(232,69,58,0.12)" : item.status === "processing" ? "rgba(232,245,66,0.1)" : t.bgThumb, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, color:t.text, flexShrink:0 }}>
-                  {item.status === "done" ? "✓" : item.status === "error" ? "✕" : item.status === "processing" ? "⚙" : i+1}
-                </div>
-                <div style={{ flex:1, minWidth:0 }}>
-                  <p style={{ fontSize:12, color:t.text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{item.prompt || `Job ${i+1}`}</p>
-                  <p style={{ fontSize:10, color:t.textMuted }}>{item.videos.length} vidéo(s)</p>
-                </div>
-                {item.status === "pending" && <button onClick={() => setQueue(prev => prev.filter(q => q.id !== item.id))} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:14, flexShrink:0 }}>✕</button>}
-              </div>
-            ))}
-            <div style={{ display:"flex", gap:7 }}>
-              <button onClick={() => setShowQueue(false)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.close}</button>
-              {queue.some(q => q.status === "pending") && <button onClick={() => { setShowQueue(false); runQueue() }} disabled={queueRunning} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:700, opacity:queueRunning ? 0.6 : 1 }}>▶ {T.runQueue}</button>}
-            </div>
-          </div>
-        </div>
-      )}
 
       {showTimestampPreview && (
         <div onClick={() => setShowTimestampPreview(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
