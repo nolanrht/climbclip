@@ -236,7 +236,16 @@ export default function Home() {
   if (window.location.hash === "#drive_connected") { setDriveConnected(true); window.history.replaceState({}, "", window.location.pathname) }
 }, [])
 
-  useEffect(() => { if (user) loadLibrary() }, [user])
+  useEffect(() => {
+    if (!user) return
+    loadLibrary()
+    const channel = supabase
+      .channel('clips-realtime')
+      .on('postgres_changes' as any, { event: 'INSERT', schema: 'public', table: 'clips', filter: `owner_email=eq.${user.email}` }, () => { loadLibrary() })
+      .on('postgres_changes' as any, { event: 'DELETE', schema: 'public', table: 'clips', filter: `owner_email=eq.${user.email}` }, () => { loadLibrary() })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [user])
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 640)
@@ -318,9 +327,10 @@ export default function Home() {
     const storage_url = clip.storageUrl || clip.storage_url || null
     console.log("saving clip:", clip.name, "storageUrl:", clip.storageUrl, "storage_url:", clip.storage_url, "user:", user?.email)
     const payload: any = { name: clip.name || `Edit #${index+1}`, storage_url, owner_email: email, folder_id: null, thumbnail: clip.thumbnail || null }
-    if (!storage_url && clip.base64) payload.base64 = clip.base64
+    if (!storage_url && clip.base64 && clip.base64.length < 500000) payload.base64 = clip.base64
     console.log(`[save ${index}] INSERT — owner_email: "${email}", storage_url: ${storage_url ? `"${storage_url.slice(0,60)}"` : "null"}, has_base64: ${!!payload.base64}`)
-    const { error } = await supabase.from("clips").insert(payload)
+    const { data: insertData, error } = await supabase.from("clips").insert(payload).select()
+    console.log("INSERT RESULT:", insertData, "ERROR:", error)
     if (error) console.error(`[save ${index}] FAILED — ${error.message} (${error.code}) hint: ${error.hint}`)
     else console.log(`[save ${index}] OK`)
   }
