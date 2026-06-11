@@ -290,14 +290,19 @@ export default function Home() {
   }
 
   const loadLibrary = async () => {
-    const { data: fd } = await supabase.from("folders").select("*").or(`owner_email.eq.${user.email},shared_with.cs.{${user.email}}`).order("created_at", { ascending: false })
-    const { data: cd } = await supabase.from("clips").select("*").eq("owner_email", user.email).order("created_at", { ascending: false })
+    const { data: { session } } = await supabase.auth.getSession()
+    const email = session?.user?.email
+    if (!email) return
+    const { data: fd } = await supabase.from("folders").select("*").or(`owner_email.eq.${email},shared_with.cs.{${email}}`).order("created_at", { ascending: false })
+    const { data: cd } = await supabase.from("clips").select("*").eq("owner_email", email).order("created_at", { ascending: false })
     setFolders(fd || []); setClips(cd || [])
   }
 
   const saveClipToLibrary = async (clip: any, index: number) => {
-    if (!user?.email) return
-    const { error } = await supabase.from("clips").insert({ name: clip.name || `Edit #${index+1}`, base64: clip.base64 || null, storage_url: clip.storageUrl || null, owner_email: user.email, folder_id: null, thumbnail: clip.thumbnail || null })
+    const { data: { session } } = await supabase.auth.getSession()
+    const email = session?.user?.email
+    if (!email) return
+    const { error } = await supabase.from("clips").insert({ name: clip.name || `Edit #${index+1}`, base64: clip.base64 || null, storage_url: clip.storageUrl || null, owner_email: email, folder_id: null, thumbnail: clip.thumbnail || null })
     if (error) console.error("saveClipToLibrary:", error.message)
   }
 
@@ -517,7 +522,7 @@ export default function Home() {
     setExportingDrive(null)
   }
 
-  const getDriveButtonLabel = (clipId: string) => { if (exportingDrive === clipId) return T.exportingDrive; if (!driveConnected) return `🔗 ${T.connectDrive}`; return `▲ ${T.exportDrive}` }
+  const getDriveButtonLabel = (clipId: string) => { if (exportingDrive === clipId) return T.exportingDrive; if (!driveConnected) return T.connectDrive; return T.exportDrive }
 
   const shareClipPublic = async (clip: any) => {
     const src = getClipSrc(clip)
@@ -603,8 +608,8 @@ export default function Home() {
         </div>
         <div style={{ padding:"9px 10px 11px", display:"flex", flexDirection:"column", gap:5 }}>
           <p style={{ fontSize:11, color:t.text, fontWeight:500 }}>{clip.name}</p>
-          <button onClick={() => shareNative(clip)} style={{ padding:"7px", borderRadius:7, fontSize:11, border:t.border, background:t.bgInput, color:t.textSub, cursor:"pointer" }}>↗ {T.shareNative}</button>
-          <button onClick={() => shareClipPublic(clip)} style={{ padding:"7px", borderRadius:7, fontSize:11, border:t.border, background:t.bgInput, color:copiedId === clipId ? "#4ade80" : t.textMuted, cursor:"pointer" }}>{copiedId === clipId ? `✓ ${T.copied}` : `🔗 ${T.copyLink}`}</button>
+          <button onClick={() => shareNative(clip)} style={{ padding:"7px", borderRadius:7, fontSize:11, border:t.border, background:t.bgInput, color:t.textSub, cursor:"pointer" }}>{T.shareNative}</button>
+          <button onClick={() => shareClipPublic(clip)} style={{ padding:"7px", borderRadius:7, fontSize:11, border:t.border, background:t.bgInput, color:copiedId === clipId ? "#4ade80" : t.textMuted, cursor:"pointer" }}>{copiedId === clipId ? T.copied : T.copyLink}</button>
           <button onClick={() => exportToDrive(clip)} disabled={exportingDrive === clipId} style={{ padding:"7px", borderRadius:7, fontSize:11, border:driveConnected ? "1px solid rgba(66,133,244,0.35)" : t.borderMed, background:driveConnected ? "rgba(66,133,244,0.06)" : t.bgInput, color:exportingDrive === clipId ? t.textMuted : driveConnected ? "#4285f4" : t.textSub, cursor:"pointer", opacity:exportingDrive === clipId ? 0.6 : 1 }}>{getDriveButtonLabel(clipId)}</button>
         </div>
       </div>
@@ -997,7 +1002,7 @@ export default function Home() {
                           <button onClick={() => { setRenamingClip(clip.id); setRenameValue(clip.name); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.rename}</button>
                           <button onClick={() => { downloadClip(clip); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.download}</button>
                           <button onClick={() => { shareNative(clip); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.shareNative}</button>
-                          <button onClick={() => { exportToDrive(clip); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:"#4285f4", cursor:"pointer", fontSize:12, textAlign:"left" }}>▲ {driveConnected ? T.exportDrive : T.connectDrive}</button>
+                          <button onClick={() => { exportToDrive(clip); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:"#4285f4", cursor:"pointer", fontSize:12, textAlign:"left" }}>{driveConnected ? T.exportDrive : T.connectDrive}</button>
                           <button onClick={() => { setShowMoveModal(clip.id); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.move}</button>
                           <button onClick={() => { shareClipPublic(clip); setClipMenu(null) }} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:t.textSub, cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.copyLink}</button>
                           <button onClick={() => deleteClip(clip.id)} style={{ width:"100%", padding:"7px 13px", background:"none", border:"none", color:"#e8453a", cursor:"pointer", fontSize:12, textAlign:"left" }}>{T.delete}</button>
