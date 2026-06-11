@@ -305,12 +305,15 @@ export default function Home() {
   const saveClipToLibrary = async (clip: any, index: number) => {
     const { data: { session }, error: sessErr } = await supabase.auth.getSession()
     const email = session?.user?.email
-    console.log(`[save ${index}] email:`, email, sessErr ? "sessErr:" + sessErr.message : "", "clip:", clip.name)
-    if (!email) { console.warn(`[save ${index}] no session — skipping`); return }
-    const payload = { name: clip.name || `Edit #${index+1}`, base64: null, storage_url: clip.storageUrl || clip.storage_url || null, owner_email: email, folder_id: null, thumbnail: clip.thumbnail || null }
+    if (sessErr) console.error(`[save ${index}] session error:`, sessErr.message)
+    if (!email) { console.warn(`[save ${index}] NO SESSION — skipping insert`); return }
+    const storage_url = clip.storageUrl || clip.storage_url || null
+    const owner_email = email
+    const payload = { name: clip.name || `Edit #${index+1}`, base64: null, storage_url, owner_email, folder_id: null, thumbnail: clip.thumbnail || null }
+    console.log(`[save ${index}] BEFORE INSERT — owner_email: "${owner_email}", storage_url: "${storage_url?.slice(0,70)}", name: "${payload.name}"`)
     const { error } = await supabase.from("clips").insert(payload)
-    if (error) console.error(`[save ${index}] insert error:`, error.message, error.code)
-    else console.log(`[save ${index}] saved OK — storage_url:`, payload.storage_url?.slice(0, 60))
+    if (error) console.error(`[save ${index}] INSERT FAILED — message: "${error.message}", code: "${error.code}", hint: "${error.hint}"`)
+    else console.log(`[save ${index}] INSERT OK`)
   }
 
   const uploadFile = async (file: File): Promise<string|null> => {
@@ -444,7 +447,7 @@ export default function Home() {
         if (d.message) setGeneratingServerMsg(d.message)
         if (d.status === "done") {
           eventSource.close()
-          console.log("[handleGenerate] done —", d.clips.length, "clips")
+          console.log("[handleGenerate] done —", d.clips.length, "clips:", d.clips.map((c: any) => ({ name: c.name, storageUrl: c.storageUrl?.slice(0,50) })))
           setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100)
           setEstimatedRemaining(null)
           if (d.clips.length > 0) setLastGeneratedClip(d.clips[0])
@@ -481,7 +484,7 @@ export default function Home() {
         if (d.message) setGeneratingServerMsg(d.message)
         if (d.status === "done") {
           eventSource.close(); setCapsuleModeActive(false)
-          console.log("[handleGenerateCapsules] done —", d.clips.length, "clips")
+          console.log("[handleGenerateCapsules] done —", d.clips.length, "clips:", d.clips.map((c: any) => ({ name: c.name, storageUrl: c.storageUrl?.slice(0,50) })))
           setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100); setEstimatedRemaining(null)
           if (d.clips.length > 0) setLastGeneratedClip(d.clips[0]); notifyDone(d.clips.length)
           console.log("[handleGenerateCapsules] saving to library...")
