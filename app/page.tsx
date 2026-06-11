@@ -111,6 +111,7 @@ export default function Home() {
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [capsulesType, setCapsulesType] = useState<"courte"|"longue"|null>(null)
   const [capsulesCount, setCapsulesCount] = useState(4)
+  const [capsuleModeActive, setCapsuleModeActive] = useState(false)
   const [pendingFile, setPendingFile] = useState<File|null>(null)
   const [compressing, setCompressing] = useState(false)
   const [selectedProblems, setSelectedProblems] = useState<string[]>([])
@@ -295,7 +296,9 @@ export default function Home() {
   }
 
   const saveClipToLibrary = async (clip: any, index: number) => {
-    await supabase.from("clips").insert({ name: clip.name || `Edit #${index+1}`, base64: clip.base64 || null, storage_url: clip.storageUrl || null, owner_email: user.email, folder_id: null, thumbnail: clip.thumbnail || null })
+    if (!user?.email) return
+    const { error } = await supabase.from("clips").insert({ name: clip.name || `Edit #${index+1}`, base64: clip.base64 || null, storage_url: clip.storageUrl || null, owner_email: user.email, folder_id: null, thumbnail: clip.thumbnail || null })
+    if (error) console.error("saveClipToLibrary:", error.message)
   }
 
   const uploadFile = async (file: File): Promise<string|null> => {
@@ -460,8 +463,8 @@ export default function Home() {
         const d = JSON.parse(e.data)
         if (d.progress) { setProgress(d.progress); const elapsed = (Date.now() - startTime) / 1000; if (d.progress > 10) { const remaining = Math.max(0, Math.round(elapsed / (d.progress/100) - elapsed)); setEstimatedRemaining(remaining > 5 ? `~${remaining}s` : null) } }
         if (d.message) setGeneratingServerMsg(d.message)
-        if (d.status === "done") { eventSource.close(); setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100); setEstimatedRemaining(null); if (d.clips.length > 0) setLastGeneratedClip(d.clips[0]); notifyDone(d.clips.length); for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i); await loadLibrary() }
-        else if (d.status === "error") { eventSource.close(); alert(`Erreur capsules: ${d.error || "inconnue"}`); setGenerating(false); setEstimatedRemaining(null) }
+        if (d.status === "done") { eventSource.close(); setCapsuleModeActive(false); setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100); setEstimatedRemaining(null); if (d.clips.length > 0) setLastGeneratedClip(d.clips[0]); notifyDone(d.clips.length); for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i); await loadLibrary() }
+        else if (d.status === "error") { eventSource.close(); setCapsuleModeActive(false); alert(`Erreur capsules: ${d.error || "inconnue"}`); setGenerating(false); setEstimatedRemaining(null) }
       }
       eventSource.onerror = () => { eventSource.close(); setGenerating(false); setEstimatedRemaining(null) }
     } catch { alert("Erreur"); setGenerating(false) }
@@ -563,7 +566,7 @@ export default function Home() {
     setHelperLoading(false)
   }
 
-  const applyCapsules = () => { if (!capsulesType) return; if (videos.length === 0) { alert("Importe une vidéo d'abord"); return }; setShowCapsulesModal(false); setCapsulesType(null); setTimeout(() => handleGenerateCapsules(), 150) }
+  const applyCapsules = () => { if (!capsulesType) return; if (videos.length === 0) { alert("Importe une vidéo d'abord"); return }; setCapsuleModeActive(true); setShowCapsulesModal(false); setCapsulesType(null) }
   const fetchTracks = async (query: string) => { setLoadingTracks(true); try { const res = await fetch(`/api/music?q=${encodeURIComponent(query)}`); const data = await res.json(); setTracks(data.data || []) } catch { setTracks([]) }; setLoadingTracks(false) }
   const handleSearch = (val: string) => { setSearchQuery(val); if (searchTimeout.current) clearTimeout(searchTimeout.current); searchTimeout.current = setTimeout(() => { if (val.trim()) fetchTracks(val) }, 500) }
   const togglePlay = (track: Track) => { if (playingId === track.id) { audioRef.current?.pause(); audioRef.current = null; setPlayingId(null) } else { if (audioRef.current) { audioRef.current.pause(); audioRef.current = null }; const a = new Audio(track.preview); audioRef.current = a; a.play(); a.onended = () => { audioRef.current = null; setPlayingId(null) }; setPlayingId(track.id) } }
@@ -876,9 +879,15 @@ export default function Home() {
             )}
             <textarea value={promptText} onChange={e => setPromptText(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"11px 13px", fontSize:13, color:t.text, outline:"none", resize:"none", height:52, lineHeight:"1.5", fontFamily:"sans-serif", boxSizing:"border-box" }}
               placeholder={autoMode ? "Optionnel — l'IA a déjà analysé ta vidéo" : "Ex : 1 clip 20s edit foot, cuts sur le beat..."}/>
+            {capsuleModeActive && (
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.2)", borderRadius:8, padding:"7px 11px" }}>
+                <span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>Mode capsules · {capsulesCount} clips</span>
+                <button onClick={() => setCapsuleModeActive(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:13, cursor:"pointer", padding:"0 2px", lineHeight:1 }}>✕</button>
+              </div>
+            )}
             <div style={{ display:"flex", gap:7 }}>
-              <button onClick={handleGenerate} disabled={generating || videos.length === 0} style={{ flex:1, background:generating ? "rgba(232,245,66,0.35)" : videos.length === 0 ? "rgba(232,245,66,0.15)" : t.accent, color:"#0a0a0a", fontWeight:700, fontSize:14, borderRadius:10, padding:"13px", border:"none", cursor:generating || videos.length === 0 ? "not-allowed" : "pointer", boxShadow:videos.length > 0 && !generating ? "0 0 24px rgba(232,245,66,0.2)" : "none" }}>
-                {generating ? T.generating : `✦ ${T.generate}`}
+              <button onClick={capsuleModeActive ? handleGenerateCapsules : handleGenerate} disabled={generating || videos.length === 0} style={{ flex:1, background:generating ? "rgba(232,245,66,0.35)" : videos.length === 0 ? "rgba(232,245,66,0.15)" : t.accent, color:"#0a0a0a", fontWeight:700, fontSize:14, borderRadius:10, padding:"13px", border:"none", cursor:generating || videos.length === 0 ? "not-allowed" : "pointer", boxShadow:videos.length > 0 && !generating ? "0 0 24px rgba(232,245,66,0.2)" : "none" }}>
+                {generating ? T.generating : capsuleModeActive ? `✦ Générer capsules (${capsulesCount})` : `✦ ${T.generate}`}
               </button>
               <button onClick={addToQueue} disabled={videos.length === 0} style={{ background:"none", border:t.borderMed, borderRadius:10, padding:"13px 14px", fontSize:12, color:t.textSub, cursor:"pointer", opacity:videos.length === 0 ? 0.35 : 1, whiteSpace:"nowrap" }}>{T.addToQueue}</button>
             </div>
@@ -909,6 +918,9 @@ export default function Home() {
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(160px, 1fr))", gap:10 }}>
                   {generatedClips.map((clip, i) => <ClipCard key={i} clip={clip} index={i}/>)}
                 </div>
+                <button onClick={() => { setVideos([]); setPromptText(""); setGeneratedClips([]); setHasGenerated(false); setLastGeneratedClip(null); window.scrollTo({ top:0, behavior:"smooth" }) }} style={{ marginTop:4, padding:"11px", borderRadius:10, border:t.border, background:"none", color:t.textSub, fontSize:13, cursor:"pointer" }}>
+                  Générer d'autres clips
+                </button>
               </div>
             </>
           )}
@@ -1045,7 +1057,7 @@ export default function Home() {
         <div onClick={() => setShowStats(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
           <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:300 }}>
             <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>📊 {T.stats}</span><button onClick={() => setShowStats(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
-            {[[T.totalClips, generatedClips.length + clips.length],[T.clipsInLib, clips.length],["Générations", generationHistory.length],[T.queue, queue.length]].map(([label, val]) => (
+            {[[T.totalClips, generatedClips.length],[T.clipsInLib, clips.length],["Générations", generationHistory.length],[T.queue, queue.length]].map(([label, val]) => (
               <div key={String(label)} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 0", borderBottom:t.border }}>
                 <span style={{ fontSize:13, color:t.textSub }}>{label}</span>
                 <span style={{ fontSize:20, fontWeight:700, color:t.accent }}>{val}</span>
@@ -1339,10 +1351,10 @@ export default function Home() {
               playsInline
               style={{ width:"100%", maxHeight:"72vh", borderRadius:12, background:"#000", objectFit:"contain" }}
             />
-            <div style={{ display:"flex", gap:8, width:"100%" }}>
-              <button onClick={() => downloadClip(videoPlayerClip)} style={{ flex:1, padding:"11px", borderRadius:9, border:"1px solid rgba(232,245,66,0.3)", background:"rgba(232,245,66,0.07)", color:"#e8f542", fontSize:13, fontWeight:600, cursor:"pointer" }}>↓ {T.download}</button>
-              <button onClick={() => shareNative(videoPlayerClip)} style={{ flex:1, padding:"11px", borderRadius:9, border:"1px solid rgba(255,255,255,0.12)", background:"rgba(255,255,255,0.05)", color:"#ccc", fontSize:13, cursor:"pointer" }}>↗ {T.shareNative}</button>
-              <button onClick={() => { exportToDrive(videoPlayerClip) }} disabled={exportingDrive === (videoPlayerClip.id || videoPlayerClip.name)} style={{ flex:1, padding:"11px", borderRadius:9, border:driveConnected ? "1px solid rgba(66,133,244,0.35)" : "1px solid rgba(255,255,255,0.1)", background:driveConnected ? "rgba(66,133,244,0.08)" : "rgba(255,255,255,0.04)", color:driveConnected ? "#4285f4" : "#666", fontSize:12, cursor:"pointer" }}>▲ Drive</button>
+            <div style={{ display:"flex", gap:10, width:"100%" }}>
+              <button onClick={() => downloadClip(videoPlayerClip)} style={{ flex:1, padding:"13px 10px", borderRadius:10, border:"1px solid rgba(232,245,66,0.3)", background:"rgba(232,245,66,0.07)", color:"#e8f542", fontSize:13, fontWeight:600, cursor:"pointer" }}>{T.download}</button>
+              <button onClick={() => shareNative(videoPlayerClip)} style={{ flex:1, padding:"13px 10px", borderRadius:10, border:"1px solid rgba(255,255,255,0.12)", background:"rgba(255,255,255,0.05)", color:"#ccc", fontSize:13, cursor:"pointer" }}>{T.shareNative}</button>
+              <button onClick={() => { exportToDrive(videoPlayerClip) }} disabled={exportingDrive === (videoPlayerClip.id || videoPlayerClip.name)} style={{ flex:1, padding:"13px 10px", borderRadius:10, border:driveConnected ? "1px solid rgba(66,133,244,0.35)" : "1px solid rgba(255,255,255,0.1)", background:driveConnected ? "rgba(66,133,244,0.08)" : "rgba(255,255,255,0.04)", color:driveConnected ? "#4285f4" : "#888", fontSize:13, cursor:"pointer" }}>Drive</button>
             </div>
           </div>
         </div>
