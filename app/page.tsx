@@ -107,6 +107,8 @@ export default function Home() {
   const [showPresets, setShowPresets] = useState(false)
   const [showSavePreset, setShowSavePreset] = useState(false)
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const [showNavMenu, setShowNavMenu] = useState(false)
   const [capsulesType, setCapsulesType] = useState<"courte"|"longue"|null>(null)
   const [capsulesCount, setCapsulesCount] = useState(4)
   const [capsuleModeActive, setCapsuleModeActive] = useState(false)
@@ -237,6 +239,13 @@ export default function Home() {
   useEffect(() => { if (user) loadLibrary() }, [user])
 
   useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
+  useEffect(() => {
     if (generating) {
       setGeneratingMsgIndex(0)
       generatingMsgRef.current = setInterval(() => setGeneratingMsgIndex(prev => (prev + 1) % generatingMsgs.length), 4000)
@@ -307,10 +316,10 @@ export default function Home() {
     if (!email) { console.warn(`[save ${index}] NO SESSION — skipping`); return }
     console.log(`[save ${index}] clip complet:`, JSON.stringify(clip))
     const storage_url = clip.storageUrl || clip.storage_url || null
-    if (!storage_url) { console.warn(`[save ${index}] no storage_url — skipping`); return }
-    const payload = { name: clip.name || `Edit #${index+1}`, storage_url, owner_email: email, folder_id: null, thumbnail: clip.thumbnail || null }
     console.log("saving clip:", clip.name, "storageUrl:", clip.storageUrl, "storage_url:", clip.storage_url, "user:", user?.email)
-    console.log(`[save ${index}] INSERT — owner_email: "${email}", storage_url: "${storage_url.slice(0,70)}"`)
+    const payload: any = { name: clip.name || `Edit #${index+1}`, storage_url, owner_email: email, folder_id: null, thumbnail: clip.thumbnail || null }
+    if (!storage_url && clip.base64) payload.base64 = clip.base64
+    console.log(`[save ${index}] INSERT — owner_email: "${email}", storage_url: ${storage_url ? `"${storage_url.slice(0,60)}"` : "null"}, has_base64: ${!!payload.base64}`)
     const { error } = await supabase.from("clips").insert(payload)
     if (error) console.error(`[save ${index}] FAILED — ${error.message} (${error.code}) hint: ${error.hint}`)
     else console.log(`[save ${index}] OK`)
@@ -698,11 +707,24 @@ export default function Home() {
           </div>
           {serverAwake === true && <div style={{ width:5, height:5, borderRadius:"50%", background:"#4ade80" }}/>}
         </div>
-        <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-          <button onClick={() => setCurrentPage("home")} style={{ fontSize:13, color:currentPage === "home" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "home" ? 600 : 400 }}>{T.home}</button>
-          <button onClick={() => { setCurrentPage("library"); loadLibrary() }} style={{ fontSize:13, color:currentPage === "library" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "library" ? 600 : 400 }}>{T.library}</button>
-          <button onClick={() => setCurrentPage("history")} style={{ fontSize:13, color:currentPage === "history" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "history" ? 600 : 400 }}>Historique</button>
-        </div>
+        {isMobile ? (
+          <div style={{ position:"relative" }} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowNavMenu(!showNavMenu)} style={{ fontSize:18, color:t.textSub, background:"none", border:"none", cursor:"pointer", lineHeight:1, padding:"4px 6px" }}>☰</button>
+            {showNavMenu && (
+              <div style={{ position:"absolute", left:"50%", transform:"translateX(-50%)", top:"calc(100% + 6px)", background:t.bgModal, border:t.border, borderRadius:10, padding:"4px 0", minWidth:160, boxShadow:"0 8px 24px rgba(0,0,0,0.6)", zIndex:300 }}>
+                {([["home", T.home], ["library", T.library], ["history", "Historique"]] as [string,string][]).map(([page, label]) => (
+                  <button key={page} onClick={() => { setCurrentPage(page as any); if (page === "library") loadLibrary(); setShowNavMenu(false) }} style={{ width:"100%", padding:"12px 18px", background:currentPage === page ? "rgba(232,245,66,0.07)" : "none", border:"none", borderBottom:page !== "history" ? t.border : "none", color:currentPage === page ? t.accent : t.text, cursor:"pointer", fontSize:14, textAlign:"left", fontWeight:currentPage === page ? 600 : 400 }}>{label}</button>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div style={{ display:"flex", alignItems:"center", gap:14 }}>
+            <button onClick={() => setCurrentPage("home")} style={{ fontSize:13, color:currentPage === "home" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "home" ? 600 : 400 }}>{T.home}</button>
+            <button onClick={() => { setCurrentPage("library"); loadLibrary() }} style={{ fontSize:13, color:currentPage === "library" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "library" ? 600 : 400 }}>{T.library}</button>
+            <button onClick={() => setCurrentPage("history")} style={{ fontSize:13, color:currentPage === "history" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "history" ? 600 : 400 }}>Historique</button>
+          </div>
+        )}
         <div style={{ display:"flex", alignItems:"center", gap:6 }}>
           <button onClick={() => driveConnected ? null : connectDrive()} style={{ fontSize:11, color:driveConnected ? "#4ade80" : t.textMuted, border:driveConnected ? "1px solid rgba(74,222,128,0.3)" : t.border, borderRadius:7, padding:"6px 10px", background:driveConnected ? "rgba(74,222,128,0.06)" : t.bgInput, cursor:driveConnected ? "default" : "pointer" }}>{driveConnected ? "✓ Drive" : "Drive"}</button>
           <button onClick={() => setShowStats(true)} style={{ fontSize:13, color:t.textSub, border:t.border, borderRadius:7, padding:"6px 10px", background:t.bgInput, cursor:"pointer" }}>📊</button>
