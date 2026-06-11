@@ -465,7 +465,7 @@ export default function Home() {
         if (d.progress) { setProgress(d.progress); const elapsed = (Date.now() - startTime) / 1000; if (d.progress > 10) { const remaining = Math.max(0, Math.round(elapsed / (d.progress/100) - elapsed)); setEstimatedRemaining(remaining > 5 ? `~${remaining}s` : null) } }
         if (d.message) setGeneratingServerMsg(d.message)
         if (d.status === "done") { eventSource.close(); setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100); setEstimatedRemaining(null); if (d.clips.length > 0) setLastGeneratedClip(d.clips[0]); notifyDone(d.clips.length); for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i) }
-        else if (d.status === "error") { eventSource.close(); alert("Erreur capsules"); setGenerating(false); setEstimatedRemaining(null) }
+        else if (d.status === "error") { eventSource.close(); alert(`Erreur capsules: ${d.error || "inconnue"}`); setGenerating(false); setEstimatedRemaining(null) }
       }
       eventSource.onerror = () => { eventSource.close(); setGenerating(false); setEstimatedRemaining(null) }
     } catch { alert("Erreur"); setGenerating(false) }
@@ -768,7 +768,18 @@ export default function Home() {
           <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
             <p style={{ fontSize:11, color:t.textMuted, textTransform:"uppercase", letterSpacing:"0.06em" }}>{T.outputFormat}</p>
             <div style={{ display:"flex", gap:6 }}>
-              {formats.map(f => <button key={f} onClick={() => setSelectedFormat(f)} style={{ flex:1, padding:"8px 4px", borderRadius:8, border:selectedFormat === f ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:selectedFormat === f ? "rgba(232,245,66,0.08)" : t.bgInput, color:selectedFormat === f ? t.accent : t.textSub, cursor:"pointer", fontSize:12, fontWeight:selectedFormat === f ? 600 : 400 }}>{f}</button>)}
+              {formats.map(f => {
+                const fr: Record<string,[number,number,number,number]> = {"9:16":[7,2,6,16],"16:9":[2,7,16,6],"1:1":[5,5,10,10],"4:5":[6,4,8,12]}
+                const [rx,ry,rw,rh] = fr[f]
+                return (
+                  <button key={f} onClick={() => setSelectedFormat(f)} style={{ flex:1, padding:"8px 4px", borderRadius:8, border:selectedFormat === f ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:selectedFormat === f ? "rgba(232,245,66,0.08)" : t.bgInput, color:selectedFormat === f ? t.accent : t.textSub, cursor:"pointer", fontSize:11, fontWeight:selectedFormat === f ? 600 : 400, display:"flex", flexDirection:"column", alignItems:"center", gap:5 }}>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <rect x={rx} y={ry} width={rw} height={rh} stroke="currentColor" strokeWidth="1.5" rx="1.5"/>
+                    </svg>
+                    {f}
+                  </button>
+                )
+              })}
             </div>
           </div>
 
