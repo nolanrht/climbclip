@@ -318,21 +318,20 @@ export default function Home() {
     setFolders(fd || []); setClips(cd || [])
   }
 
-  const saveClipToLibrary = async (clip: any, _index: number) => {
-    const { data: { session } } = await supabase.auth.getSession()
-    const email = session?.user?.email
-    const insertData = {
-      name: clip.name || "clip",
-      base64: null,
-      storage_url: clip.storageUrl || clip.storage_url || null,
-      owner_email: email || null,
-      folder_id: null,
-      thumbnail: clip.thumbnail || null
-    }
-    console.log("INSERTING:", JSON.stringify(insertData))
-    const { data, error } = await supabase.from("clips").insert(insertData).select()
-    console.log("RESULT data:", data, "error:", error?.message, error?.code, error?.details)
-    if (!error) loadLibrary()
+  const saveClipToLibrary = async (clip: any) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user?.email) { console.error("NO SESSION EMAIL"); return }
+      const { data, error } = await supabase.from("clips").insert({
+        name: clip.name || "clip",
+        base64: null,
+        storage_url: clip.storageUrl || clip.storage_url || null,
+        owner_email: session.user.email,
+        folder_id: null,
+      }).select()
+      console.log("INSERT:", data, error)
+      if (!error) loadLibrary()
+    } catch(e) { console.error("save error:", e) }
   }
 
   const uploadFile = async (file: File): Promise<string|null> => {
@@ -472,7 +471,7 @@ export default function Home() {
           if (d.clips.length > 0) setLastGeneratedClip(d.clips[0])
           notifyDone(d.clips.length)
           console.log("[handleGenerate] saving clips to library...")
-          for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i)
+          for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i])
           console.log("[handleGenerate] all saves done — reloading library")
           await loadLibrary()
           console.log("[handleGenerate] library reloaded")
@@ -509,7 +508,7 @@ export default function Home() {
           setGeneratedClips(d.clips); setHasGenerated(true); setGenerating(false); setProgress(100); setEstimatedRemaining(null)
           if (d.clips.length > 0) setLastGeneratedClip(d.clips[0]); notifyDone(d.clips.length)
           console.log("[handleGenerateCapsules] saving to library...")
-          for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i], i)
+          for (let i = 0; i < d.clips.length; i++) await saveClipToLibrary(d.clips[i])
           console.log("[handleGenerateCapsules] all saves done — reloading library")
           await loadLibrary()
           console.log("[handleGenerateCapsules] library reloaded")
