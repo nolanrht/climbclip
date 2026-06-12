@@ -670,6 +670,22 @@ export default function Home() {
     finally { setUpscaling(false) }
   }
 
+  const makeSliderHandler = (setSlider: (v: number) => void) =>
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      e.preventDefault()
+      const container = e.currentTarget
+      const update = (clientX: number) => {
+        const rect = container.getBoundingClientRect()
+        const pct = Math.max(1, Math.min(99, ((clientX - rect.left) / rect.width) * 100))
+        setSlider(pct)
+      }
+      update(e.clientX)
+      const onMove = (ev: PointerEvent) => update(ev.clientX)
+      const onUp = () => { window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerup", onUp) }
+      window.addEventListener("pointermove", onMove)
+      window.addEventListener("pointerup", onUp)
+    }
+
   const applyCapsules = () => { if (!capsulesType) return; if (videos.length === 0) { alert("Importe une vidéo d'abord"); return }; setCapsuleModeActive(true); setShowCapsulesModal(false); setCapsulesType(null) }
   const fetchTracks = async (query: string) => { setLoadingTracks(true); try { const res = await fetch(`/api/music?q=${encodeURIComponent(query)}`); const data = await res.json(); setTracks(data.data || []) } catch { setTracks([]) }; setLoadingTracks(false) }
   const handleSearch = (val: string) => { setSearchQuery(val); if (searchTimeout.current) clearTimeout(searchTimeout.current); searchTimeout.current = setTimeout(() => { if (val.trim()) fetchTracks(val) }, 500) }
@@ -1378,34 +1394,42 @@ export default function Home() {
                   </span>
                 </div>
 
-                {upscaleMediaType === "image" && upscalePreviewUrl && (
+                {upscaleMediaType === "image" && upscalePreviewUrl && upscaleResultUrl && (
                   <>
-                    <p style={{ fontSize:11, color:t.textMuted }}>Déplace le curseur ← → pour comparer</p>
-                    <div style={{ position:"relative", borderRadius:12, overflow:"hidden", userSelect:"none", lineHeight:0 }}>
-                      <img src={upscaleResultUrl} style={{ width:"100%", display:"block" }} alt="après" />
-                      <div style={{ position:"absolute", top:0, left:0, bottom:0, width:`${upscaleSlider}%`, overflow:"hidden" }}>
-                        <img src={upscalePreviewUrl} style={{ width:`${10000/upscaleSlider}%`, maxWidth:"none", display:"block" }} alt="avant" />
+                    <p style={{ fontSize:11, color:t.textMuted }}>Glisse ← → pour comparer avant / après</p>
+                    <div
+                      style={{ position:"relative", borderRadius:12, overflow:"hidden", userSelect:"none", lineHeight:0, cursor:"col-resize", touchAction:"none" }}
+                      onPointerDown={makeSliderHandler(setUpscaleSlider)}>
+                      <img src={upscaleResultUrl} style={{ width:"100%", display:"block" }} alt="après" draggable={false} />
+                      <div style={{ position:"absolute", top:0, left:0, bottom:0, width:`${upscaleSlider}%`, overflow:"hidden", pointerEvents:"none" }}>
+                        <img src={upscalePreviewUrl} style={{ width:`${10000/upscaleSlider}%`, maxWidth:"none", display:"block" }} alt="avant" draggable={false} />
                       </div>
-                      <div style={{ position:"absolute", top:0, bottom:0, left:`${upscaleSlider}%`, width:2, background:"rgba(255,255,255,0.9)", transform:"translateX(-50%)", pointerEvents:"none" }} />
-                      <div style={{ position:"absolute", top:"50%", left:`${upscaleSlider}%`, transform:"translate(-50%,-50%)", width:28, height:28, borderRadius:"50%", background:"white", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 2px 8px rgba(0,0,0,0.6)", fontSize:11, pointerEvents:"none" }}>↔</div>
-                      <input type="range" min={1} max={99} value={upscaleSlider} onChange={e => setUpscaleSlider(Number(e.target.value))} style={{ position:"absolute", inset:0, width:"100%", height:"100%", opacity:0, cursor:"col-resize", margin:0 }} />
-                      <div style={{ position:"absolute", top:8, left:8, padding:"2px 8px", background:"rgba(0,0,0,0.7)", borderRadius:5, fontSize:10, color:"rgba(255,255,255,0.8)", pointerEvents:"none" }}>Avant</div>
-                      <div style={{ position:"absolute", top:8, right:8, padding:"2px 8px", background:"rgba(0,0,0,0.7)", borderRadius:5, fontSize:10, color:t.accent, pointerEvents:"none" }}>Après x{upscaleScale}</div>
+                      <div style={{ position:"absolute", top:0, bottom:0, left:`${upscaleSlider}%`, width:2, background:"rgba(255,255,255,0.85)", transform:"translateX(-50%)", pointerEvents:"none" }} />
+                      <div style={{ position:"absolute", top:"50%", left:`${upscaleSlider}%`, transform:"translate(-50%,-50%)", width:32, height:32, borderRadius:"50%", background:"#fff", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 2px 10px rgba(0,0,0,0.55)", fontSize:12, pointerEvents:"none", fontWeight:600, color:"#333" }}>↔</div>
+                      <div style={{ position:"absolute", top:8, left:10, padding:"2px 8px", background:"rgba(0,0,0,0.65)", borderRadius:5, fontSize:10, color:"rgba(255,255,255,0.85)", pointerEvents:"none" }}>Avant</div>
+                      <div style={{ position:"absolute", top:8, right:10, padding:"2px 8px", background:"rgba(0,0,0,0.65)", borderRadius:5, fontSize:10, color:t.accent, pointerEvents:"none", fontWeight:600 }}>×{upscaleScale}</div>
                     </div>
                   </>
                 )}
 
-                {upscaleMediaType === "video" && (
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-                    <div>
-                      <p style={{ fontSize:11, color:t.textMuted, marginBottom:6 }}>Avant</p>
-                      <video src={upscalePreviewUrl||""} controls playsInline style={{ width:"100%", borderRadius:10, background:"#000", display:"block" }} />
+                {upscaleMediaType === "video" && upscalePreviewUrl && upscaleResultUrl && (
+                  <>
+                    <p style={{ fontSize:11, color:t.textMuted }}>Glisse ← → pour redimensionner avant / après</p>
+                    <div
+                      style={{ position:"relative", display:"flex", borderRadius:12, overflow:"hidden", userSelect:"none", background:"#000", cursor:"col-resize", touchAction:"none" }}
+                      onPointerDown={makeSliderHandler(setUpscaleSlider)}>
+                      <div style={{ width:`${upscaleSlider}%`, flexShrink:0, overflow:"hidden", pointerEvents:"none" }}>
+                        <video src={upscalePreviewUrl} autoPlay loop muted playsInline style={{ width:`${10000/upscaleSlider}%`, maxWidth:"none", display:"block" }} />
+                      </div>
+                      <div style={{ flex:1, overflow:"hidden", pointerEvents:"none" }}>
+                        <video src={upscaleResultUrl} autoPlay loop muted playsInline style={{ width:`${10000/(100-upscaleSlider)}%`, maxWidth:"none", display:"block", marginLeft:`${-(upscaleSlider/(100-upscaleSlider))*100}%` }} />
+                      </div>
+                      <div style={{ position:"absolute", top:0, bottom:0, left:`${upscaleSlider}%`, width:2, background:"rgba(255,255,255,0.85)", transform:"translateX(-50%)", pointerEvents:"none", zIndex:2 }} />
+                      <div style={{ position:"absolute", top:"50%", left:`${upscaleSlider}%`, transform:"translate(-50%,-50%)", width:32, height:32, borderRadius:"50%", background:"#fff", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 2px 10px rgba(0,0,0,0.55)", fontSize:12, pointerEvents:"none", fontWeight:600, color:"#333", zIndex:2 }}>↔</div>
+                      <div style={{ position:"absolute", top:8, left:10, padding:"2px 8px", background:"rgba(0,0,0,0.65)", borderRadius:5, fontSize:10, color:"rgba(255,255,255,0.85)", pointerEvents:"none", zIndex:2 }}>Avant</div>
+                      <div style={{ position:"absolute", top:8, right:10, padding:"2px 8px", background:"rgba(0,0,0,0.65)", borderRadius:5, fontSize:10, color:t.accent, pointerEvents:"none", fontWeight:600, zIndex:2 }}>{upscaleScale===2?"1080p":"4K"}</div>
                     </div>
-                    <div>
-                      <p style={{ fontSize:11, color:t.accent, marginBottom:6 }}>Après {upscaleScale===2?"1080p":"4K"}</p>
-                      <video src={upscaleResultUrl} controls playsInline style={{ width:"100%", borderRadius:10, background:"#000", display:"block" }} />
-                    </div>
-                  </div>
+                  </>
                 )}
 
                 <button onClick={() => { const a = document.createElement("a"); a.href = upscaleResultUrl!; a.download = upscaleResultName||"upscaled"; document.body.appendChild(a); a.click(); document.body.removeChild(a) }}
