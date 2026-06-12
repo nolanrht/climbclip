@@ -94,7 +94,7 @@ export default function Home() {
   const [dark, setDark] = useState(true)
   const [lang, setLang] = useState<Lang>("FR")
   const [user, setUser] = useState<any>(null)
-  const [currentPage, setCurrentPage] = useState<"home"|"library"|"history">("home")
+  const [currentPage, setCurrentPage] = useState<"home"|"library"|"history"|"upscaling">("home")
   const [activeOptions, setActiveOptions] = useState<string[]>(["Beat sync"])
   const [showSettings, setShowSettings] = useState(false)
   const [showReport, setShowReport] = useState(false)
@@ -109,6 +109,14 @@ export default function Home() {
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [showNavMenu, setShowNavMenu] = useState(false)
+  const [upscaleFile, setUpscaleFile] = useState<File|null>(null)
+  const [upscalePreviewUrl, setUpscalePreviewUrl] = useState<string|null>(null)
+  const [upscaleResultUrl, setUpscaleResultUrl] = useState<string|null>(null)
+  const [upscaling, setUpscaling] = useState(false)
+  const [upscaleScale, setUpscaleScale] = useState<2|4>(4)
+  const [upscaleSlider, setUpscaleSlider] = useState(50)
+  const [upscaleMediaType, setUpscaleMediaType] = useState<"image"|"video"|null>(null)
+  const [upscaleError, setUpscaleError] = useState<string|null>(null)
   const [capsulesType, setCapsulesType] = useState<"courte"|"longue"|null>(null)
   const [capsulesCount, setCapsulesCount] = useState(4)
   const [capsuleModeActive, setCapsuleModeActive] = useState(false)
@@ -613,6 +621,22 @@ export default function Home() {
     setHelperLoading(false)
   }
 
+  const handleUpscale = async () => {
+    if (!upscaleFile) return
+    setUpscaling(true); setUpscaleResultUrl(null); setUpscaleError(null)
+    try {
+      const fd = new FormData()
+      fd.append("file", upscaleFile)
+      fd.append("scale", String(upscaleScale))
+      const res = await fetch(`${SERVER_URL}/upscale`, { method:"POST", body:fd })
+      const data = await res.json()
+      if (data.error) { setUpscaleError(data.error); return }
+      setUpscaleResultUrl(data.url)
+      setUpscaleSlider(50)
+    } catch (e: any) { setUpscaleError(e.message) }
+    finally { setUpscaling(false) }
+  }
+
   const applyCapsules = () => { if (!capsulesType) return; if (videos.length === 0) { alert("Importe une vidéo d'abord"); return }; setCapsuleModeActive(true); setShowCapsulesModal(false); setCapsulesType(null) }
   const fetchTracks = async (query: string) => { setLoadingTracks(true); try { const res = await fetch(`/api/music?q=${encodeURIComponent(query)}`); const data = await res.json(); setTracks(data.data || []) } catch { setTracks([]) }; setLoadingTracks(false) }
   const handleSearch = (val: string) => { setSearchQuery(val); if (searchTimeout.current) clearTimeout(searchTimeout.current); searchTimeout.current = setTimeout(() => { if (val.trim()) fetchTracks(val) }, 500) }
@@ -721,8 +745,8 @@ export default function Home() {
             <button onClick={() => setShowNavMenu(!showNavMenu)} style={{ fontSize:18, color:t.textSub, background:"none", border:"none", cursor:"pointer", lineHeight:1, padding:"4px 6px" }}>☰</button>
             {showNavMenu && (
               <div style={{ position:"absolute", left:"50%", transform:"translateX(-50%)", top:"calc(100% + 6px)", background:t.bgModal, border:t.border, borderRadius:10, padding:"4px 0", minWidth:160, boxShadow:"0 8px 24px rgba(0,0,0,0.6)", zIndex:300 }}>
-                {([["home", T.home], ["library", T.library], ["history", "Historique"]] as [string,string][]).map(([page, label]) => (
-                  <button key={page} onClick={() => { setCurrentPage(page as any); if (page === "library") loadLibrary(); setShowNavMenu(false) }} style={{ width:"100%", padding:"12px 18px", background:currentPage === page ? "rgba(232,245,66,0.07)" : "none", border:"none", borderBottom:page !== "history" ? t.border : "none", color:currentPage === page ? t.accent : t.text, cursor:"pointer", fontSize:14, textAlign:"left", fontWeight:currentPage === page ? 600 : 400 }}>{label}</button>
+                {([["home", T.home], ["library", T.library], ["history", "Historique"], ["upscaling", "Upscaling"]] as [string,string][]).map(([page, label]) => (
+                  <button key={page} onClick={() => { setCurrentPage(page as any); if (page === "library") loadLibrary(); setShowNavMenu(false) }} style={{ width:"100%", padding:"12px 18px", background:currentPage === page ? "rgba(232,245,66,0.07)" : "none", border:"none", borderBottom:page !== "upscaling" ? t.border : "none", color:currentPage === page ? t.accent : t.text, cursor:"pointer", fontSize:14, textAlign:"left", fontWeight:currentPage === page ? 600 : 400 }}>{label}</button>
                 ))}
               </div>
             )}
@@ -732,6 +756,7 @@ export default function Home() {
             <button onClick={() => setCurrentPage("home")} style={{ fontSize:13, color:currentPage === "home" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "home" ? 600 : 400 }}>{T.home}</button>
             <button onClick={() => { setCurrentPage("library"); loadLibrary() }} style={{ fontSize:13, color:currentPage === "library" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "library" ? 600 : 400 }}>{T.library}</button>
             <button onClick={() => setCurrentPage("history")} style={{ fontSize:13, color:currentPage === "history" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "history" ? 600 : 400 }}>Historique</button>
+            <button onClick={() => setCurrentPage("upscaling")} style={{ fontSize:13, color:currentPage === "upscaling" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "upscaling" ? 600 : 400 }}>Upscaling</button>
           </div>
         )}
         <div style={{ display:"flex", alignItems:"center", gap:6 }}>
@@ -1092,6 +1117,98 @@ export default function Home() {
               <button onClick={() => { if (entry.prompt) setPromptText(entry.prompt); setCurrentPage("home") }} style={{ padding:"7px 12px", borderRadius:8, fontSize:11, border:"1px solid rgba(232,245,66,0.22)", background:"rgba(232,245,66,0.05)", color:t.accent, cursor:"pointer", alignSelf:"flex-start" }}>↺ Réutiliser ces settings</button>
             </div>
           ))}
+        </div>
+      )}
+
+      {currentPage === "upscaling" && (
+        <div style={{ width:"100%", maxWidth:600, display:"flex", flexDirection:"column", gap:18, padding:"32px 16px 120px", position:"relative", zIndex:1 }}>
+          <p style={{ fontSize:16, fontWeight:600, color:t.text }}>Upscaling IA</p>
+          <p style={{ fontSize:12, color:t.textMuted }}>Améliore la résolution de tes photos et vidéos avec Real-ESRGAN</p>
+
+          {!upscaleFile ? (
+            <label style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:12, padding:"48px 20px", border:`2px dashed rgba(232,245,66,0.25)`, borderRadius:16, background:t.bgCard, cursor:"pointer" }}>
+              <input type="file" accept=".jpg,.jpeg,.png,.webp,.mp4,.mov" style={{ display:"none" }} onChange={e => {
+                const f = e.target.files?.[0]
+                if (!f) return
+                setUpscaleFile(f); setUpscaleResultUrl(null); setUpscaleError(null); setUpscaleSlider(50)
+                setUpscaleMediaType(f.type.startsWith("image/") ? "image" : "video")
+                const reader = new FileReader()
+                reader.onload = ev => setUpscalePreviewUrl(ev.target?.result as string)
+                reader.readAsDataURL(f)
+              }} />
+              <span style={{ fontSize:36, opacity:0.6 }}>🔍</span>
+              <p style={{ fontSize:14, color:t.text, fontWeight:500 }}>Upload une photo ou vidéo</p>
+              <p style={{ fontSize:12, color:t.textMuted }}>JPG, PNG, WebP, MP4, MOV • max 100MB</p>
+            </label>
+          ) : (
+            <div style={{ background:t.bgCard, border:t.border, borderRadius:12, padding:"14px 16px", display:"flex", alignItems:"center", gap:12 }}>
+              <span style={{ fontSize:22 }}>{upscaleMediaType === "image" ? "🖼" : "🎬"}</span>
+              <div style={{ flex:1, minWidth:0 }}>
+                <p style={{ fontSize:13, color:t.text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{upscaleFile.name}</p>
+                <p style={{ fontSize:11, color:t.textMuted }}>{(upscaleFile.size/1024/1024).toFixed(1)} MB</p>
+              </div>
+              <button onClick={() => { setUpscaleFile(null); setUpscalePreviewUrl(null); setUpscaleResultUrl(null); setUpscaleError(null) }} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15 }}>✕</button>
+            </div>
+          )}
+
+          {upscaleFile && (
+            <div style={{ display:"flex", gap:10 }}>
+              {([2, 4] as const).map(s => (
+                <button key={s} onClick={() => setUpscaleScale(s)} style={{ flex:1, padding:"10px", borderRadius:10, border:upscaleScale===s ? "1px solid rgba(232,245,66,0.55)" : t.border, background:upscaleScale===s ? "rgba(232,245,66,0.08)" : t.bgCard, color:upscaleScale===s ? t.accent : t.textSub, fontSize:14, fontWeight:upscaleScale===s ? 600 : 400, cursor:"pointer" }}>x{s}</button>
+              ))}
+            </div>
+          )}
+
+          {upscaleFile && !upscaling && !upscaleResultUrl && (
+            <button onClick={handleUpscale} style={{ width:"100%", padding:"15px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:14, fontWeight:700, cursor:"pointer" }}>Améliorer la qualité</button>
+          )}
+
+          {upscaling && (
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, padding:"28px" }}>
+              <div style={{ width:16, height:16, border:`2px solid ${t.accent}`, borderTopColor:"transparent", borderRadius:"50%", animation:"spin 0.8s linear infinite" }} />
+              <p style={{ fontSize:13, color:t.textSub }}>Upscaling en cours... (peut prendre 30-60s)</p>
+            </div>
+          )}
+
+          {upscaleError && (
+            <p style={{ fontSize:12, color:"#ff6b6b", textAlign:"center", padding:"8px 0" }}>{upscaleError}</p>
+          )}
+
+          {upscaleResultUrl && upscalePreviewUrl && upscaleMediaType === "image" && (
+            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+              <p style={{ fontSize:12, color:t.textMuted }}>Glisse le curseur pour comparer avant / après</p>
+              <div style={{ position:"relative", borderRadius:12, overflow:"hidden", userSelect:"none", lineHeight:0 }}>
+                <img src={upscaleResultUrl} style={{ width:"100%", display:"block" }} alt="après" />
+                <div style={{ position:"absolute", top:0, left:0, bottom:0, width:`${upscaleSlider}%`, overflow:"hidden" }}>
+                  <img src={upscalePreviewUrl} style={{ width:`${10000/upscaleSlider}%`, maxWidth:"none", display:"block" }} alt="avant" />
+                </div>
+                <div style={{ position:"absolute", top:0, bottom:0, left:`${upscaleSlider}%`, width:2, background:"white", transform:"translateX(-50%)", pointerEvents:"none" }} />
+                <div style={{ position:"absolute", top:"50%", left:`${upscaleSlider}%`, transform:"translate(-50%,-50%)", width:30, height:30, borderRadius:"50%", background:"white", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 2px 8px rgba(0,0,0,0.5)", fontSize:12, pointerEvents:"none" }}>↔</div>
+                <input type="range" min={1} max={99} value={upscaleSlider} onChange={e => setUpscaleSlider(Number(e.target.value))} style={{ position:"absolute", inset:0, width:"100%", height:"100%", opacity:0, cursor:"col-resize", margin:0 }} />
+                <div style={{ position:"absolute", top:8, left:8, padding:"2px 8px", background:"rgba(0,0,0,0.65)", borderRadius:6, fontSize:10, color:"white", pointerEvents:"none" }}>Avant</div>
+                <div style={{ position:"absolute", top:8, right:8, padding:"2px 8px", background:"rgba(0,0,0,0.65)", borderRadius:6, fontSize:10, color:t.accent, pointerEvents:"none" }}>Après x{upscaleScale}</div>
+              </div>
+              <button onClick={() => { const a = document.createElement("a"); a.href = upscaleResultUrl!; a.download = `upscaled_x${upscaleScale}_${upscaleFile?.name||"image"}`; document.body.appendChild(a); a.click(); document.body.removeChild(a) }} style={{ width:"100%", padding:"15px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:14, fontWeight:700, cursor:"pointer" }}>Télécharger l'image améliorée</button>
+              <button onClick={() => { setUpscaleFile(null); setUpscalePreviewUrl(null); setUpscaleResultUrl(null); setUpscaleError(null) }} style={{ width:"100%", padding:"12px", borderRadius:14, border:t.border, background:"none", color:t.textSub, fontSize:13, cursor:"pointer" }}>Recommencer</button>
+            </div>
+          )}
+
+          {upscaleResultUrl && upscaleMediaType === "video" && (
+            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+                <div>
+                  <p style={{ fontSize:11, color:t.textMuted, marginBottom:6 }}>Avant</p>
+                  <video src={upscalePreviewUrl||""} controls playsInline style={{ width:"100%", borderRadius:10, background:"#000", display:"block" }} />
+                </div>
+                <div>
+                  <p style={{ fontSize:11, color:t.accent, marginBottom:6 }}>Après x{upscaleScale}</p>
+                  <video src={upscaleResultUrl} controls playsInline style={{ width:"100%", borderRadius:10, background:"#000", display:"block" }} />
+                </div>
+              </div>
+              <button onClick={() => { const a = document.createElement("a"); a.href = upscaleResultUrl!; a.download = `upscaled_x${upscaleScale}_${upscaleFile?.name||"video.mp4"}`; document.body.appendChild(a); a.click(); document.body.removeChild(a) }} style={{ width:"100%", padding:"15px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:14, fontWeight:700, cursor:"pointer" }}>Télécharger la vidéo améliorée</button>
+              <button onClick={() => { setUpscaleFile(null); setUpscalePreviewUrl(null); setUpscaleResultUrl(null); setUpscaleError(null) }} style={{ width:"100%", padding:"12px", borderRadius:14, border:t.border, background:"none", color:t.textSub, fontSize:13, cursor:"pointer" }}>Recommencer</button>
+            </div>
+          )}
         </div>
       )}
 
