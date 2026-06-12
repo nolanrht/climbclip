@@ -89,119 +89,191 @@ const NoiseBg = () => (
   </svg>
 )
 
-const SakuraBg = () => (
-  <>
-    <style>{`
-      @keyframes sway  { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(1.8deg)}  }
-      @keyframes swayR { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(-1.8deg)} }
-      @keyframes fallA {
-        0%  {transform:translateY(-20px) rotate(0deg);opacity:0}
-        8%  {opacity:.65}
-        92% {opacity:.4}
-        100%{transform:translateY(calc(100vh + 30px)) translateX(45px) rotate(400deg);opacity:0}
-      }
-      @keyframes fallB {
-        0%  {transform:translateY(-20px) rotate(30deg);opacity:0}
-        8%  {opacity:.6}
-        92% {opacity:.4}
-        100%{transform:translateY(calc(100vh + 30px)) translateX(-40px) rotate(-350deg);opacity:0}
-      }
-      @keyframes fallC {
-        0%  {transform:translateY(-20px) rotate(-20deg);opacity:0}
-        8%  {opacity:.65}
-        50% {transform:translateY(50vh) translateX(18px) rotate(200deg)}
-        92% {opacity:.4}
-        100%{transform:translateY(calc(100vh + 30px)) translateX(-12px) rotate(420deg);opacity:0}
-      }
-    `}</style>
+const SakuraBg = () => {
+  const [settled, setSettled] = useState<{id:number,lp:number,bp:number,rot:number,w:number,color:string}[]>([])
+  const idRef = useRef(0)
 
-    {/* Subtle calligraphy strokes */}
-    <svg style={{position:"fixed",inset:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0}}
-      viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <g stroke="#f5f0e8" fill="none">
-        <line x1="88"   y1="15" x2="87"   y2="570" strokeWidth="1.5" opacity="0.038"/>
-        <line x1="184"  y1="0"  x2="183"  y2="400" strokeWidth="1"   opacity="0.024"/>
-        <line x1="1112" y1="15" x2="1113" y2="590" strokeWidth="1.5" opacity="0.038"/>
-        <line x1="1016" y1="0"  x2="1017" y2="420" strokeWidth="1"   opacity="0.024"/>
-        <line x1="598"  y1="60" x2="597"  y2="310" strokeWidth="1"   opacity="0.018"/>
-      </g>
-    </svg>
+  const land = useCallback((lp:number, w:number, color:string) => {
+    const id = ++idRef.current
+    setSettled(prev => {
+      const np = {
+        id,
+        lp: Math.max(1, Math.min(98, lp + (Math.random()-0.5)*5)),
+        bp: Math.min(2 + prev.length * 1.5, 22) + Math.random()*3,
+        rot: Math.random()*360,
+        w,
+        color,
+      }
+      return prev.length >= 30 ? [np] : [...prev, np]
+    })
+  }, [])
 
-    {/* Left branch — swaying from top-left corner */}
-    <div style={{position:"fixed",top:0,left:0,width:480,height:220,pointerEvents:"none",zIndex:0,
-      transformOrigin:"0 0",animation:"sway 5s ease-in-out infinite",willChange:"transform"}}>
-      <svg viewBox="0 0 480 220" style={{width:"100%",height:"100%",overflow:"visible"}} xmlns="http://www.w3.org/2000/svg">
-        <path d="M 0,0 C 60,38 132,28 212,76 C 270,108 324,96 378,136"
-          stroke="#f5f0e8" strokeWidth="2.5" fill="none" opacity="0.32"/>
-        <path d="M 115,42 C 146,16 186,8 222,20"
-          stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.27"/>
-        <path d="M 212,76 C 222,48 242,32 274,24"
-          stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.25"/>
-        <path d="M 295,106 C 313,78 340,62 372,56"
-          stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.25"/>
-        <path d="M 378,136 C 390,104 408,88 438,82"
-          stroke="#f5f0e8" strokeWidth="1.2" fill="none" opacity="0.21"/>
-        <g fill="#f5c2c7" opacity="0.50">
-          <circle cx="222" cy="18" r="4.5"/><circle cx="231" cy="12" r="3"/><circle cx="214" cy="13" r="3.5"/>
-          <circle cx="275" cy="22" r="4"/><circle cx="285" cy="16" r="3"/><circle cx="265" cy="17" r="3"/>
-          <circle cx="372" cy="54" r="4.5"/><circle cx="382" cy="48" r="3.5"/><circle cx="363" cy="49" r="3"/>
-          <circle cx="438" cy="80" r="4"/><circle cx="448" cy="74" r="3"/>
-          <circle cx="160" cy="30" r="3.5"/><circle cx="168" cy="24" r="3"/>
-        </g>
-        <g fill="#f5f0e8" opacity="0.20">
-          <circle cx="226" cy="15" r="2"/><circle cx="279" cy="19" r="1.5"/>
-          <circle cx="376" cy="51" r="2"/><circle cx="441" cy="77" r="1.5"/>
+  const petals = [
+    {l:12, a:"fallA", d:"9s",    dl:"0s",    c:"#f5c2c7", r:"15deg",  s:8 },
+    {l:27, a:"fallB", d:"11s",   dl:"2.5s",  c:"#f5c2c7", r:"-20deg", s:7 },
+    {l:43, a:"fallC", d:"8.5s",  dl:"5s",    c:"#f5f0e8", r:"40deg",  s:9 },
+    {l:57, a:"fallA", d:"10s",   dl:"1.5s",  c:"#f5c2c7", r:"-10deg", s:8 },
+    {l:70, a:"fallB", d:"9.5s",  dl:"4s",    c:"#f5f0e8", r:"30deg",  s:7 },
+    {l:82, a:"fallC", d:"12s",   dl:"7s",    c:"#f5c2c7", r:"-35deg", s:9 },
+    {l:20, a:"fallB", d:"10.5s", dl:"3s",    c:"#f5f0e8", r:"50deg",  s:7 },
+    {l:64, a:"fallA", d:"8s",    dl:"8.5s",  c:"#f5c2c7", r:"-5deg",  s:8 },
+    {l:5,  a:"fallC", d:"13s",   dl:"1s",    c:"#f5c2c7", r:"25deg",  s:6 },
+    {l:35, a:"fallA", d:"7.5s",  dl:"6s",    c:"#f5f0e8", r:"-45deg", s:10},
+    {l:50, a:"fallB", d:"9s",    dl:"10s",   c:"#f5c2c7", r:"60deg",  s:6 },
+    {l:75, a:"fallC", d:"11s",   dl:"4.5s",  c:"#f5f0e8", r:"-25deg", s:11},
+    {l:88, a:"fallA", d:"8.5s",  dl:"2s",    c:"#f5c2c7", r:"10deg",  s:7 },
+    {l:15, a:"fallB", d:"14s",   dl:"9s",    c:"#f5f0e8", r:"-55deg", s:8 },
+    {l:38, a:"fallC", d:"10s",   dl:"0.5s",  c:"#f5c2c7", r:"35deg",  s:9 },
+    {l:55, a:"fallA", d:"7s",    dl:"11s",   c:"#f5f0e8", r:"-15deg", s:6 },
+    {l:78, a:"fallB", d:"12s",   dl:"6.5s",  c:"#f5c2c7", r:"45deg",  s:10},
+    {l:92, a:"fallC", d:"9s",    dl:"3.5s",  c:"#f5f0e8", r:"-40deg", s:7 },
+    {l:8,  a:"fallA", d:"11.5s", dl:"7.5s",  c:"#f5c2c7", r:"20deg",  s:9 },
+    {l:47, a:"fallB", d:"8s",    dl:"13s",   c:"#f5f0e8", r:"-30deg", s:8 },
+  ]
+
+  return (
+    <>
+      <style>{`
+        @keyframes sway  { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(1.8deg)}  }
+        @keyframes swayR { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(-1.8deg)} }
+        @keyframes fallA {
+          0%  {transform:translateY(-20px) rotate(0deg);opacity:0}
+          8%  {opacity:.65}
+          92% {opacity:.4}
+          100%{transform:translateY(calc(100vh + 30px)) translateX(45px) rotate(400deg);opacity:0}
+        }
+        @keyframes fallB {
+          0%  {transform:translateY(-20px) rotate(30deg);opacity:0}
+          8%  {opacity:.6}
+          92% {opacity:.4}
+          100%{transform:translateY(calc(100vh + 30px)) translateX(-40px) rotate(-350deg);opacity:0}
+        }
+        @keyframes fallC {
+          0%  {transform:translateY(-20px) rotate(-20deg);opacity:0}
+          8%  {opacity:.65}
+          50% {transform:translateY(50vh) translateX(18px) rotate(200deg)}
+          92% {opacity:.4}
+          100%{transform:translateY(calc(100vh + 30px)) translateX(-12px) rotate(420deg);opacity:0}
+        }
+      `}</style>
+
+      {/* Calligraphy strokes */}
+      <svg style={{position:"fixed",inset:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0}}
+        viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="#f5f0e8" fill="none">
+          <line x1="88"   y1="15" x2="87"   y2="570" strokeWidth="1.5" opacity="0.038"/>
+          <line x1="184"  y1="0"  x2="183"  y2="400" strokeWidth="1"   opacity="0.024"/>
+          <line x1="1112" y1="15" x2="1113" y2="590" strokeWidth="1.5" opacity="0.038"/>
+          <line x1="1016" y1="0"  x2="1017" y2="420" strokeWidth="1"   opacity="0.024"/>
+          <line x1="598"  y1="60" x2="597"  y2="310" strokeWidth="1"   opacity="0.018"/>
         </g>
       </svg>
-    </div>
 
-    {/* Right branch — swaying from top-right corner */}
-    <div style={{position:"fixed",top:0,right:0,width:480,height:220,pointerEvents:"none",zIndex:0,
-      transformOrigin:"100% 0",animation:"swayR 6s ease-in-out 1.2s infinite",willChange:"transform"}}>
-      <svg viewBox="0 0 480 220" style={{width:"100%",height:"100%",overflow:"visible"}} xmlns="http://www.w3.org/2000/svg">
-        <path d="M 480,0 C 420,38 348,28 268,76 C 210,108 156,96 102,136"
-          stroke="#f5f0e8" strokeWidth="2.5" fill="none" opacity="0.32"/>
-        <path d="M 365,42 C 334,16 294,8 258,20"
-          stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.27"/>
-        <path d="M 268,76 C 258,48 238,32 206,24"
-          stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.25"/>
-        <path d="M 185,106 C 167,78 140,62 108,56"
-          stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.25"/>
-        <path d="M 102,136 C 90,104 72,88 42,82"
-          stroke="#f5f0e8" strokeWidth="1.2" fill="none" opacity="0.21"/>
-        <g fill="#f5c2c7" opacity="0.50">
-          <circle cx="258" cy="18" r="4.5"/><circle cx="249" cy="12" r="3"/><circle cx="266" cy="13" r="3.5"/>
-          <circle cx="205" cy="22" r="4"/><circle cx="195" cy="16" r="3"/><circle cx="215" cy="17" r="3"/>
-          <circle cx="108" cy="54" r="4.5"/><circle cx="98"  cy="48" r="3.5"/><circle cx="117" cy="49" r="3"/>
-          <circle cx="42"  cy="80" r="4"/><circle cx="32"  cy="74" r="3"/>
-          <circle cx="320" cy="30" r="3.5"/><circle cx="312" cy="24" r="3"/>
-        </g>
-        <g fill="#f5f0e8" opacity="0.20">
-          <circle cx="254" cy="15" r="2"/><circle cx="201" cy="19" r="1.5"/>
-          <circle cx="104" cy="51" r="2"/><circle cx="39"  cy="77" r="1.5"/>
-        </g>
-      </svg>
-    </div>
+      {/* Left branch 1 — top-left corner, 5s sway */}
+      <div style={{position:"fixed",top:0,left:0,width:480,height:220,pointerEvents:"none",zIndex:0,
+        transformOrigin:"0 0",animation:"sway 5s ease-in-out infinite",willChange:"transform"}}>
+        <svg viewBox="0 0 480 220" style={{width:"100%",height:"100%",overflow:"visible"}} xmlns="http://www.w3.org/2000/svg">
+          <path d="M 0,0 C 60,38 132,28 212,76 C 270,108 324,96 378,136" stroke="#f5f0e8" strokeWidth="2.5" fill="none" opacity="0.32"/>
+          <path d="M 115,42 C 146,16 186,8 222,20" stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.27"/>
+          <path d="M 212,76 C 222,48 242,32 274,24" stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.25"/>
+          <path d="M 295,106 C 313,78 340,62 372,56" stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.25"/>
+          <path d="M 378,136 C 390,104 408,88 438,82" stroke="#f5f0e8" strokeWidth="1.2" fill="none" opacity="0.21"/>
+          <g fill="#f5c2c7" opacity="0.50">
+            <circle cx="222" cy="18" r="4.5"/><circle cx="231" cy="12" r="3"/><circle cx="214" cy="13" r="3.5"/>
+            <circle cx="275" cy="22" r="4"/><circle cx="285" cy="16" r="3"/><circle cx="265" cy="17" r="3"/>
+            <circle cx="372" cy="54" r="4.5"/><circle cx="382" cy="48" r="3.5"/><circle cx="363" cy="49" r="3"/>
+            <circle cx="438" cy="80" r="4"/><circle cx="448" cy="74" r="3"/>
+            <circle cx="160" cy="30" r="3.5"/><circle cx="168" cy="24" r="3"/>
+          </g>
+          <g fill="#f5f0e8" opacity="0.20">
+            <circle cx="226" cy="15" r="2"/><circle cx="279" cy="19" r="1.5"/>
+            <circle cx="376" cy="51" r="2"/><circle cx="441" cy="77" r="1.5"/>
+          </g>
+        </svg>
+      </div>
 
-    {/* Falling petals */}
-    <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
-      {([
-        {left:"12%", anim:"fallA 9s ease-in 0s infinite",    color:"#f5c2c7", rot:"15deg" },
-        {left:"27%", anim:"fallB 11s ease-in 2.5s infinite", color:"#f5c2c7", rot:"-20deg"},
-        {left:"43%", anim:"fallC 8.5s ease-in 5s infinite",  color:"#f5f0e8", rot:"40deg" },
-        {left:"57%", anim:"fallA 10s ease-in 1.5s infinite", color:"#f5c2c7", rot:"-10deg"},
-        {left:"70%", anim:"fallB 9.5s ease-in 4s infinite",  color:"#f5f0e8", rot:"30deg" },
-        {left:"82%", anim:"fallC 12s ease-in 7s infinite",   color:"#f5c2c7", rot:"-35deg"},
-        {left:"20%", anim:"fallB 10.5s ease-in 3s infinite", color:"#f5f0e8", rot:"50deg" },
-        {left:"64%", anim:"fallA 8s ease-in 8.5s infinite",  color:"#f5c2c7", rot:"-5deg" },
-      ] as {left:string,anim:string,color:string,rot:string}[]).map(({left,anim,color,rot},i)=>(
-        <div key={i} style={{position:"absolute",top:0,left,animation:anim,willChange:"transform,opacity"}}>
-          <div style={{width:8,height:11,borderRadius:"50% 50% 50% 0",background:color,transform:`rotate(${rot})`}}/>
-        </div>
-      ))}
-    </div>
-  </>
-)
+      {/* Left branch 2 — lower, extends toward center, crosses right branch 2 */}
+      <div style={{position:"fixed",top:52,left:0,width:700,height:170,pointerEvents:"none",zIndex:0,
+        transformOrigin:"0 0",animation:"sway 7s ease-in-out 0.8s infinite",willChange:"transform"}}>
+        <svg viewBox="0 0 700 170" style={{width:"100%",height:"100%",overflow:"visible"}} xmlns="http://www.w3.org/2000/svg">
+          <path d="M 0,0 C 85,24 210,40 340,60 C 468,80 576,84 658,97" stroke="#f5f0e8" strokeWidth="2" fill="none" opacity="0.22"/>
+          <path d="M 185,44 C 214,20 252,12 288,24" stroke="#f5f0e8" strokeWidth="1.3" fill="none" opacity="0.20"/>
+          <path d="M 405,70 C 424,44 458,32 494,40" stroke="#f5f0e8" strokeWidth="1.3" fill="none" opacity="0.18"/>
+          <path d="M 586,88 C 604,62 628,50 658,52" stroke="#f5f0e8" strokeWidth="1.2" fill="none" opacity="0.16"/>
+          <g fill="#f5c2c7" opacity="0.42">
+            <circle cx="289" cy="22" r="4"/><circle cx="298" cy="16" r="3"/><circle cx="280" cy="17" r="3"/>
+            <circle cx="494" cy="38" r="4"/><circle cx="503" cy="32" r="3"/><circle cx="485" cy="33" r="3"/>
+            <circle cx="658" cy="50" r="3.5"/><circle cx="667" cy="45" r="2.5"/>
+          </g>
+        </svg>
+      </div>
+
+      {/* Right branch 1 — top-right corner, 6s sway */}
+      <div style={{position:"fixed",top:0,right:0,width:480,height:220,pointerEvents:"none",zIndex:0,
+        transformOrigin:"100% 0",animation:"swayR 6s ease-in-out 1.2s infinite",willChange:"transform"}}>
+        <svg viewBox="0 0 480 220" style={{width:"100%",height:"100%",overflow:"visible"}} xmlns="http://www.w3.org/2000/svg">
+          <path d="M 480,0 C 420,38 348,28 268,76 C 210,108 156,96 102,136" stroke="#f5f0e8" strokeWidth="2.5" fill="none" opacity="0.32"/>
+          <path d="M 365,42 C 334,16 294,8 258,20" stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.27"/>
+          <path d="M 268,76 C 258,48 238,32 206,24" stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.25"/>
+          <path d="M 185,106 C 167,78 140,62 108,56" stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.25"/>
+          <path d="M 102,136 C 90,104 72,88 42,82" stroke="#f5f0e8" strokeWidth="1.2" fill="none" opacity="0.21"/>
+          <g fill="#f5c2c7" opacity="0.50">
+            <circle cx="258" cy="18" r="4.5"/><circle cx="249" cy="12" r="3"/><circle cx="266" cy="13" r="3.5"/>
+            <circle cx="205" cy="22" r="4"/><circle cx="195" cy="16" r="3"/><circle cx="215" cy="17" r="3"/>
+            <circle cx="108" cy="54" r="4.5"/><circle cx="98"  cy="48" r="3.5"/><circle cx="117" cy="49" r="3"/>
+            <circle cx="42"  cy="80" r="4"/><circle cx="32"  cy="74" r="3"/>
+            <circle cx="320" cy="30" r="3.5"/><circle cx="312" cy="24" r="3"/>
+          </g>
+          <g fill="#f5f0e8" opacity="0.20">
+            <circle cx="254" cy="15" r="2"/><circle cx="201" cy="19" r="1.5"/>
+            <circle cx="104" cy="51" r="2"/><circle cx="39"  cy="77" r="1.5"/>
+          </g>
+        </svg>
+      </div>
+
+      {/* Right branch 2 — lower, extends toward center, crosses left branch 2 */}
+      <div style={{position:"fixed",top:52,right:0,width:700,height:170,pointerEvents:"none",zIndex:0,
+        transformOrigin:"100% 0",animation:"swayR 8s ease-in-out 2s infinite",willChange:"transform"}}>
+        <svg viewBox="0 0 700 170" style={{width:"100%",height:"100%",overflow:"visible"}} xmlns="http://www.w3.org/2000/svg">
+          <path d="M 700,0 C 615,24 490,40 360,60 C 232,80 124,84 42,97" stroke="#f5f0e8" strokeWidth="2" fill="none" opacity="0.22"/>
+          <path d="M 515,44 C 486,20 448,12 412,24" stroke="#f5f0e8" strokeWidth="1.3" fill="none" opacity="0.20"/>
+          <path d="M 295,70 C 276,44 242,32 206,40" stroke="#f5f0e8" strokeWidth="1.3" fill="none" opacity="0.18"/>
+          <path d="M 114,88 C 96,62 72,50 42,52" stroke="#f5f0e8" strokeWidth="1.2" fill="none" opacity="0.16"/>
+          <g fill="#f5c2c7" opacity="0.42">
+            <circle cx="411" cy="22" r="4"/><circle cx="402" cy="16" r="3"/><circle cx="420" cy="17" r="3"/>
+            <circle cx="206" cy="38" r="4"/><circle cx="197" cy="32" r="3"/><circle cx="215" cy="33" r="3"/>
+            <circle cx="42"  cy="50" r="3.5"/><circle cx="33"  cy="45" r="2.5"/>
+          </g>
+        </svg>
+      </div>
+
+      {/* Falling petals */}
+      <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
+        {petals.map(({l,a,d,dl,c,r,s},i) => (
+          <div key={i}
+            style={{position:"absolute",top:0,left:`${l}%`,animation:`${a} ${d} ease-in ${dl} infinite`,willChange:"transform,opacity"}}
+            onAnimationIteration={() => land(l, s, c)}>
+            <div style={{width:s,height:Math.round(s*1.4),borderRadius:"50% 50% 50% 0",background:c,transform:`rotate(${r})`}}/>
+          </div>
+        ))}
+      </div>
+
+      {/* Accumulated petals at bottom */}
+      <div style={{position:"fixed",bottom:0,left:0,right:0,height:60,pointerEvents:"none",zIndex:0}}>
+        {settled.map(p => (
+          <div key={p.id} style={{
+            position:"absolute", left:`${p.lp}%`, bottom:p.bp,
+            width:p.w, height:Math.round(p.w*1.4),
+            borderRadius:"50% 50% 50% 0",
+            background:p.color,
+            transform:`rotate(${p.rot}deg)`,
+            opacity:0.45,
+          }}/>
+        ))}
+      </div>
+    </>
+  )
+}
 
 export default function Home() {
   const router = useRouter()
