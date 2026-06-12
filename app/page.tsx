@@ -89,24 +89,47 @@ const NoiseBg = () => (
   </svg>
 )
 
-const RomanColumnsBg = ({ dark }: { dark: boolean }) => {
-  const fill = dark ? "rgba(232,245,66,0.038)" : "rgba(0,0,0,0.025)"
-  return (
+const VideoBg = ({ dark }: { dark: boolean }) => (
+  <>
+    <style>{`
+      @keyframes vb1{0%,100%{opacity:.22}50%{opacity:.55}}
+      @keyframes vb2{0%,100%{opacity:.12}50%{opacity:.38}}
+      @keyframes vb3{0%,100%{opacity:.07}60%{opacity:.28}}
+    `}</style>
     <svg style={{ position:"fixed", inset:0, width:"100%", height:"100%", pointerEvents:"none", zIndex:0 }}
-      viewBox="0 0 1200 820" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <g fill={fill}>
-        <rect x="48" y="38" width="240" height="18" rx="1"/>
-        <rect x="58" y="54" width="72" height="14"/><rect x="66" y="68" width="56" height="570"/><rect x="58" y="638" width="72" height="11"/><rect x="44" y="649" width="100" height="18" rx="1"/>
-        <rect x="164" y="54" width="66" height="12"/><rect x="172" y="66" width="50" height="490"/><rect x="164" y="556" width="66" height="10"/><rect x="150" y="566" width="94" height="16" rx="1"/>
-        <rect x="910" y="20" width="250" height="18" rx="1"/>
-        <rect x="910" y="36" width="72" height="14"/><rect x="918" y="50" width="56" height="530"/><rect x="910" y="580" width="72" height="11"/><rect x="896" y="591" width="100" height="18" rx="1"/>
-        <rect x="1036" y="36" width="70" height="14"/><rect x="1044" y="50" width="54" height="600"/><rect x="1036" y="650" width="70" height="11"/><rect x="1022" y="661" width="98" height="18" rx="1"/>
-        <rect x="0" y="738" width="330" height="5" rx="1"/>
-        <rect x="870" y="726" width="330" height="5" rx="1"/>
+      viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="540" width="1200" height="42" fill={dark?"rgba(255,255,255,0.018)":"rgba(0,0,0,0.015)"}/>
+      <rect x="0" y="539" width="1200" height="1" fill={dark?"rgba(255,255,255,0.07)":"rgba(0,0,0,0.06)"}/>
+      <rect x="0" y="582" width="1200" height="1" fill={dark?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.04)"}/>
+      {([[15,78,"vb1","2.8s","0s"],[103,42,"vb2","3.2s","0.6s"],[155,108,"vb1","2.5s","1.1s"],[273,62,"vb3","3.8s","0.3s"],[345,94,"vb2","2.9s","1.5s"],[449,52,"vb1","3.1s","0.8s"],[511,126,"vb3","2.7s","0.4s"],[647,50,"vb2","3.5s","1.8s"],[707,86,"vb1","2.6s","0.9s"],[803,70,"vb3","3.3s","1.2s"],[883,112,"vb2","2.8s","0.5s"],[1005,46,"vb1","3.6s","1.4s"],[1061,74,"vb3","2.9s","0.7s"],[1145,50,"vb2","3.1s","2.0s"]] as [number,number,string,string,string][]).map(([x,w,a,d,dl])=>(
+        <rect key={`t1-${x}`} x={x} y="546" width={w} height="30" rx="3" fill="#e8f542" style={{ animation:`${a} ${d} ease-in-out ${dl} infinite` }}/>
+      ))}
+      <rect x="0" y="592" width="1200" height="26" fill={dark?"rgba(255,255,255,0.012)":"rgba(0,0,0,0.010)"}/>
+      <rect x="0" y="591" width="1200" height="0.5" fill={dark?"rgba(255,255,255,0.05)":"rgba(0,0,0,0.04)"}/>
+      <rect x="0" y="618" width="1200" height="0.5" fill={dark?"rgba(255,255,255,0.03)":"rgba(0,0,0,0.03)"}/>
+      {([[38,55,"vb3","3.4s","1.0s"],[103,88,"vb2","2.7s","0.2s"],[201,38,"vb1","3.0s","1.6s"],[249,72,"vb3","2.8s","0.8s"],[331,116,"vb2","3.3s","1.3s"],[457,44,"vb1","2.9s","0.5s"],[511,82,"vb3","3.1s","1.9s"],[603,58,"vb2","2.6s","0.4s"],[671,98,"vb1","3.4s","1.1s"],[779,54,"vb3","2.8s","0.6s"],[843,90,"vb2","3.2s","1.7s"],[943,48,"vb1","2.7s","0.9s"],[1001,74,"vb3","3.5s","1.5s"],[1085,58,"vb2","2.9s","2.2s"],[1153,40,"vb1","3.6s","0.3s"]] as [number,number,string,string,string][]).map(([x,w,a,d,dl])=>(
+        <rect key={`t2-${x}`} x={x} y="595" width={w} height="18" rx="2" fill="#e8f542" opacity="0.7" style={{ animation:`${a} ${d} ease-in-out ${dl} infinite` }}/>
+      ))}
+      <g fill={dark?"rgba(232,245,66,0.10)":"rgba(0,0,0,0.07)"}>
+        {[8,14,6,20,12,18,5,16,22,10,15,8,25,11,19,7,13,21,9,17,12,6,23,14,18,8,20,15,10,24,7,16,11,19,5,22,13,17,9,21,14,8,18,12,25,10,16,7,20,15,12,9,18,6,22,14,8,20,11,17,5,23,10,16,25,7,15,19,8,21,13,6,24,12,18,9,20,14,7,22,11,17,4,23,10,15,8,19,6,22,13,18,9,21,12,7,25,14,17,8,20,11,16,5,23,9,18,13,21,7,8,14,6,20,12].map((h,i)=>(
+          <rect key={i} x={i*10} y={640-h/2} width={7} height={h} rx={1}/>
+        ))}
+      </g>
+      <rect x="0" y="635" width="1200" height="0.5" fill={dark?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.04)"}/>
+      {[155,273,345,449,511,647,707,803,883,1005,1061,1145].map(x=>(
+        <rect key={x} x={x} y="536" width="1" height="83" fill={dark?"rgba(255,255,255,0.12)":"rgba(0,0,0,0.08)"}/>
+      ))}
+      <rect x="434" y="496" width="2" height="140" fill={dark?"rgba(232,245,66,0.32)":"rgba(50,50,0,0.18)"}/>
+      <polygon points="426,496 442,496 435,512" fill={dark?"rgba(232,245,66,0.55)":"rgba(50,50,0,0.3)"}/>
+      <g fill={dark?"rgba(255,255,255,0.042)":"rgba(0,0,0,0.03)"}>
+        {[0,1,2,3,4,5,6,7,8,9,10,11,12].map(i=>(<circle key={i} cx="14" cy={30+i*40} r="5"/>))}
+      </g>
+      <g fill={dark?"rgba(255,255,255,0.042)":"rgba(0,0,0,0.03)"}>
+        {[0,1,2,3,4,5,6,7,8,9,10,11,12].map(i=>(<circle key={i} cx="1186" cy={45+i*40} r="5"/>))}
       </g>
     </svg>
-  )
-}
+  </>
+)
 
 export default function Home() {
   const router = useRouter()
@@ -794,7 +817,7 @@ export default function Home() {
 
       {currentMode === "home" && (
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"100vh", position:"relative" }}>
-          <RomanColumnsBg dark={dark}/>
+          <VideoBg dark={dark}/>
           {dark && <NoiseBg/>}
           <div style={{ position:"fixed", inset:0, backgroundImage:"linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)", backgroundSize:"44px 44px", pointerEvents:"none", zIndex:0 }}/>
           <div style={{ position:"relative", zIndex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:44, padding:"56px 20px" }}>
@@ -1260,10 +1283,6 @@ export default function Home() {
 
       {currentMode === "upscaling" && (
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", minHeight:"100vh", width:"100%" }}>
-          {dark && <>
-            <NoiseBg/>
-            <div style={{ position:"fixed", inset:0, backgroundImage:"repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.007) 3px, rgba(255,255,255,0.007) 4px)", pointerEvents:"none", zIndex:0 }}/>
-          </>}
           <nav style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 16px", borderBottom:t.border, background:t.bgNav, backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", position:"sticky", top:0, zIndex:50 }}>
             <div style={{ display:"flex", alignItems:"center", gap:8 }}>
               <ClimbLogo size={26}/>
