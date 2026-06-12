@@ -89,6 +89,14 @@ const NoiseBg = () => (
   </svg>
 )
 
+// Pre-computed petal pile (deterministic pseudo-random, module-level)
+const PILE = Array.from({length:88},(_,i)=>{
+  const a=((i*1234567+89)%997)/997, b=((i*7654321+123)%1009)/1009
+  const c=((i*3456789+456)%1013)/1013, d=((i*9876543+789)%1019)/1019
+  const ly=b<0.35?0:b<0.65?1:b<0.85?2:3
+  return {x:a*1200, y:798-ly*13-c*10, rot:d*360, rx:4+a*5, ry:(3+a*4)*(0.5+b*0.3), color:c>0.55?"#f5c2c7":"#f5f0e8", op:0.38+c*0.36}
+})
+
 const SakuraBg = () => {
   const [settled, setSettled] = useState<{id:number,lp:number,bp:number,rot:number,w:number,color:string}[]>([])
   const idRef = useRef(0)
@@ -96,156 +104,140 @@ const SakuraBg = () => {
   const land = useCallback((lp:number, w:number, color:string) => {
     const id = ++idRef.current
     setSettled(prev => {
-      const np = {
-        id,
-        lp: Math.max(1, Math.min(98, lp + (Math.random()-0.5)*5)),
-        bp: Math.min(2 + prev.length * 1.5, 22) + Math.random()*3,
-        rot: Math.random()*360,
-        w,
-        color,
-      }
+      const np = {id, lp:Math.max(1,Math.min(98,lp+(Math.random()-.5)*5)), bp:Math.min(2+prev.length*1.5,22)+Math.random()*3, rot:Math.random()*360, w, color}
       return prev.length >= 30 ? [np] : [...prev, np]
     })
   }, [])
 
   const petals = [
-    {l:12, a:"fallA", d:"9s",    dl:"0s",    c:"#f5c2c7", r:"15deg",  s:8 },
-    {l:27, a:"fallB", d:"11s",   dl:"2.5s",  c:"#f5c2c7", r:"-20deg", s:7 },
-    {l:43, a:"fallC", d:"8.5s",  dl:"5s",    c:"#f5f0e8", r:"40deg",  s:9 },
-    {l:57, a:"fallA", d:"10s",   dl:"1.5s",  c:"#f5c2c7", r:"-10deg", s:8 },
-    {l:70, a:"fallB", d:"9.5s",  dl:"4s",    c:"#f5f0e8", r:"30deg",  s:7 },
-    {l:82, a:"fallC", d:"12s",   dl:"7s",    c:"#f5c2c7", r:"-35deg", s:9 },
-    {l:20, a:"fallB", d:"10.5s", dl:"3s",    c:"#f5f0e8", r:"50deg",  s:7 },
-    {l:64, a:"fallA", d:"8s",    dl:"8.5s",  c:"#f5c2c7", r:"-5deg",  s:8 },
     {l:5,  a:"fallC", d:"13s",   dl:"1s",    c:"#f5c2c7", r:"25deg",  s:6 },
-    {l:35, a:"fallA", d:"7.5s",  dl:"6s",    c:"#f5f0e8", r:"-45deg", s:10},
-    {l:50, a:"fallB", d:"9s",    dl:"10s",   c:"#f5c2c7", r:"60deg",  s:6 },
-    {l:75, a:"fallC", d:"11s",   dl:"4.5s",  c:"#f5f0e8", r:"-25deg", s:11},
-    {l:88, a:"fallA", d:"8.5s",  dl:"2s",    c:"#f5c2c7", r:"10deg",  s:7 },
+    {l:12, a:"fallA", d:"9s",    dl:"0s",    c:"#f5c2c7", r:"15deg",  s:8 },
     {l:15, a:"fallB", d:"14s",   dl:"9s",    c:"#f5f0e8", r:"-55deg", s:8 },
+    {l:20, a:"fallB", d:"10.5s", dl:"3s",    c:"#f5f0e8", r:"50deg",  s:7 },
+    {l:27, a:"fallB", d:"11s",   dl:"2.5s",  c:"#f5c2c7", r:"-20deg", s:7 },
+    {l:35, a:"fallA", d:"7.5s",  dl:"6s",    c:"#f5f0e8", r:"-45deg", s:10},
     {l:38, a:"fallC", d:"10s",   dl:"0.5s",  c:"#f5c2c7", r:"35deg",  s:9 },
+    {l:43, a:"fallC", d:"8.5s",  dl:"5s",    c:"#f5f0e8", r:"40deg",  s:9 },
+    {l:47, a:"fallB", d:"8s",    dl:"13s",   c:"#f5f0e8", r:"-30deg", s:8 },
+    {l:50, a:"fallB", d:"9s",    dl:"10s",   c:"#f5c2c7", r:"60deg",  s:6 },
     {l:55, a:"fallA", d:"7s",    dl:"11s",   c:"#f5f0e8", r:"-15deg", s:6 },
+    {l:57, a:"fallA", d:"10s",   dl:"1.5s",  c:"#f5c2c7", r:"-10deg", s:8 },
+    {l:64, a:"fallA", d:"8s",    dl:"8.5s",  c:"#f5c2c7", r:"-5deg",  s:8 },
+    {l:70, a:"fallB", d:"9.5s",  dl:"4s",    c:"#f5f0e8", r:"30deg",  s:7 },
+    {l:75, a:"fallC", d:"11s",   dl:"4.5s",  c:"#f5f0e8", r:"-25deg", s:11},
     {l:78, a:"fallB", d:"12s",   dl:"6.5s",  c:"#f5c2c7", r:"45deg",  s:10},
+    {l:82, a:"fallC", d:"12s",   dl:"7s",    c:"#f5c2c7", r:"-35deg", s:9 },
+    {l:88, a:"fallA", d:"8.5s",  dl:"2s",    c:"#f5c2c7", r:"10deg",  s:7 },
     {l:92, a:"fallC", d:"9s",    dl:"3.5s",  c:"#f5f0e8", r:"-40deg", s:7 },
     {l:8,  a:"fallA", d:"11.5s", dl:"7.5s",  c:"#f5c2c7", r:"20deg",  s:9 },
-    {l:47, a:"fallB", d:"8s",    dl:"13s",   c:"#f5f0e8", r:"-30deg", s:8 },
   ]
 
   return (
     <>
       <style>{`
-        @keyframes sway  { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(1.8deg)}  }
-        @keyframes swayR { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(-1.8deg)} }
-        @keyframes fallA {
-          0%  {transform:translateY(-20px) rotate(0deg);opacity:0}
-          8%  {opacity:.65}
-          92% {opacity:.4}
-          100%{transform:translateY(calc(100vh + 30px)) translateX(45px) rotate(400deg);opacity:0}
-        }
-        @keyframes fallB {
-          0%  {transform:translateY(-20px) rotate(30deg);opacity:0}
-          8%  {opacity:.6}
-          92% {opacity:.4}
-          100%{transform:translateY(calc(100vh + 30px)) translateX(-40px) rotate(-350deg);opacity:0}
-        }
-        @keyframes fallC {
-          0%  {transform:translateY(-20px) rotate(-20deg);opacity:0}
-          8%  {opacity:.65}
-          50% {transform:translateY(50vh) translateX(18px) rotate(200deg)}
-          92% {opacity:.4}
-          100%{transform:translateY(calc(100vh + 30px)) translateX(-12px) rotate(420deg);opacity:0}
-        }
+        @keyframes ts1{0%,100%{transform:rotate(0deg)}50%{transform:rotate(0.7deg)}}
+        @keyframes ts2{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-0.8deg)}}
+        @keyframes ts3{0%,100%{transform:rotate(0deg)}50%{transform:rotate(0.5deg)}}
+        .sk-t1{animation:ts1 5s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+        .sk-t2{animation:ts2 6.5s ease-in-out 0.8s infinite;transform-box:fill-box;transform-origin:50% 100%}
+        .sk-t3{animation:ts1 7s ease-in-out 1.5s infinite;transform-box:fill-box;transform-origin:50% 100%}
+        .sk-t4{animation:ts3 5.5s ease-in-out 2.2s infinite;transform-box:fill-box;transform-origin:50% 100%}
+        .sk-t5{animation:ts2 6s ease-in-out 0.4s infinite;transform-box:fill-box;transform-origin:50% 100%}
+        @keyframes fallA{0%{transform:translateY(-20px) rotate(0deg);opacity:0}8%{opacity:.65}92%{opacity:.4}100%{transform:translateY(calc(100vh + 30px)) translateX(45px) rotate(400deg);opacity:0}}
+        @keyframes fallB{0%{transform:translateY(-20px) rotate(30deg);opacity:0}8%{opacity:.6}92%{opacity:.4}100%{transform:translateY(calc(100vh + 30px)) translateX(-40px) rotate(-350deg);opacity:0}}
+        @keyframes fallC{0%{transform:translateY(-20px) rotate(-20deg);opacity:0}8%{opacity:.65}50%{transform:translateY(50vh) translateX(18px) rotate(200deg)}92%{opacity:.4}100%{transform:translateY(calc(100vh + 30px)) translateX(-12px) rotate(420deg);opacity:0}}
       `}</style>
 
-      {/* Calligraphy strokes */}
+      {/* Full-scene SVG: 5 cherry trees + pre-rendered petal pile */}
       <svg style={{position:"fixed",inset:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0}}
         viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-        <g stroke="#f5f0e8" fill="none">
-          <line x1="88"   y1="15" x2="87"   y2="570" strokeWidth="1.5" opacity="0.038"/>
-          <line x1="184"  y1="0"  x2="183"  y2="400" strokeWidth="1"   opacity="0.024"/>
-          <line x1="1112" y1="15" x2="1113" y2="590" strokeWidth="1.5" opacity="0.038"/>
-          <line x1="1016" y1="0"  x2="1017" y2="420" strokeWidth="1"   opacity="0.024"/>
-          <line x1="598"  y1="60" x2="597"  y2="310" strokeWidth="1"   opacity="0.018"/>
+
+        {/* Tree 1 — left edge */}
+        <g className="sk-t1" stroke="#f5f0e8" fill="none" strokeLinecap="round">
+          <path strokeWidth="2.5" opacity="0.32" d="M 78,820 C 79,710 80,605 80,505"/>
+          <path strokeWidth="1.8" opacity="0.27" d="M 80,505 C 54,445 18,375 -8,315 M 80,505 C 106,445 140,380 168,338"/>
+          <path strokeWidth="1.2" opacity="0.22" d="M -8,315 C -20,287 -26,255 -28,224 M 18,348 C 6,320 -3,288 -6,256 M 168,338 C 180,310 186,278 188,248 M 148,360 C 161,333 170,302 174,272"/>
+          <g fill="#f5c2c7" stroke="none" opacity="0.46">
+            <circle cx="-28" cy="222" r="4"/><circle cx="-20" cy="215" r="3"/><circle cx="-35" cy="216" r="3.5"/>
+            <circle cx="-6"  cy="254" r="3.5"/><circle cx="-14" cy="247" r="3"/><circle cx="2"   cy="248" r="3"/>
+            <circle cx="188" cy="246" r="4"/><circle cx="196" cy="240" r="3"/><circle cx="181" cy="241" r="3.5"/>
+            <circle cx="174" cy="270" r="3.5"/><circle cx="182" cy="264" r="3"/><circle cx="167" cy="265" r="3"/>
+          </g>
         </g>
+
+        {/* Tree 2 — left-center */}
+        <g className="sk-t2" stroke="#f5f0e8" fill="none" strokeLinecap="round">
+          <path strokeWidth="2.5" opacity="0.30" d="M 261,830 C 262,718 262,608 261,462"/>
+          <path strokeWidth="1.8" opacity="0.25" d="M 261,462 C 228,398 180,330 148,272 M 261,462 C 294,398 336,336 365,290 M 261,462 C 260,400 258,338 256,285"/>
+          <path strokeWidth="1.2" opacity="0.20" d="M 148,272 C 130,246 118,214 112,184 M 178,308 C 164,282 154,252 150,222 M 365,290 C 378,263 386,232 389,203 M 344,312 C 358,285 367,256 371,226 M 256,285 C 252,253 248,220 245,192 M 245,192 C 235,172 222,152 213,134 M 245,192 C 255,172 266,153 274,135"/>
+          <g fill="#f5c2c7" stroke="none" opacity="0.44">
+            <circle cx="112" cy="182" r="4"/><circle cx="104" cy="176" r="3"/><circle cx="120" cy="177" r="3.5"/>
+            <circle cx="150" cy="220" r="3.5"/><circle cx="143" cy="214" r="3"/><circle cx="157" cy="215" r="3"/>
+            <circle cx="389" cy="201" r="4"/><circle cx="397" cy="195" r="3"/><circle cx="382" cy="196" r="3.5"/>
+            <circle cx="371" cy="224" r="3.5"/><circle cx="379" cy="218" r="3"/><circle cx="364" cy="219" r="3"/>
+            <circle cx="213" cy="132" r="4"/><circle cx="205" cy="126" r="3"/><circle cx="221" cy="127" r="3"/>
+            <circle cx="274" cy="133" r="4"/><circle cx="282" cy="127" r="3"/><circle cx="267" cy="128" r="3"/>
+          </g>
+        </g>
+
+        {/* Tree 3 — center, tallest */}
+        <g className="sk-t3" stroke="#f5f0e8" fill="none" strokeLinecap="round">
+          <path strokeWidth="3" opacity="0.35" d="M 498,860 C 499,740 500,618 498,428"/>
+          <path strokeWidth="2" opacity="0.30" d="M 498,428 C 458,364 402,294 355,234 M 498,428 C 538,364 590,296 638,236 M 498,428 C 496,368 494,308 492,255"/>
+          <path strokeWidth="1.4" opacity="0.24" d="M 355,234 C 330,208 308,176 294,148 M 388,266 C 370,240 355,210 348,180 M 638,236 C 663,210 682,178 692,150 M 605,268 C 622,242 636,212 642,182 M 492,255 C 490,222 488,188 486,158 M 486,158 C 472,138 455,118 441,100 M 486,158 C 500,138 516,120 528,102"/>
+          <g fill="#f5c2c7" stroke="none" opacity="0.48">
+            <circle cx="294" cy="146" r="4.5"/><circle cx="285" cy="140" r="3"/><circle cx="303" cy="141" r="3.5"/>
+            <circle cx="348" cy="178" r="4"/><circle cx="340" cy="172" r="3"/><circle cx="356" cy="173" r="3"/>
+            <circle cx="692" cy="148" r="4.5"/><circle cx="701" cy="142" r="3"/><circle cx="684" cy="143" r="3.5"/>
+            <circle cx="642" cy="180" r="4"/><circle cx="650" cy="174" r="3"/><circle cx="634" cy="175" r="3"/>
+            <circle cx="441" cy="98"  r="4"/><circle cx="433" cy="92"  r="3"/><circle cx="449" cy="93"  r="3.5"/>
+            <circle cx="528" cy="100" r="4"/><circle cx="536" cy="94"  r="3"/><circle cx="521" cy="95"  r="3.5"/>
+            <circle cx="486" cy="156" r="3.5"/><circle cx="478" cy="150" r="3"/>
+          </g>
+          <g fill="#f5f0e8" stroke="none" opacity="0.20">
+            <circle cx="290" cy="143" r="2"/><circle cx="345" cy="175" r="1.5"/>
+            <circle cx="697" cy="145" r="2"/><circle cx="647" cy="177" r="1.5"/>
+            <circle cx="445" cy="95"  r="2"/><circle cx="532" cy="97"  r="2"/>
+          </g>
+        </g>
+
+        {/* Tree 4 — right-center */}
+        <g className="sk-t4" stroke="#f5f0e8" fill="none" strokeLinecap="round">
+          <path strokeWidth="2.5" opacity="0.30" d="M 750,825 C 751,715 752,608 750,472"/>
+          <path strokeWidth="1.8" opacity="0.25" d="M 750,472 C 720,410 676,344 642,292 M 750,472 C 780,410 822,346 855,299 M 750,472 C 748,410 746,348 744,293"/>
+          <path strokeWidth="1.2" opacity="0.20" d="M 642,292 C 622,266 608,236 603,207 M 665,316 C 649,290 637,260 632,230 M 855,299 C 868,272 876,242 879,212 M 833,322 C 847,295 856,266 860,236 M 744,293 C 742,260 740,226 738,197 M 738,197 C 724,177 708,156 696,138 M 738,197 C 752,177 767,158 778,140"/>
+          <g fill="#f5c2c7" stroke="none" opacity="0.44">
+            <circle cx="603" cy="205" r="4"/><circle cx="595" cy="199" r="3"/><circle cx="611" cy="200" r="3.5"/>
+            <circle cx="632" cy="228" r="3.5"/><circle cx="625" cy="222" r="3"/><circle cx="639" cy="223" r="3"/>
+            <circle cx="879" cy="210" r="4"/><circle cx="887" cy="204" r="3"/><circle cx="872" cy="205" r="3.5"/>
+            <circle cx="860" cy="234" r="3.5"/><circle cx="868" cy="228" r="3"/><circle cx="853" cy="229" r="3"/>
+            <circle cx="696" cy="136" r="4"/><circle cx="688" cy="130" r="3"/><circle cx="704" cy="131" r="3"/>
+            <circle cx="778" cy="138" r="4"/><circle cx="786" cy="132" r="3"/><circle cx="771" cy="133" r="3"/>
+          </g>
+        </g>
+
+        {/* Tree 5 — right edge */}
+        <g className="sk-t5" stroke="#f5f0e8" fill="none" strokeLinecap="round">
+          <path strokeWidth="2.5" opacity="0.28" d="M 960,820 C 961,720 962,630 961,550"/>
+          <path strokeWidth="1.8" opacity="0.23" d="M 961,550 C 938,492 902,426 868,374 M 961,550 C 984,492 1016,430 1046,384 M 961,550 C 959,490 957,428 955,372"/>
+          <path strokeWidth="1.2" opacity="0.18" d="M 868,374 C 851,348 840,317 836,287 M 890,398 C 876,372 865,342 860,312 M 1046,384 C 1060,358 1068,326 1072,296 M 1025,406 C 1039,380 1048,350 1053,320 M 955,372 C 936,346 914,318 896,292 M 955,372 C 974,346 992,320 1008,294"/>
+          <g fill="#f5c2c7" stroke="none" opacity="0.42">
+            <circle cx="836"  cy="285" r="4"/><circle cx="828"  cy="279" r="3"/><circle cx="844"  cy="280" r="3.5"/>
+            <circle cx="860"  cy="310" r="3.5"/><circle cx="853" cy="304" r="3"/><circle cx="867"  cy="305" r="3"/>
+            <circle cx="1072" cy="294" r="4"/><circle cx="1080" cy="288" r="3"/><circle cx="1065" cy="289" r="3.5"/>
+            <circle cx="1053" cy="318" r="3.5"/><circle cx="1061" cy="312" r="3"/><circle cx="1046" cy="313" r="3"/>
+            <circle cx="896"  cy="290" r="3.5"/><circle cx="888" cy="284" r="3"/>
+            <circle cx="1008" cy="292" r="3.5"/><circle cx="1016" cy="286" r="3"/>
+          </g>
+        </g>
+
+        {/* Pre-existing petal pile */}
+        {PILE.map((p,i) => (
+          <ellipse key={i} cx={p.x} cy={p.y} rx={p.rx} ry={p.ry}
+            fill={p.color} opacity={p.op}
+            transform={`rotate(${p.rot},${p.x},${p.y})`}/>
+        ))}
       </svg>
-
-      {/* Left branch 1 — top-left corner, 5s sway */}
-      <div style={{position:"fixed",top:0,left:0,width:480,height:220,pointerEvents:"none",zIndex:0,
-        transformOrigin:"0 0",animation:"sway 5s ease-in-out infinite",willChange:"transform"}}>
-        <svg viewBox="0 0 480 220" style={{width:"100%",height:"100%",overflow:"visible"}} xmlns="http://www.w3.org/2000/svg">
-          <path d="M 0,0 C 60,38 132,28 212,76 C 270,108 324,96 378,136" stroke="#f5f0e8" strokeWidth="2.5" fill="none" opacity="0.32"/>
-          <path d="M 115,42 C 146,16 186,8 222,20" stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.27"/>
-          <path d="M 212,76 C 222,48 242,32 274,24" stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.25"/>
-          <path d="M 295,106 C 313,78 340,62 372,56" stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.25"/>
-          <path d="M 378,136 C 390,104 408,88 438,82" stroke="#f5f0e8" strokeWidth="1.2" fill="none" opacity="0.21"/>
-          <g fill="#f5c2c7" opacity="0.50">
-            <circle cx="222" cy="18" r="4.5"/><circle cx="231" cy="12" r="3"/><circle cx="214" cy="13" r="3.5"/>
-            <circle cx="275" cy="22" r="4"/><circle cx="285" cy="16" r="3"/><circle cx="265" cy="17" r="3"/>
-            <circle cx="372" cy="54" r="4.5"/><circle cx="382" cy="48" r="3.5"/><circle cx="363" cy="49" r="3"/>
-            <circle cx="438" cy="80" r="4"/><circle cx="448" cy="74" r="3"/>
-            <circle cx="160" cy="30" r="3.5"/><circle cx="168" cy="24" r="3"/>
-          </g>
-          <g fill="#f5f0e8" opacity="0.20">
-            <circle cx="226" cy="15" r="2"/><circle cx="279" cy="19" r="1.5"/>
-            <circle cx="376" cy="51" r="2"/><circle cx="441" cy="77" r="1.5"/>
-          </g>
-        </svg>
-      </div>
-
-      {/* Left branch 2 — lower, extends toward center, crosses right branch 2 */}
-      <div style={{position:"fixed",top:52,left:0,width:700,height:170,pointerEvents:"none",zIndex:0,
-        transformOrigin:"0 0",animation:"sway 7s ease-in-out 0.8s infinite",willChange:"transform"}}>
-        <svg viewBox="0 0 700 170" style={{width:"100%",height:"100%",overflow:"visible"}} xmlns="http://www.w3.org/2000/svg">
-          <path d="M 0,0 C 85,24 210,40 340,60 C 468,80 576,84 658,97" stroke="#f5f0e8" strokeWidth="2" fill="none" opacity="0.22"/>
-          <path d="M 185,44 C 214,20 252,12 288,24" stroke="#f5f0e8" strokeWidth="1.3" fill="none" opacity="0.20"/>
-          <path d="M 405,70 C 424,44 458,32 494,40" stroke="#f5f0e8" strokeWidth="1.3" fill="none" opacity="0.18"/>
-          <path d="M 586,88 C 604,62 628,50 658,52" stroke="#f5f0e8" strokeWidth="1.2" fill="none" opacity="0.16"/>
-          <g fill="#f5c2c7" opacity="0.42">
-            <circle cx="289" cy="22" r="4"/><circle cx="298" cy="16" r="3"/><circle cx="280" cy="17" r="3"/>
-            <circle cx="494" cy="38" r="4"/><circle cx="503" cy="32" r="3"/><circle cx="485" cy="33" r="3"/>
-            <circle cx="658" cy="50" r="3.5"/><circle cx="667" cy="45" r="2.5"/>
-          </g>
-        </svg>
-      </div>
-
-      {/* Right branch 1 — top-right corner, 6s sway */}
-      <div style={{position:"fixed",top:0,right:0,width:480,height:220,pointerEvents:"none",zIndex:0,
-        transformOrigin:"100% 0",animation:"swayR 6s ease-in-out 1.2s infinite",willChange:"transform"}}>
-        <svg viewBox="0 0 480 220" style={{width:"100%",height:"100%",overflow:"visible"}} xmlns="http://www.w3.org/2000/svg">
-          <path d="M 480,0 C 420,38 348,28 268,76 C 210,108 156,96 102,136" stroke="#f5f0e8" strokeWidth="2.5" fill="none" opacity="0.32"/>
-          <path d="M 365,42 C 334,16 294,8 258,20" stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.27"/>
-          <path d="M 268,76 C 258,48 238,32 206,24" stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.25"/>
-          <path d="M 185,106 C 167,78 140,62 108,56" stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.25"/>
-          <path d="M 102,136 C 90,104 72,88 42,82" stroke="#f5f0e8" strokeWidth="1.2" fill="none" opacity="0.21"/>
-          <g fill="#f5c2c7" opacity="0.50">
-            <circle cx="258" cy="18" r="4.5"/><circle cx="249" cy="12" r="3"/><circle cx="266" cy="13" r="3.5"/>
-            <circle cx="205" cy="22" r="4"/><circle cx="195" cy="16" r="3"/><circle cx="215" cy="17" r="3"/>
-            <circle cx="108" cy="54" r="4.5"/><circle cx="98"  cy="48" r="3.5"/><circle cx="117" cy="49" r="3"/>
-            <circle cx="42"  cy="80" r="4"/><circle cx="32"  cy="74" r="3"/>
-            <circle cx="320" cy="30" r="3.5"/><circle cx="312" cy="24" r="3"/>
-          </g>
-          <g fill="#f5f0e8" opacity="0.20">
-            <circle cx="254" cy="15" r="2"/><circle cx="201" cy="19" r="1.5"/>
-            <circle cx="104" cy="51" r="2"/><circle cx="39"  cy="77" r="1.5"/>
-          </g>
-        </svg>
-      </div>
-
-      {/* Right branch 2 — lower, extends toward center, crosses left branch 2 */}
-      <div style={{position:"fixed",top:52,right:0,width:700,height:170,pointerEvents:"none",zIndex:0,
-        transformOrigin:"100% 0",animation:"swayR 8s ease-in-out 2s infinite",willChange:"transform"}}>
-        <svg viewBox="0 0 700 170" style={{width:"100%",height:"100%",overflow:"visible"}} xmlns="http://www.w3.org/2000/svg">
-          <path d="M 700,0 C 615,24 490,40 360,60 C 232,80 124,84 42,97" stroke="#f5f0e8" strokeWidth="2" fill="none" opacity="0.22"/>
-          <path d="M 515,44 C 486,20 448,12 412,24" stroke="#f5f0e8" strokeWidth="1.3" fill="none" opacity="0.20"/>
-          <path d="M 295,70 C 276,44 242,32 206,40" stroke="#f5f0e8" strokeWidth="1.3" fill="none" opacity="0.18"/>
-          <path d="M 114,88 C 96,62 72,50 42,52" stroke="#f5f0e8" strokeWidth="1.2" fill="none" opacity="0.16"/>
-          <g fill="#f5c2c7" opacity="0.42">
-            <circle cx="411" cy="22" r="4"/><circle cx="402" cy="16" r="3"/><circle cx="420" cy="17" r="3"/>
-            <circle cx="206" cy="38" r="4"/><circle cx="197" cy="32" r="3"/><circle cx="215" cy="33" r="3"/>
-            <circle cx="42"  cy="50" r="3.5"/><circle cx="33"  cy="45" r="2.5"/>
-          </g>
-        </svg>
-      </div>
 
       {/* Falling petals */}
       <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
@@ -261,14 +253,7 @@ const SakuraBg = () => {
       {/* Accumulated petals at bottom */}
       <div style={{position:"fixed",bottom:0,left:0,right:0,height:60,pointerEvents:"none",zIndex:0}}>
         {settled.map(p => (
-          <div key={p.id} style={{
-            position:"absolute", left:`${p.lp}%`, bottom:p.bp,
-            width:p.w, height:Math.round(p.w*1.4),
-            borderRadius:"50% 50% 50% 0",
-            background:p.color,
-            transform:`rotate(${p.rot}deg)`,
-            opacity:0.45,
-          }}/>
+          <div key={p.id} style={{position:"absolute",left:`${p.lp}%`,bottom:p.bp,width:p.w,height:Math.round(p.w*1.4),borderRadius:"50% 50% 50% 0",background:p.color,transform:`rotate(${p.rot}deg)`,opacity:0.45}}/>
         ))}
       </div>
     </>
