@@ -1365,10 +1365,8 @@ export default function Home() {
               <button onClick={() => setShowSettings(true)} style={{ fontSize:18, color:t.textSub, border:t.borderMed, borderRadius:7, padding:"7px 11px", background:t.bgInput, cursor:"pointer", lineHeight:1 }}>⚙</button>
             </div>
           </nav>
-          <div style={{ width:"100%", padding:"10px 20px", background:"linear-gradient(90deg, rgba(232,245,66,0.07) 0%, transparent 100%)", borderBottom:"1px solid rgba(232,245,66,0.1)", display:"flex", alignItems:"center", gap:10, zIndex:1 }}>
-            <div style={{ width:6, height:6, borderRadius:"50%", background:t.accent, boxShadow:`0 0 8px ${t.accent}80` }} />
-            <span style={{ fontSize:12, fontWeight:600, color:t.text }}>Upscaling IA</span>
-            <span style={{ fontSize:11, color:t.textMuted }}>Sharp lanczos3 · x2/x4</span>
+          <div style={{ width:"100%", padding:"14px 20px 6px", zIndex:1 }}>
+            <span style={{ fontSize:15, fontWeight:700, color:t.text, letterSpacing:"0.01em" }}>Upscaling IA</span>
           </div>
 
           <div style={{ width:"100%", maxWidth:600, display:"flex", flexDirection:"column", gap:16, padding:"24px 16px 120px", position:"relative", zIndex:1 }}>
