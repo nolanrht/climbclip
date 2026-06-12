@@ -670,6 +670,34 @@ export default function Home() {
     finally { setUpscaling(false) }
   }
 
+  const handleDownloadUpscaled = async () => {
+    if (!upscaleResultUrl || !upscaleFile) return
+    const ext = upscaleMediaType === "video"
+      ? "mp4"
+      : upscaleResultUrl.includes(".png") ? "png" : "jpg"
+    const baseName = upscaleFile.name.replace(/\.[^.]+$/, "")
+    const fileName = `${baseName}_upscaled.${ext}`
+    try {
+      const res = await fetch(upscaleResultUrl)
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = fileName
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch {
+      const a = document.createElement("a")
+      a.href = upscaleResultUrl
+      a.download = fileName
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+    }
+  }
+
   const makeSliderHandler = (setSlider: (v: number) => void) =>
     (e: React.PointerEvent<HTMLDivElement>) => {
       e.preventDefault()
@@ -1432,7 +1460,7 @@ export default function Home() {
                   </>
                 )}
 
-                <button onClick={() => { const a = document.createElement("a"); a.href = upscaleResultUrl!; a.download = upscaleResultName||"upscaled"; document.body.appendChild(a); a.click(); document.body.removeChild(a) }}
+                <button onClick={handleDownloadUpscaled}
                   style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:15, fontWeight:700, cursor:"pointer" }}>
                   Télécharger
                 </button>
