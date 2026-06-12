@@ -117,6 +117,9 @@ export default function Home() {
   const [upscaleSlider, setUpscaleSlider] = useState(50)
   const [upscaleMediaType, setUpscaleMediaType] = useState<"image"|"video"|null>(null)
   const [upscaleError, setUpscaleError] = useState<string|null>(null)
+  const [upscaleProgress, setUpscaleProgress] = useState(0)
+  const [upscaleResultName, setUpscaleResultName] = useState("")
+  const [upscaleRenaming, setUpscaleRenaming] = useState(false)
   const [capsulesType, setCapsulesType] = useState<"courte"|"longue"|null>(null)
   const [capsulesCount, setCapsulesCount] = useState(4)
   const [capsuleModeActive, setCapsuleModeActive] = useState(false)
@@ -261,6 +264,14 @@ export default function Home() {
     window.addEventListener('resize', check)
     return () => window.removeEventListener('resize', check)
   }, [])
+
+  useEffect(() => {
+    if (!upscaling) { setUpscaleProgress(0); return }
+    const id = setInterval(() => {
+      setUpscaleProgress(prev => prev >= 85 ? prev : prev + (85 - prev) * 0.06)
+    }, 600)
+    return () => clearInterval(id)
+  }, [upscaling])
 
   useEffect(() => {
     if (generating) {
@@ -623,7 +634,7 @@ export default function Home() {
 
   const handleUpscale = async () => {
     if (!upscaleFile) return
-    setUpscaling(true); setUpscaleResultUrl(null); setUpscaleError(null)
+    setUpscaling(true); setUpscaleResultUrl(null); setUpscaleError(null); setUpscaleProgress(5)
     try {
       const fd = new FormData()
       fd.append("file", upscaleFile)
@@ -631,8 +642,10 @@ export default function Home() {
       const res = await fetch(`${SERVER_URL}/upscale`, { method:"POST", body:fd })
       const data = await res.json()
       if (data.error) { setUpscaleError(data.error); return }
-      setUpscaleResultUrl(data.url)
+      setUpscaleProgress(100)
+      setUpscaleResultName(`upscaled_x${upscaleScale}_${upscaleFile.name}`)
       setUpscaleSlider(50)
+      setUpscaleResultUrl(data.url)
     } catch (e: any) { setUpscaleError(e.message) }
     finally { setUpscaling(false) }
   }
@@ -1121,95 +1134,188 @@ export default function Home() {
       )}
 
       {currentPage === "upscaling" && (
-        <div style={{ width:"100%", maxWidth:600, display:"flex", flexDirection:"column", gap:18, padding:"32px 16px 120px", position:"relative", zIndex:1 }}>
-          <p style={{ fontSize:16, fontWeight:600, color:t.text }}>Upscaling IA</p>
-          <p style={{ fontSize:12, color:t.textMuted }}>Améliore la résolution de tes photos et vidéos avec Real-ESRGAN</p>
+        <>
+          <div style={{ width:"100%", padding:"13px 20px", background:"linear-gradient(90deg, rgba(232,245,66,0.07) 0%, transparent 100%)", borderBottom:"1px solid rgba(232,245,66,0.1)", display:"flex", alignItems:"center", gap:10, position:"relative", zIndex:1, flexShrink:0 }}>
+            <div style={{ width:6, height:6, borderRadius:"50%", background:t.accent, boxShadow:`0 0 8px ${t.accent}80`, flexShrink:0 }} />
+            <span style={{ fontSize:13, fontWeight:600, color:t.text }}>Upscaling IA</span>
+            <span style={{ fontSize:11, color:t.textMuted }}>Real-ESRGAN · améliore la résolution x2 ou x4</span>
+          </div>
 
-          {!upscaleFile ? (
-            <label style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:12, padding:"48px 20px", border:`2px dashed rgba(232,245,66,0.25)`, borderRadius:16, background:t.bgCard, cursor:"pointer" }}>
-              <input type="file" accept=".jpg,.jpeg,.png,.webp,.mp4,.mov" style={{ display:"none" }} onChange={e => {
-                const f = e.target.files?.[0]
-                if (!f) return
-                setUpscaleFile(f); setUpscaleResultUrl(null); setUpscaleError(null); setUpscaleSlider(50)
-                setUpscaleMediaType(f.type.startsWith("image/") ? "image" : "video")
-                const reader = new FileReader()
-                reader.onload = ev => setUpscalePreviewUrl(ev.target?.result as string)
-                reader.readAsDataURL(f)
-              }} />
-              <span style={{ fontSize:36, opacity:0.6 }}>🔍</span>
-              <p style={{ fontSize:14, color:t.text, fontWeight:500 }}>Upload une photo ou vidéo</p>
-              <p style={{ fontSize:12, color:t.textMuted }}>JPG, PNG, WebP, MP4, MOV • max 100MB</p>
-            </label>
-          ) : (
-            <div style={{ background:t.bgCard, border:t.border, borderRadius:12, padding:"14px 16px", display:"flex", alignItems:"center", gap:12 }}>
-              <span style={{ fontSize:22 }}>{upscaleMediaType === "image" ? "🖼" : "🎬"}</span>
-              <div style={{ flex:1, minWidth:0 }}>
-                <p style={{ fontSize:13, color:t.text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{upscaleFile.name}</p>
-                <p style={{ fontSize:11, color:t.textMuted }}>{(upscaleFile.size/1024/1024).toFixed(1)} MB</p>
+          <div style={{ width:"100%", maxWidth:600, display:"flex", flexDirection:"column", gap:16, padding:"24px 16px 120px", position:"relative", zIndex:1 }}>
+
+            {/* Step 1 — type selection */}
+            {!upscaleMediaType && !upscaleResultUrl && (
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginTop:4 }}>
+                {([
+                  { type:"image" as const, icon:"📷", label:"Photo", desc1:"JPG, PNG, WebP", desc2:"IA Real-ESRGAN · x2 ou x4" },
+                  { type:"video" as const, icon:"🎬", label:"Vidéo", desc1:"MP4, MOV", desc2:"Upscaling · 1080p ou 4K" },
+                ]).map(({ type, icon, label, desc1, desc2 }) => (
+                  <button key={type} onClick={() => setUpscaleMediaType(type)}
+                    style={{ display:"flex", flexDirection:"column", alignItems:"flex-start", gap:12, padding:"22px 18px", background:t.bgCard, border:t.border, borderRadius:16, cursor:"pointer", textAlign:"left" }}>
+                    <span style={{ fontSize:34 }}>{icon}</span>
+                    <div>
+                      <p style={{ fontSize:15, fontWeight:700, color:t.text, marginBottom:5 }}>{label}</p>
+                      <p style={{ fontSize:11, color:t.textMuted, lineHeight:1.55 }}>{desc1}</p>
+                      <p style={{ fontSize:11, color:t.textMuted, lineHeight:1.55 }}>{desc2}</p>
+                    </div>
+                  </button>
+                ))}
               </div>
-              <button onClick={() => { setUpscaleFile(null); setUpscalePreviewUrl(null); setUpscaleResultUrl(null); setUpscaleError(null) }} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15 }}>✕</button>
-            </div>
-          )}
+            )}
 
-          {upscaleFile && (
-            <div style={{ display:"flex", gap:10 }}>
-              {([2, 4] as const).map(s => (
-                <button key={s} onClick={() => setUpscaleScale(s)} style={{ flex:1, padding:"10px", borderRadius:10, border:upscaleScale===s ? "1px solid rgba(232,245,66,0.55)" : t.border, background:upscaleScale===s ? "rgba(232,245,66,0.08)" : t.bgCard, color:upscaleScale===s ? t.accent : t.textSub, fontSize:14, fontWeight:upscaleScale===s ? 600 : 400, cursor:"pointer" }}>x{s}</button>
-              ))}
-            </div>
-          )}
-
-          {upscaleFile && !upscaling && !upscaleResultUrl && (
-            <button onClick={handleUpscale} style={{ width:"100%", padding:"15px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:14, fontWeight:700, cursor:"pointer" }}>Améliorer la qualité</button>
-          )}
-
-          {upscaling && (
-            <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, padding:"28px" }}>
-              <div style={{ width:16, height:16, border:`2px solid ${t.accent}`, borderTopColor:"transparent", borderRadius:"50%", animation:"spin 0.8s linear infinite" }} />
-              <p style={{ fontSize:13, color:t.textSub }}>Upscaling en cours... (peut prendre 30-60s)</p>
-            </div>
-          )}
-
-          {upscaleError && (
-            <p style={{ fontSize:12, color:"#ff6b6b", textAlign:"center", padding:"8px 0" }}>{upscaleError}</p>
-          )}
-
-          {upscaleResultUrl && upscalePreviewUrl && upscaleMediaType === "image" && (
-            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-              <p style={{ fontSize:12, color:t.textMuted }}>Glisse le curseur pour comparer avant / après</p>
-              <div style={{ position:"relative", borderRadius:12, overflow:"hidden", userSelect:"none", lineHeight:0 }}>
-                <img src={upscaleResultUrl} style={{ width:"100%", display:"block" }} alt="après" />
-                <div style={{ position:"absolute", top:0, left:0, bottom:0, width:`${upscaleSlider}%`, overflow:"hidden" }}>
-                  <img src={upscalePreviewUrl} style={{ width:`${10000/upscaleSlider}%`, maxWidth:"none", display:"block" }} alt="avant" />
+            {/* Step 2 — upload + configure */}
+            {upscaleMediaType && !upscaleResultUrl && (
+              <>
+                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <button onClick={() => { setUpscaleMediaType(null); setUpscaleFile(null); setUpscalePreviewUrl(null); setUpscaleError(null) }}
+                    style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:18, lineHeight:1, padding:"0 2px", display:"flex", alignItems:"center" }}>←</button>
+                  <span style={{ fontSize:14, fontWeight:600, color:t.text }}>{upscaleMediaType === "image" ? "📷 Photo" : "🎬 Vidéo"}</span>
                 </div>
-                <div style={{ position:"absolute", top:0, bottom:0, left:`${upscaleSlider}%`, width:2, background:"white", transform:"translateX(-50%)", pointerEvents:"none" }} />
-                <div style={{ position:"absolute", top:"50%", left:`${upscaleSlider}%`, transform:"translate(-50%,-50%)", width:30, height:30, borderRadius:"50%", background:"white", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 2px 8px rgba(0,0,0,0.5)", fontSize:12, pointerEvents:"none" }}>↔</div>
-                <input type="range" min={1} max={99} value={upscaleSlider} onChange={e => setUpscaleSlider(Number(e.target.value))} style={{ position:"absolute", inset:0, width:"100%", height:"100%", opacity:0, cursor:"col-resize", margin:0 }} />
-                <div style={{ position:"absolute", top:8, left:8, padding:"2px 8px", background:"rgba(0,0,0,0.65)", borderRadius:6, fontSize:10, color:"white", pointerEvents:"none" }}>Avant</div>
-                <div style={{ position:"absolute", top:8, right:8, padding:"2px 8px", background:"rgba(0,0,0,0.65)", borderRadius:6, fontSize:10, color:t.accent, pointerEvents:"none" }}>Après x{upscaleScale}</div>
-              </div>
-              <button onClick={() => { const a = document.createElement("a"); a.href = upscaleResultUrl!; a.download = `upscaled_x${upscaleScale}_${upscaleFile?.name||"image"}`; document.body.appendChild(a); a.click(); document.body.removeChild(a) }} style={{ width:"100%", padding:"15px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:14, fontWeight:700, cursor:"pointer" }}>Télécharger l'image améliorée</button>
-              <button onClick={() => { setUpscaleFile(null); setUpscalePreviewUrl(null); setUpscaleResultUrl(null); setUpscaleError(null) }} style={{ width:"100%", padding:"12px", borderRadius:14, border:t.border, background:"none", color:t.textSub, fontSize:13, cursor:"pointer" }}>Recommencer</button>
-            </div>
-          )}
 
-          {upscaleResultUrl && upscaleMediaType === "video" && (
-            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-                <div>
-                  <p style={{ fontSize:11, color:t.textMuted, marginBottom:6 }}>Avant</p>
-                  <video src={upscalePreviewUrl||""} controls playsInline style={{ width:"100%", borderRadius:10, background:"#000", display:"block" }} />
+                {!upscaleFile && !upscaling && (
+                  <label style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, padding:"52px 20px", border:`2px dashed rgba(232,245,66,0.2)`, borderRadius:16, background:t.bgCard, cursor:"pointer" }}>
+                    <input type="file" accept={upscaleMediaType === "image" ? ".jpg,.jpeg,.png,.webp" : ".mp4,.mov"} style={{ display:"none" }} onChange={e => {
+                      const f = e.target.files?.[0]
+                      if (!f) return
+                      setUpscaleFile(f); setUpscaleResultUrl(null); setUpscaleError(null); setUpscaleSlider(50)
+                      const reader = new FileReader()
+                      reader.onload = ev => setUpscalePreviewUrl(ev.target?.result as string)
+                      reader.readAsDataURL(f)
+                    }} />
+                    <span style={{ fontSize:38, opacity:0.5 }}>{upscaleMediaType === "image" ? "🖼" : "🎬"}</span>
+                    <div style={{ textAlign:"center" }}>
+                      <p style={{ fontSize:14, color:t.text, fontWeight:500 }}>Clique ou glisse ton fichier</p>
+                      <p style={{ fontSize:11, color:t.textMuted, marginTop:4 }}>{upscaleMediaType === "image" ? "JPG, PNG, WebP · max 20MB" : "MP4, MOV · max 200MB"}</p>
+                    </div>
+                  </label>
+                )}
+
+                {upscaleFile && (
+                  <div style={{ background:t.bgCard, border:t.border, borderRadius:12, padding:"13px 16px", display:"flex", alignItems:"center", gap:12 }}>
+                    <span style={{ fontSize:20 }}>{upscaleMediaType === "image" ? "🖼" : "🎬"}</span>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <p style={{ fontSize:13, color:t.text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{upscaleFile.name}</p>
+                      <p style={{ fontSize:11, color:t.textMuted }}>{(upscaleFile.size/1024/1024).toFixed(1)} MB</p>
+                    </div>
+                    {!upscaling && (
+                      <button onClick={() => { setUpscaleFile(null); setUpscalePreviewUrl(null); setUpscaleError(null) }}
+                        style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15 }}>✕</button>
+                    )}
+                  </div>
+                )}
+
+                {upscaleFile && !upscaling && (
+                  <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                    <p style={{ fontSize:11, color:t.textMuted }}>Qualité de sortie</p>
+                    <div style={{ display:"flex", gap:10 }}>
+                      {(upscaleMediaType === "image"
+                        ? [{ v:2 as const, label:"x2", sub:"2× résolution" }, { v:4 as const, label:"x4", sub:"4× résolution" }]
+                        : [{ v:2 as const, label:"1080p", sub:"Full HD" }, { v:4 as const, label:"4K", sub:"Ultra HD" }]
+                      ).map(({ v, label, sub }) => (
+                        <button key={v} onClick={() => setUpscaleScale(v)}
+                          style={{ flex:1, padding:"11px 8px", borderRadius:10, border:upscaleScale===v ? "1px solid rgba(232,245,66,0.5)" : t.border, background:upscaleScale===v ? "rgba(232,245,66,0.07)" : t.bgCard, color:upscaleScale===v ? t.accent : t.textSub, cursor:"pointer", textAlign:"center" }}>
+                          <p style={{ fontSize:14, fontWeight:upscaleScale===v ? 700 : 400 }}>{label}</p>
+                          <p style={{ fontSize:10, color:upscaleScale===v ? "rgba(232,245,66,0.6)" : t.textMuted, marginTop:2 }}>{sub}</p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {upscaleFile && !upscaling && (
+                  <button onClick={handleUpscale} style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:15, fontWeight:700, cursor:"pointer", marginTop:4 }}>
+                    Améliorer ↑
+                  </button>
+                )}
+
+                {upscaling && (
+                  <div style={{ display:"flex", flexDirection:"column", gap:10, padding:"8px 0" }}>
+                    <div style={{ display:"flex", justifyContent:"space-between" }}>
+                      <p style={{ fontSize:12, color:t.textSub }}>Upscaling en cours...</p>
+                      <p style={{ fontSize:11, color:t.textMuted }}>{Math.round(upscaleProgress)}%</p>
+                    </div>
+                    <div style={{ height:3, background:"rgba(255,255,255,0.06)", borderRadius:2, overflow:"hidden" }}>
+                      <div style={{ height:"100%", width:`${upscaleProgress}%`, background:t.accent, borderRadius:2, transition:"width 0.6s ease" }} />
+                    </div>
+                    <p style={{ fontSize:11, color:t.textMuted }}>{upscaleMediaType === "image" ? "Traitement Real-ESRGAN via Replicate..." : "Upscaling ffmpeg en cours..."}</p>
+                  </div>
+                )}
+
+                {upscaleError && (
+                  <div style={{ padding:"12px 16px", background:"rgba(255,107,107,0.07)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:10 }}>
+                    <p style={{ fontSize:12, color:"#ff6b6b" }}>{upscaleError}</p>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Step 3 — result */}
+            {upscaleResultUrl && (
+              <>
+                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <button onClick={() => { setUpscaleResultUrl(null); setUpscaleFile(null); setUpscalePreviewUrl(null); setUpscaleError(null); setUpscaleRenaming(false) }}
+                    style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:18, lineHeight:1, padding:"0 2px" }}>←</button>
+                  {upscaleRenaming ? (
+                    <input value={upscaleResultName} onChange={e => setUpscaleResultName(e.target.value)}
+                      onBlur={() => setUpscaleRenaming(false)}
+                      onKeyDown={e => e.key === "Enter" && setUpscaleRenaming(false)}
+                      autoFocus
+                      style={{ flex:1, background:"none", border:"none", borderBottom:`1px solid ${t.accent}`, color:t.text, fontSize:14, fontWeight:600, outline:"none", padding:"2px 0" }} />
+                  ) : (
+                    <span style={{ fontSize:14, fontWeight:600, color:t.text, flex:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{upscaleResultName}</span>
+                  )}
+                  <span style={{ fontSize:10, padding:"2px 8px", borderRadius:8, background:"rgba(232,245,66,0.1)", color:t.accent, flexShrink:0 }}>
+                    {upscaleMediaType === "video" ? (upscaleScale === 2 ? "1080p" : "4K") : `x${upscaleScale}`}
+                  </span>
                 </div>
-                <div>
-                  <p style={{ fontSize:11, color:t.accent, marginBottom:6 }}>Après x{upscaleScale}</p>
-                  <video src={upscaleResultUrl} controls playsInline style={{ width:"100%", borderRadius:10, background:"#000", display:"block" }} />
+
+                {upscaleMediaType === "image" && upscalePreviewUrl && (
+                  <>
+                    <p style={{ fontSize:11, color:t.textMuted }}>Déplace le curseur ← → pour comparer</p>
+                    <div style={{ position:"relative", borderRadius:12, overflow:"hidden", userSelect:"none", lineHeight:0 }}>
+                      <img src={upscaleResultUrl} style={{ width:"100%", display:"block" }} alt="après" />
+                      <div style={{ position:"absolute", top:0, left:0, bottom:0, width:`${upscaleSlider}%`, overflow:"hidden" }}>
+                        <img src={upscalePreviewUrl} style={{ width:`${10000/upscaleSlider}%`, maxWidth:"none", display:"block" }} alt="avant" />
+                      </div>
+                      <div style={{ position:"absolute", top:0, bottom:0, left:`${upscaleSlider}%`, width:2, background:"rgba(255,255,255,0.9)", transform:"translateX(-50%)", pointerEvents:"none" }} />
+                      <div style={{ position:"absolute", top:"50%", left:`${upscaleSlider}%`, transform:"translate(-50%,-50%)", width:28, height:28, borderRadius:"50%", background:"white", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 2px 8px rgba(0,0,0,0.6)", fontSize:11, pointerEvents:"none" }}>↔</div>
+                      <input type="range" min={1} max={99} value={upscaleSlider} onChange={e => setUpscaleSlider(Number(e.target.value))} style={{ position:"absolute", inset:0, width:"100%", height:"100%", opacity:0, cursor:"col-resize", margin:0 }} />
+                      <div style={{ position:"absolute", top:8, left:8, padding:"2px 8px", background:"rgba(0,0,0,0.7)", borderRadius:5, fontSize:10, color:"rgba(255,255,255,0.8)", pointerEvents:"none" }}>Avant</div>
+                      <div style={{ position:"absolute", top:8, right:8, padding:"2px 8px", background:"rgba(0,0,0,0.7)", borderRadius:5, fontSize:10, color:t.accent, pointerEvents:"none" }}>Après x{upscaleScale}</div>
+                    </div>
+                  </>
+                )}
+
+                {upscaleMediaType === "video" && (
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+                    <div>
+                      <p style={{ fontSize:11, color:t.textMuted, marginBottom:6 }}>Avant</p>
+                      <video src={upscalePreviewUrl||""} controls playsInline style={{ width:"100%", borderRadius:10, background:"#000", display:"block" }} />
+                    </div>
+                    <div>
+                      <p style={{ fontSize:11, color:t.accent, marginBottom:6 }}>Après {upscaleScale===2?"1080p":"4K"}</p>
+                      <video src={upscaleResultUrl} controls playsInline style={{ width:"100%", borderRadius:10, background:"#000", display:"block" }} />
+                    </div>
+                  </div>
+                )}
+
+                <button onClick={() => { const a = document.createElement("a"); a.href = upscaleResultUrl!; a.download = upscaleResultName||"upscaled"; document.body.appendChild(a); a.click(); document.body.removeChild(a) }}
+                  style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:15, fontWeight:700, cursor:"pointer" }}>
+                  Télécharger
+                </button>
+
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
+                  <button onClick={() => shareNative({ name:upscaleResultName||"upscaled", storageUrl:upscaleResultUrl, storage_url:upscaleResultUrl })}
+                    style={{ padding:"12px 8px", borderRadius:12, border:t.border, background:t.bgCard, color:t.textSub, fontSize:12, cursor:"pointer" }}>↗ Partager</button>
+                  <button onClick={() => exportToDrive({ name:upscaleResultName||"upscaled", storageUrl:upscaleResultUrl, storage_url:upscaleResultUrl })}
+                    style={{ padding:"12px 8px", borderRadius:12, border:driveConnected ? "1px solid rgba(66,133,244,0.3)" : t.border, background:driveConnected ? "rgba(66,133,244,0.06)" : t.bgCard, color:driveConnected ? "#4285f4" : t.textSub, fontSize:12, cursor:"pointer" }}>{driveConnected ? "▲ Drive" : "Drive"}</button>
+                  <button onClick={() => setUpscaleRenaming(true)}
+                    style={{ padding:"12px 8px", borderRadius:12, border:t.border, background:t.bgCard, color:t.textSub, fontSize:12, cursor:"pointer" }}>✎ Renommer</button>
                 </div>
-              </div>
-              <button onClick={() => { const a = document.createElement("a"); a.href = upscaleResultUrl!; a.download = `upscaled_x${upscaleScale}_${upscaleFile?.name||"video.mp4"}`; document.body.appendChild(a); a.click(); document.body.removeChild(a) }} style={{ width:"100%", padding:"15px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:14, fontWeight:700, cursor:"pointer" }}>Télécharger la vidéo améliorée</button>
-              <button onClick={() => { setUpscaleFile(null); setUpscalePreviewUrl(null); setUpscaleResultUrl(null); setUpscaleError(null) }} style={{ width:"100%", padding:"12px", borderRadius:14, border:t.border, background:"none", color:t.textSub, fontSize:13, cursor:"pointer" }}>Recommencer</button>
-            </div>
-          )}
-        </div>
+              </>
+            )}
+          </div>
+        </>
       )}
 
       {lastGeneratedClip && (
