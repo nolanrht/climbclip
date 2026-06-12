@@ -1263,7 +1263,7 @@ export default function Home() {
           <div style={{ width:"100%", padding:"10px 20px", background:"linear-gradient(90deg, rgba(232,245,66,0.07) 0%, transparent 100%)", borderBottom:"1px solid rgba(232,245,66,0.1)", display:"flex", alignItems:"center", gap:10, zIndex:1 }}>
             <div style={{ width:6, height:6, borderRadius:"50%", background:t.accent, boxShadow:`0 0 8px ${t.accent}80` }} />
             <span style={{ fontSize:12, fontWeight:600, color:t.text }}>Upscaling IA</span>
-            <span style={{ fontSize:11, color:t.textMuted }}>Lanczos3 + Unsharp · x2/x4</span>
+            <span style={{ fontSize:11, color:t.textMuted }}>Swin2SR · x2/x4 — FFmpeg lanczos vidéo</span>
           </div>
 
           <div style={{ width:"100%", maxWidth:600, display:"flex", flexDirection:"column", gap:16, padding:"24px 16px 120px", position:"relative", zIndex:1 }}>
@@ -1272,7 +1272,7 @@ export default function Home() {
             {!upscaleMediaType && !upscaleResultUrl && (
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginTop:4 }}>
                 {([
-                  { type:"image" as const, icon:"📷", label:"Photo", desc1:"JPG, PNG, WebP", desc2:"Sharp lanczos3 · x2 ou x4" },
+                  { type:"image" as const, icon:"📷", label:"Photo", desc1:"JPG, PNG, WebP", desc2:"Swin2SR · x2 ou x4" },
                   { type:"video" as const, icon:"🎬", label:"Vidéo", desc1:"MP4, MOV", desc2:"Upscaling · 1080p ou 4K" },
                 ]).map(({ type, icon, label, desc1, desc2 }) => (
                   <button key={type} onClick={() => setUpscaleMediaType(type)}
@@ -1362,7 +1362,7 @@ export default function Home() {
                     <div style={{ height:3, background:"rgba(255,255,255,0.06)", borderRadius:2, overflow:"hidden" }}>
                       <div style={{ height:"100%", width:`${upscaleProgress}%`, background:t.accent, borderRadius:2, transition:"width 0.6s ease" }} />
                     </div>
-                    <p style={{ fontSize:11, color:t.textMuted }}>{upscaleMediaType === "image" ? "Sharp lanczos3 + unsharp..." : "FFmpeg lanczos + unsharp..."}</p>
+                    <p style={{ fontSize:11, color:t.textMuted }}>{upscaleMediaType === "image" ? "Swin2SR via Hugging Face..." : "FFmpeg lanczos + unsharp..."}</p>
                   </div>
                 )}
 
