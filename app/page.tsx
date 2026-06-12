@@ -816,40 +816,33 @@ export default function Home() {
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
       {currentMode === "home" && (
-        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"100vh", position:"relative" }}>
-          <VideoBg dark={dark}/>
-          {dark && <NoiseBg/>}
-          <div style={{ position:"fixed", inset:0, backgroundImage:"linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)", backgroundSize:"44px 44px", pointerEvents:"none", zIndex:0 }}/>
-          <div style={{ position:"relative", zIndex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:44, padding:"56px 20px" }}>
-            <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:14 }}>
-              <ClimbLogo size={48}/>
-              <div style={{ textAlign:"center", lineHeight:1 }}>
-                <div style={{ color:t.text, fontWeight:800, fontSize:28, letterSpacing:"0.09em" }}>CLIMB</div>
-                <div style={{ color:t.textMuted, fontSize:11, letterSpacing:"0.25em" }}>CLIP</div>
-              </div>
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"100vh" }}>
+          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:52, padding:"56px 20px", width:"100%", maxWidth:520 }}>
+            <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
+              <ClimbLogo size={38}/>
+              <span style={{ color:t.text, fontWeight:800, fontSize:18, letterSpacing:"0.14em" }}>CLIMBCLIP</span>
             </div>
-            <h1 style={{ fontSize:22, fontWeight:700, color:t.text, textAlign:"center", margin:0 }}>{T.whatToDo}</h1>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, width:"100%", maxWidth:460 }}>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, width:"100%" }}>
               {([
                 { key:"clips" as const, title:T.clipGeneratorTitle, desc:T.clipGeneratorDesc, icon:(
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="2" y="6" width="20" height="14" rx="2"/><path d="m8 6-2-4"/><path d="m16 6 2-4"/><line x1="12" y1="10" x2="12" y2="16"/><line x1="9" y1="13" x2="15" y2="13"/>
                   </svg>
                 )},
                 { key:"upscaling" as const, title:"Upscaling", desc:T.upscalingModeDesc, icon:(
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
                   </svg>
                 )},
               ] as {key:"clips"|"upscaling", title:string, desc:string, icon:React.ReactNode}[]).map(card => (
                 <button key={card.key} onClick={() => setCurrentMode(card.key)}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(232,245,66,0.4)"; e.currentTarget.style.transform="translateY(-3px)" }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor=dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)"; e.currentTarget.style.transform="translateY(0)" }}
-                  style={{ display:"flex", flexDirection:"column", alignItems:"flex-start", gap:16, padding:"26px 20px", background:t.bgCard, border:dark?"1px solid rgba(255,255,255,0.08)":"1px solid rgba(0,0,0,0.1)", borderRadius:18, cursor:"pointer", textAlign:"left", transition:"border-color 0.2s, transform 0.2s", color:t.textMuted }}>
-                  {card.icon}
-                  <div>
-                    <p style={{ fontSize:15, fontWeight:700, color:t.text, marginBottom:5 }}>{card.title}</p>
-                    <p style={{ fontSize:12, color:t.textMuted, lineHeight:1.55 }}>{card.desc}</p>
+                  onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(232,245,66,0.35)"; e.currentTarget.style.boxShadow="0 0 0 1px rgba(232,245,66,0.1), 0 12px 40px rgba(0,0,0,0.5)" }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor=dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)"; e.currentTarget.style.boxShadow="none" }}
+                  style={{ display:"flex", flexDirection:"column", alignItems:"flex-start", gap:20, padding:"28px 22px", background:dark?"rgba(255,255,255,0.03)":t.bgCard, border:dark?"1px solid rgba(255,255,255,0.08)":"1px solid rgba(0,0,0,0.1)", borderRadius:16, cursor:"pointer", textAlign:"left", transition:"border-color 0.15s, box-shadow 0.15s" }}>
+                  <span style={{ color:t.accent }}>{card.icon}</span>
+                  <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+                    <span style={{ fontSize:15, fontWeight:700, color:t.text, letterSpacing:"0.01em" }}>{card.title}</span>
+                    <span style={{ fontSize:12, color:t.textMuted, lineHeight:1.6 }}>{card.desc}</span>
                   </div>
                 </button>
               ))}
@@ -1283,6 +1276,13 @@ export default function Home() {
 
       {currentMode === "upscaling" && (
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", minHeight:"100vh", width:"100%" }}>
+          {dark && <>
+            <NoiseBg/>
+            <div style={{ position:"fixed", top:"-20%", left:"10%", width:"55vw", height:"55vw", borderRadius:"50%", background:"radial-gradient(circle, rgba(232,245,66,0.022) 0%, transparent 70%)", pointerEvents:"none", zIndex:0 }}/>
+            <div style={{ position:"fixed", bottom:"25%", right:"5%", width:"40vw", height:"40vw", borderRadius:"50%", background:"radial-gradient(circle, rgba(180,180,255,0.015) 0%, transparent 70%)", pointerEvents:"none", zIndex:0 }}/>
+            <div style={{ position:"fixed", inset:0, backgroundImage:"repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.007) 3px, rgba(255,255,255,0.007) 4px)", pointerEvents:"none", zIndex:0 }}/>
+          </>}
+          <MountainBg dark={dark}/>
           <nav style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 16px", borderBottom:t.border, background:t.bgNav, backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", position:"sticky", top:0, zIndex:50 }}>
             <div style={{ display:"flex", alignItems:"center", gap:8 }}>
               <ClimbLogo size={26}/>
