@@ -89,52 +89,118 @@ const NoiseBg = () => (
   </svg>
 )
 
-const JungleBg = () => (
-  <svg
-    style={{ position:"fixed", inset:0, width:"100%", height:"100%", pointerEvents:"none", zIndex:0 }}
-    viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="jbg" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="#040904" stopOpacity="0.88"/>
-        <stop offset="100%" stopColor="#0a1a0a"/>
-      </linearGradient>
-    </defs>
-    <rect width="1200" height="800" fill="url(#jbg)"/>
-    {/* Far back canopy */}
-    <path fill="#0a1a0a" d="M0,482 C90,437 195,470 300,434 C405,398 510,457 610,420 C710,383 820,447 930,410 C1040,373 1140,440 1200,412 L1200,800 L0,800 Z"/>
-    {/* Mid canopy */}
-    <path fill="#0d2a0d" d="M0,574 C60,540 132,563 202,538 C272,513 342,551 417,525 C492,499 564,539 647,513 C730,487 802,529 880,505 C958,481 1040,519 1114,497 C1164,483 1193,504 1200,495 L1200,800 L0,800 Z"/>
-    {/* Front canopy */}
-    <path fill="#163016" d="M0,650 C42,620 88,641 134,615 C180,589 230,625 286,601 C342,577 394,613 452,589 C510,565 572,604 642,579 C712,554 772,593 840,571 C908,549 970,583 1040,563 C1110,543 1162,569 1200,556 L1200,800 L0,800 Z"/>
-    {/* Left palm fronds */}
-    <g fill="#1a3a1a">
-      <path d="M -20,-20 C 120,-30 340,10 450,42 C 340,18 120,-16 -20,-14 Z"/>
-      <path d="M -20,-20 C 80,10 230,70 352,162 C 230,88 80,26 -20,-10 Z"/>
-      <path d="M -20,-20 C 50,40 170,150 252,284 C 170,166 50,56 -20,-10 Z"/>
-      <path d="M -20,-20 C 10,60 60,200 102,364 C 60,216 10,76 -30,-10 Z"/>
-      <path d="M -20,-20 C -28,70 -10,232 32,424 C -10,240 -26,76 -40,-10 Z"/>
-    </g>
-    {/* Right palm fronds */}
-    <g fill="#1a3a1a">
-      <path d="M 1220,-20 C 1080,-30 860,10 750,42 C 860,18 1080,-16 1220,-14 Z"/>
-      <path d="M 1220,-20 C 1120,10 970,70 848,162 C 970,88 1120,26 1220,-10 Z"/>
-      <path d="M 1220,-20 C 1150,40 1030,150 948,284 C 1030,166 1150,56 1220,-10 Z"/>
-      <path d="M 1220,-20 C 1190,60 1140,200 1098,364 C 1140,216 1190,76 1230,-10 Z"/>
-      <path d="M 1220,-20 C 1228,70 1210,232 1168,424 C 1210,240 1226,76 1240,-10 Z"/>
-    </g>
-    {/* Left tropical leaves */}
-    <g fill="#162e16">
-      <path d="M -10,262 C 40,222 132,226 186,264 C 132,296 40,292 -10,280 Z"/>
-      <path d="M -10,342 C 50,302 146,309 193,346 C 146,379 50,373 -10,361 Z"/>
-      <path d="M -10,422 C 46,386 136,391 181,426 C 136,459 46,454 -10,440 Z"/>
-    </g>
-    {/* Right tropical leaves */}
-    <g fill="#162e16">
-      <path d="M 1210,262 C 1160,222 1068,226 1014,264 C 1068,296 1160,292 1210,280 Z"/>
-      <path d="M 1210,342 C 1150,302 1054,309 1007,346 C 1054,379 1150,373 1210,361 Z"/>
-      <path d="M 1210,422 C 1154,386 1064,391 1019,426 C 1064,459 1154,454 1210,440 Z"/>
-    </g>
-  </svg>
+const SakuraBg = () => (
+  <>
+    <style>{`
+      @keyframes sway  { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(1.8deg)}  }
+      @keyframes swayR { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(-1.8deg)} }
+      @keyframes fallA {
+        0%  {transform:translateY(-20px) rotate(0deg);opacity:0}
+        8%  {opacity:.65}
+        92% {opacity:.4}
+        100%{transform:translateY(calc(100vh + 30px)) translateX(45px) rotate(400deg);opacity:0}
+      }
+      @keyframes fallB {
+        0%  {transform:translateY(-20px) rotate(30deg);opacity:0}
+        8%  {opacity:.6}
+        92% {opacity:.4}
+        100%{transform:translateY(calc(100vh + 30px)) translateX(-40px) rotate(-350deg);opacity:0}
+      }
+      @keyframes fallC {
+        0%  {transform:translateY(-20px) rotate(-20deg);opacity:0}
+        8%  {opacity:.65}
+        50% {transform:translateY(50vh) translateX(18px) rotate(200deg)}
+        92% {opacity:.4}
+        100%{transform:translateY(calc(100vh + 30px)) translateX(-12px) rotate(420deg);opacity:0}
+      }
+    `}</style>
+
+    {/* Subtle calligraphy strokes */}
+    <svg style={{position:"fixed",inset:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0}}
+      viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <g stroke="#f5f0e8" fill="none">
+        <line x1="88"   y1="15" x2="87"   y2="570" strokeWidth="1.5" opacity="0.038"/>
+        <line x1="184"  y1="0"  x2="183"  y2="400" strokeWidth="1"   opacity="0.024"/>
+        <line x1="1112" y1="15" x2="1113" y2="590" strokeWidth="1.5" opacity="0.038"/>
+        <line x1="1016" y1="0"  x2="1017" y2="420" strokeWidth="1"   opacity="0.024"/>
+        <line x1="598"  y1="60" x2="597"  y2="310" strokeWidth="1"   opacity="0.018"/>
+      </g>
+    </svg>
+
+    {/* Left branch — swaying from top-left corner */}
+    <div style={{position:"fixed",top:0,left:0,width:480,height:220,pointerEvents:"none",zIndex:0,
+      transformOrigin:"0 0",animation:"sway 5s ease-in-out infinite",willChange:"transform"}}>
+      <svg viewBox="0 0 480 220" style={{width:"100%",height:"100%",overflow:"visible"}} xmlns="http://www.w3.org/2000/svg">
+        <path d="M 0,0 C 60,38 132,28 212,76 C 270,108 324,96 378,136"
+          stroke="#f5f0e8" strokeWidth="2.5" fill="none" opacity="0.32"/>
+        <path d="M 115,42 C 146,16 186,8 222,20"
+          stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.27"/>
+        <path d="M 212,76 C 222,48 242,32 274,24"
+          stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.25"/>
+        <path d="M 295,106 C 313,78 340,62 372,56"
+          stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.25"/>
+        <path d="M 378,136 C 390,104 408,88 438,82"
+          stroke="#f5f0e8" strokeWidth="1.2" fill="none" opacity="0.21"/>
+        <g fill="#f5c2c7" opacity="0.50">
+          <circle cx="222" cy="18" r="4.5"/><circle cx="231" cy="12" r="3"/><circle cx="214" cy="13" r="3.5"/>
+          <circle cx="275" cy="22" r="4"/><circle cx="285" cy="16" r="3"/><circle cx="265" cy="17" r="3"/>
+          <circle cx="372" cy="54" r="4.5"/><circle cx="382" cy="48" r="3.5"/><circle cx="363" cy="49" r="3"/>
+          <circle cx="438" cy="80" r="4"/><circle cx="448" cy="74" r="3"/>
+          <circle cx="160" cy="30" r="3.5"/><circle cx="168" cy="24" r="3"/>
+        </g>
+        <g fill="#f5f0e8" opacity="0.20">
+          <circle cx="226" cy="15" r="2"/><circle cx="279" cy="19" r="1.5"/>
+          <circle cx="376" cy="51" r="2"/><circle cx="441" cy="77" r="1.5"/>
+        </g>
+      </svg>
+    </div>
+
+    {/* Right branch — swaying from top-right corner */}
+    <div style={{position:"fixed",top:0,right:0,width:480,height:220,pointerEvents:"none",zIndex:0,
+      transformOrigin:"100% 0",animation:"swayR 6s ease-in-out 1.2s infinite",willChange:"transform"}}>
+      <svg viewBox="0 0 480 220" style={{width:"100%",height:"100%",overflow:"visible"}} xmlns="http://www.w3.org/2000/svg">
+        <path d="M 480,0 C 420,38 348,28 268,76 C 210,108 156,96 102,136"
+          stroke="#f5f0e8" strokeWidth="2.5" fill="none" opacity="0.32"/>
+        <path d="M 365,42 C 334,16 294,8 258,20"
+          stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.27"/>
+        <path d="M 268,76 C 258,48 238,32 206,24"
+          stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.25"/>
+        <path d="M 185,106 C 167,78 140,62 108,56"
+          stroke="#f5f0e8" strokeWidth="1.5" fill="none" opacity="0.25"/>
+        <path d="M 102,136 C 90,104 72,88 42,82"
+          stroke="#f5f0e8" strokeWidth="1.2" fill="none" opacity="0.21"/>
+        <g fill="#f5c2c7" opacity="0.50">
+          <circle cx="258" cy="18" r="4.5"/><circle cx="249" cy="12" r="3"/><circle cx="266" cy="13" r="3.5"/>
+          <circle cx="205" cy="22" r="4"/><circle cx="195" cy="16" r="3"/><circle cx="215" cy="17" r="3"/>
+          <circle cx="108" cy="54" r="4.5"/><circle cx="98"  cy="48" r="3.5"/><circle cx="117" cy="49" r="3"/>
+          <circle cx="42"  cy="80" r="4"/><circle cx="32"  cy="74" r="3"/>
+          <circle cx="320" cy="30" r="3.5"/><circle cx="312" cy="24" r="3"/>
+        </g>
+        <g fill="#f5f0e8" opacity="0.20">
+          <circle cx="254" cy="15" r="2"/><circle cx="201" cy="19" r="1.5"/>
+          <circle cx="104" cy="51" r="2"/><circle cx="39"  cy="77" r="1.5"/>
+        </g>
+      </svg>
+    </div>
+
+    {/* Falling petals */}
+    <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
+      {([
+        {left:"12%", anim:"fallA 9s ease-in 0s infinite",    color:"#f5c2c7", rot:"15deg" },
+        {left:"27%", anim:"fallB 11s ease-in 2.5s infinite", color:"#f5c2c7", rot:"-20deg"},
+        {left:"43%", anim:"fallC 8.5s ease-in 5s infinite",  color:"#f5f0e8", rot:"40deg" },
+        {left:"57%", anim:"fallA 10s ease-in 1.5s infinite", color:"#f5c2c7", rot:"-10deg"},
+        {left:"70%", anim:"fallB 9.5s ease-in 4s infinite",  color:"#f5f0e8", rot:"30deg" },
+        {left:"82%", anim:"fallC 12s ease-in 7s infinite",   color:"#f5c2c7", rot:"-35deg"},
+        {left:"20%", anim:"fallB 10.5s ease-in 3s infinite", color:"#f5f0e8", rot:"50deg" },
+        {left:"64%", anim:"fallA 8s ease-in 8.5s infinite",  color:"#f5c2c7", rot:"-5deg" },
+      ] as {left:string,anim:string,color:string,rot:string}[]).map(({left,anim,color,rot},i)=>(
+        <div key={i} style={{position:"absolute",top:0,left,animation:anim,willChange:"transform,opacity"}}>
+          <div style={{width:8,height:11,borderRadius:"50% 50% 50% 0",background:color,transform:`rotate(${rot})`}}/>
+        </div>
+      ))}
+    </div>
+  </>
 )
 
 export default function Home() {
@@ -823,7 +889,7 @@ export default function Home() {
 
       {currentMode === "home" && (
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"100vh", position:"relative" }}>
-          <JungleBg/>
+          <SakuraBg/>
           <div style={{ position:"relative", zIndex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:52, padding:"56px 20px", width:"100%", maxWidth:520 }}>
             <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
               <ClimbLogo size={38}/>
@@ -845,7 +911,7 @@ export default function Home() {
                 <button key={card.key} onClick={() => setCurrentMode(card.key)}
                   onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(232,245,66,0.35)"; e.currentTarget.style.boxShadow="0 0 0 1px rgba(232,245,66,0.1), 0 12px 40px rgba(0,0,0,0.5)" }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor=dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)"; e.currentTarget.style.boxShadow="none" }}
-                  style={{ display:"flex", flexDirection:"column", alignItems:"flex-start", gap:20, padding:"28px 22px", background:dark?"rgba(10,10,10,0.72)":t.bgCard, border:dark?"1px solid rgba(255,255,255,0.1)":"1px solid rgba(0,0,0,0.1)", borderRadius:16, cursor:"pointer", textAlign:"left", transition:"border-color 0.15s, box-shadow 0.15s", backdropFilter:"blur(8px)", WebkitBackdropFilter:"blur(8px)" }}>
+                  style={{ display:"flex", flexDirection:"column", alignItems:"flex-start", gap:20, padding:"28px 22px", background:dark?"rgba(255,255,255,0.04)":t.bgCard, border:dark?"1px solid rgba(255,255,255,0.1)":"1px solid rgba(0,0,0,0.1)", borderRadius:16, cursor:"pointer", textAlign:"left", transition:"border-color 0.15s, box-shadow 0.15s", backdropFilter:"blur(6px)", WebkitBackdropFilter:"blur(6px)" }}>
                   <span style={{ color:t.accent }}>{card.icon}</span>
                   <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
                     <span style={{ fontSize:15, fontWeight:700, color:t.text, letterSpacing:"0.01em" }}>{card.title}</span>
