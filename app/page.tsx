@@ -89,46 +89,52 @@ const NoiseBg = () => (
   </svg>
 )
 
-const VideoBg = ({ dark }: { dark: boolean }) => (
-  <>
-    <style>{`
-      @keyframes vb1{0%,100%{opacity:.22}50%{opacity:.55}}
-      @keyframes vb2{0%,100%{opacity:.12}50%{opacity:.38}}
-      @keyframes vb3{0%,100%{opacity:.07}60%{opacity:.28}}
-    `}</style>
-    <svg style={{ position:"fixed", inset:0, width:"100%", height:"100%", pointerEvents:"none", zIndex:0 }}
-      viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <rect x="0" y="540" width="1200" height="42" fill={dark?"rgba(255,255,255,0.018)":"rgba(0,0,0,0.015)"}/>
-      <rect x="0" y="539" width="1200" height="1" fill={dark?"rgba(255,255,255,0.07)":"rgba(0,0,0,0.06)"}/>
-      <rect x="0" y="582" width="1200" height="1" fill={dark?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.04)"}/>
-      {([[15,78,"vb1","2.8s","0s"],[103,42,"vb2","3.2s","0.6s"],[155,108,"vb1","2.5s","1.1s"],[273,62,"vb3","3.8s","0.3s"],[345,94,"vb2","2.9s","1.5s"],[449,52,"vb1","3.1s","0.8s"],[511,126,"vb3","2.7s","0.4s"],[647,50,"vb2","3.5s","1.8s"],[707,86,"vb1","2.6s","0.9s"],[803,70,"vb3","3.3s","1.2s"],[883,112,"vb2","2.8s","0.5s"],[1005,46,"vb1","3.6s","1.4s"],[1061,74,"vb3","2.9s","0.7s"],[1145,50,"vb2","3.1s","2.0s"]] as [number,number,string,string,string][]).map(([x,w,a,d,dl])=>(
-        <rect key={`t1-${x}`} x={x} y="546" width={w} height="30" rx="3" fill="#e8f542" style={{ animation:`${a} ${d} ease-in-out ${dl} infinite` }}/>
-      ))}
-      <rect x="0" y="592" width="1200" height="26" fill={dark?"rgba(255,255,255,0.012)":"rgba(0,0,0,0.010)"}/>
-      <rect x="0" y="591" width="1200" height="0.5" fill={dark?"rgba(255,255,255,0.05)":"rgba(0,0,0,0.04)"}/>
-      <rect x="0" y="618" width="1200" height="0.5" fill={dark?"rgba(255,255,255,0.03)":"rgba(0,0,0,0.03)"}/>
-      {([[38,55,"vb3","3.4s","1.0s"],[103,88,"vb2","2.7s","0.2s"],[201,38,"vb1","3.0s","1.6s"],[249,72,"vb3","2.8s","0.8s"],[331,116,"vb2","3.3s","1.3s"],[457,44,"vb1","2.9s","0.5s"],[511,82,"vb3","3.1s","1.9s"],[603,58,"vb2","2.6s","0.4s"],[671,98,"vb1","3.4s","1.1s"],[779,54,"vb3","2.8s","0.6s"],[843,90,"vb2","3.2s","1.7s"],[943,48,"vb1","2.7s","0.9s"],[1001,74,"vb3","3.5s","1.5s"],[1085,58,"vb2","2.9s","2.2s"],[1153,40,"vb1","3.6s","0.3s"]] as [number,number,string,string,string][]).map(([x,w,a,d,dl])=>(
-        <rect key={`t2-${x}`} x={x} y="595" width={w} height="18" rx="2" fill="#e8f542" opacity="0.7" style={{ animation:`${a} ${d} ease-in-out ${dl} infinite` }}/>
-      ))}
-      <g fill={dark?"rgba(232,245,66,0.10)":"rgba(0,0,0,0.07)"}>
-        {[8,14,6,20,12,18,5,16,22,10,15,8,25,11,19,7,13,21,9,17,12,6,23,14,18,8,20,15,10,24,7,16,11,19,5,22,13,17,9,21,14,8,18,12,25,10,16,7,20,15,12,9,18,6,22,14,8,20,11,17,5,23,10,16,25,7,15,19,8,21,13,6,24,12,18,9,20,14,7,22,11,17,4,23,10,15,8,19,6,22,13,18,9,21,12,7,25,14,17,8,20,11,16,5,23,9,18,13,21,7,8,14,6,20,12].map((h,i)=>(
-          <rect key={i} x={i*10} y={640-h/2} width={7} height={h} rx={1}/>
-        ))}
-      </g>
-      <rect x="0" y="635" width="1200" height="0.5" fill={dark?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.04)"}/>
-      {[155,273,345,449,511,647,707,803,883,1005,1061,1145].map(x=>(
-        <rect key={x} x={x} y="536" width="1" height="83" fill={dark?"rgba(255,255,255,0.12)":"rgba(0,0,0,0.08)"}/>
-      ))}
-      <rect x="434" y="496" width="2" height="140" fill={dark?"rgba(232,245,66,0.32)":"rgba(50,50,0,0.18)"}/>
-      <polygon points="426,496 442,496 435,512" fill={dark?"rgba(232,245,66,0.55)":"rgba(50,50,0,0.3)"}/>
-      <g fill={dark?"rgba(255,255,255,0.042)":"rgba(0,0,0,0.03)"}>
-        {[0,1,2,3,4,5,6,7,8,9,10,11,12].map(i=>(<circle key={i} cx="14" cy={30+i*40} r="5"/>))}
-      </g>
-      <g fill={dark?"rgba(255,255,255,0.042)":"rgba(0,0,0,0.03)"}>
-        {[0,1,2,3,4,5,6,7,8,9,10,11,12].map(i=>(<circle key={i} cx="1186" cy={45+i*40} r="5"/>))}
-      </g>
-    </svg>
-  </>
+const JungleBg = () => (
+  <svg
+    style={{ position:"fixed", inset:0, width:"100%", height:"100%", pointerEvents:"none", zIndex:0 }}
+    viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="jbg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#040904" stopOpacity="0.88"/>
+        <stop offset="100%" stopColor="#0a1a0a"/>
+      </linearGradient>
+    </defs>
+    <rect width="1200" height="800" fill="url(#jbg)"/>
+    {/* Far back canopy */}
+    <path fill="#0a1a0a" d="M0,482 C90,437 195,470 300,434 C405,398 510,457 610,420 C710,383 820,447 930,410 C1040,373 1140,440 1200,412 L1200,800 L0,800 Z"/>
+    {/* Mid canopy */}
+    <path fill="#0d2a0d" d="M0,574 C60,540 132,563 202,538 C272,513 342,551 417,525 C492,499 564,539 647,513 C730,487 802,529 880,505 C958,481 1040,519 1114,497 C1164,483 1193,504 1200,495 L1200,800 L0,800 Z"/>
+    {/* Front canopy */}
+    <path fill="#163016" d="M0,650 C42,620 88,641 134,615 C180,589 230,625 286,601 C342,577 394,613 452,589 C510,565 572,604 642,579 C712,554 772,593 840,571 C908,549 970,583 1040,563 C1110,543 1162,569 1200,556 L1200,800 L0,800 Z"/>
+    {/* Left palm fronds */}
+    <g fill="#1a3a1a">
+      <path d="M -20,-20 C 120,-30 340,10 450,42 C 340,18 120,-16 -20,-14 Z"/>
+      <path d="M -20,-20 C 80,10 230,70 352,162 C 230,88 80,26 -20,-10 Z"/>
+      <path d="M -20,-20 C 50,40 170,150 252,284 C 170,166 50,56 -20,-10 Z"/>
+      <path d="M -20,-20 C 10,60 60,200 102,364 C 60,216 10,76 -30,-10 Z"/>
+      <path d="M -20,-20 C -28,70 -10,232 32,424 C -10,240 -26,76 -40,-10 Z"/>
+    </g>
+    {/* Right palm fronds */}
+    <g fill="#1a3a1a">
+      <path d="M 1220,-20 C 1080,-30 860,10 750,42 C 860,18 1080,-16 1220,-14 Z"/>
+      <path d="M 1220,-20 C 1120,10 970,70 848,162 C 970,88 1120,26 1220,-10 Z"/>
+      <path d="M 1220,-20 C 1150,40 1030,150 948,284 C 1030,166 1150,56 1220,-10 Z"/>
+      <path d="M 1220,-20 C 1190,60 1140,200 1098,364 C 1140,216 1190,76 1230,-10 Z"/>
+      <path d="M 1220,-20 C 1228,70 1210,232 1168,424 C 1210,240 1226,76 1240,-10 Z"/>
+    </g>
+    {/* Left tropical leaves */}
+    <g fill="#162e16">
+      <path d="M -10,262 C 40,222 132,226 186,264 C 132,296 40,292 -10,280 Z"/>
+      <path d="M -10,342 C 50,302 146,309 193,346 C 146,379 50,373 -10,361 Z"/>
+      <path d="M -10,422 C 46,386 136,391 181,426 C 136,459 46,454 -10,440 Z"/>
+    </g>
+    {/* Right tropical leaves */}
+    <g fill="#162e16">
+      <path d="M 1210,262 C 1160,222 1068,226 1014,264 C 1068,296 1160,292 1210,280 Z"/>
+      <path d="M 1210,342 C 1150,302 1054,309 1007,346 C 1054,379 1150,373 1210,361 Z"/>
+      <path d="M 1210,422 C 1154,386 1064,391 1019,426 C 1064,459 1154,454 1210,440 Z"/>
+    </g>
+  </svg>
 )
 
 export default function Home() {
@@ -816,8 +822,9 @@ export default function Home() {
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
       {currentMode === "home" && (
-        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"100vh" }}>
-          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:52, padding:"56px 20px", width:"100%", maxWidth:520 }}>
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"100vh", position:"relative" }}>
+          <JungleBg/>
+          <div style={{ position:"relative", zIndex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:52, padding:"56px 20px", width:"100%", maxWidth:520 }}>
             <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
               <ClimbLogo size={38}/>
               <span style={{ color:t.text, fontWeight:800, fontSize:18, letterSpacing:"0.14em" }}>CLIMBCLIP</span>
@@ -838,7 +845,7 @@ export default function Home() {
                 <button key={card.key} onClick={() => setCurrentMode(card.key)}
                   onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(232,245,66,0.35)"; e.currentTarget.style.boxShadow="0 0 0 1px rgba(232,245,66,0.1), 0 12px 40px rgba(0,0,0,0.5)" }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor=dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)"; e.currentTarget.style.boxShadow="none" }}
-                  style={{ display:"flex", flexDirection:"column", alignItems:"flex-start", gap:20, padding:"28px 22px", background:dark?"rgba(255,255,255,0.03)":t.bgCard, border:dark?"1px solid rgba(255,255,255,0.08)":"1px solid rgba(0,0,0,0.1)", borderRadius:16, cursor:"pointer", textAlign:"left", transition:"border-color 0.15s, box-shadow 0.15s" }}>
+                  style={{ display:"flex", flexDirection:"column", alignItems:"flex-start", gap:20, padding:"28px 22px", background:dark?"rgba(10,10,10,0.72)":t.bgCard, border:dark?"1px solid rgba(255,255,255,0.1)":"1px solid rgba(0,0,0,0.1)", borderRadius:16, cursor:"pointer", textAlign:"left", transition:"border-color 0.15s, box-shadow 0.15s", backdropFilter:"blur(8px)", WebkitBackdropFilter:"blur(8px)" }}>
                   <span style={{ color:t.accent }}>{card.icon}</span>
                   <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
                     <span style={{ fontSize:15, fontWeight:700, color:t.text, letterSpacing:"0.01em" }}>{card.title}</span>
