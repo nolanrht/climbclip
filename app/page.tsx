@@ -324,6 +324,7 @@ export default function Home() {
   const searchTimeout = useRef<ReturnType<typeof setTimeout>|null>(null)
   const generatingMsgRef = useRef<ReturnType<typeof setInterval>|null>(null)
   const canvasRef = useRef<HTMLCanvasElement|null>(null)
+  const imgGommageRef = useRef<HTMLImageElement|null>(null)
   const drawingRef = useRef(false)
   const lastPosRef = useRef({x:0, y:0})
   const defaultQueries = ["phonk","rap us","drill","travis scott","central cee"]
@@ -823,17 +824,21 @@ export default function Home() {
 
   const handleGommage = async () => {
     if (!gommagePreview || !canvasRef.current) return
+    const canvas = canvasRef.current
+    const imgEl = imgGommageRef.current
+    if (!imgEl || !imgEl.complete || !imgEl.naturalWidth) {
+      setGommageError("Image pas encore chargée, réessaye dans un instant.")
+      return
+    }
     setGommageProcessing(true); setGommageError(null)
     try {
-      const maskData = canvasRef.current.toDataURL("image/png")
-      console.log('[gommage] image length:', gommagePreview.length, 'mask length:', maskData.length)
+      const maskData = canvas.toDataURL("image/png")
       const res = await fetch(`${SERVER_URL}/retouch/inpaint`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image: gommagePreview, mask: maskData }),
       })
       const data = await res.json()
-      console.log('[gommage] response:', data.error || 'ok')
       if (data.error) { setGommageError(data.error); return }
       setGommageResult(data.result); setGommageSlider(50)
     } catch (e: any) { setGommageError(e.message) }
@@ -1695,7 +1700,7 @@ export default function Home() {
                 </div>
                 <p style={{ fontSize:11, color:t.textMuted }}>Dessine sur les zones à effacer, puis clique "Gommer"</p>
                 <div style={{ position:"relative", borderRadius:12, overflow:"hidden", userSelect:"none", lineHeight:0 }}>
-                  <img src={gommagePreview!} style={{ width:"100%", display:"block" }} draggable={false}
+                  <img ref={imgGommageRef} src={gommagePreview!} style={{ width:"100%", display:"block" }} draggable={false}
                     onLoad={e => {
                       const img = e.target as HTMLImageElement
                       if (canvasRef.current) {
