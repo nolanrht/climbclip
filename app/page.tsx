@@ -822,13 +822,17 @@ export default function Home() {
   }
 
   const handleGommage = async () => {
-    if (!gommageFile || !canvasRef.current) return
+    if (!gommagePreview || !canvasRef.current) return
     setGommageProcessing(true); setGommageError(null)
     try {
-      const fd = new FormData()
-      fd.append("image", gommageFile)
-      fd.append("mask", canvasRef.current.toDataURL("image/png"))
-      const res = await fetch(`${SERVER_URL}/retouch/inpaint`, { method:"POST", body:fd })
+      const res = await fetch(`${SERVER_URL}/retouch/inpaint`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          image: gommagePreview,
+          mask: canvasRef.current.toDataURL("image/png"),
+        }),
+      })
       const data = await res.json()
       if (data.error) { setGommageError(data.error); return }
       setGommageResult(data.result); setGommageSlider(50)
