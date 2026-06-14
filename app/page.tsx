@@ -196,17 +196,6 @@ const DASH_TPLS: Record<string, {bg:string,accent:string,name:string,fee:number,
   Inflow: {bg:"#140f00",accent:"#f97316",name:"Inflow",   fee:0.90,sub:"Conversions"},
 }
 
-function dashGenOrganic(total: number, n: number): number[] {
-  const r: number[] = []
-  for (let i = 0; i < n; i++) {
-    const wd = i % 7; const wb = wd >= 5 ? 1.4 : 1.0
-    const tr = 0.7 + 0.6 * i / n
-    r.push(wb * tr * (0.5 + Math.random()))
-  }
-  const s = r.reduce((a, b) => a + b, 0)
-  return r.map(v => v / s * total)
-}
-
 export default function Home() {
   const router = useRouter()
   const [dark, setDark] = useState(true)
@@ -343,13 +332,16 @@ export default function Home() {
   const [dashPeriod, setDashPeriod] = useState<"24h"|"7d"|"1w"|"30d"|"custom">("30d")
   const [dashStartDate, setDashStartDate] = useState("")
   const [dashEndDate, setDashEndDate] = useState("")
-  const [dashGenerated, setDashGenerated] = useState(false)
+  const [dashFile, setDashFile] = useState<File|null>(null)
+  const [dashPreview, setDashPreview] = useState<string|null>(null)
+  const [dashResult, setDashResult] = useState<string|null>(null)
+  const [dashProcessing, setDashProcessing] = useState(false)
+  const [dashError, setDashError] = useState<string|null>(null)
 
   const audioRef = useRef<HTMLAudioElement|null>(null)
   const searchTimeout = useRef<ReturnType<typeof setTimeout>|null>(null)
   const generatingMsgRef = useRef<ReturnType<typeof setInterval>|null>(null)
   const canvasRef = useRef<HTMLCanvasElement|null>(null)
-  const dashCanvasRef = useRef<HTMLCanvasElement|null>(null)
   const imgGommageRef = useRef<HTMLImageElement|null>(null)
   const drawingRef = useRef(false)
   const lastPosRef = useRef({x:0, y:0})
@@ -433,117 +425,31 @@ export default function Home() {
     return () => { if (generatingMsgRef.current) clearInterval(generatingMsgRef.current) }
   }, [generating])
 
-  useEffect(() => {
-    if (!dashGenerated || !dashCanvasRef.current || !dashTemplate) return
-    const canvas = dashCanvasRef.current
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-    const W = canvas.width, H = canvas.height
-    const tpl = DASH_TPLS[dashTemplate]
-    const raw = parseFloat(dashAmount.replace(/[^0-9.,]/g,'').replace(',','.')) || 0
-    const net = Math.round(raw * tpl.fee)
-
-    let bars = 30, periodLabel = '30 derniers jours', days = 30
-    if (dashPeriod === '24h') { bars = 24; days = 1; periodLabel = 'Dernières 24h' }
-    else if (dashPeriod === '7d' || dashPeriod === '1w') { bars = 7; days = 7; periodLabel = '7 derniers jours' }
-    else if (dashPeriod === '30d') { bars = 30; days = 30; periodLabel = '30 derniers jours' }
-    else if (dashPeriod === 'custom' && dashStartDate && dashEndDate) {
-      const ms = new Date(dashEndDate).getTime() - new Date(dashStartDate).getTime()
-      days = Math.max(1, Math.ceil(ms / 86400000)); bars = Math.min(days, 60)
-      periodLabel = `${dashStartDate} → ${dashEndDate}`
+  const generateDashboard = async () => {
+    if (!dashFile || !dashAmount || !dashTemplate) return
+    setDashProcessing(true); setDashError(null); setDashResult(null)
+    try {
+      const fd = new FormData()
+      fd.append('image', dashFile)
+      fd.append('amount', dashAmount)
+      fd.append('period', dashPeriod)
+      fd.append('template', dashTemplate)
+      if (dashPeriod === 'custom') { fd.append('startDate', dashStartDate); fd.append('endDate', dashEndDate) }
+      const res = await fetch(`${SERVER_URL}/dashboard/generate`, { method: 'POST', body: fd })
+      const json = await res.json()
+      if (json.error) throw new Error(json.error)
+      setDashResult(json.image)
+    } catch (err: any) {
+      setDashError(err.message || 'Erreur serveur')
+    } finally {
+      setDashProcessing(false)
     }
-    const avgDay = raw / days
-    const subs = Math.round(raw / (tpl.fee * 12)) + 40
-    const data = dashGenOrganic(raw, bars)
-    const maxVal = Math.max(...data)
-    const fmtAmt = (v: number) => v >= 1000 ? `${(v/1000).toFixed(1)}k €` : `${Math.round(v)} €`
+  }
 
-    const rr = (x: number, y: number, w: number, h: number, r: number) => {
-      ctx.beginPath(); ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y)
-      ctx.quadraticCurveTo(x+w, y, x+w, y+r); ctx.lineTo(x+w, y+h-r)
-      ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h); ctx.lineTo(x+r, y+h)
-      ctx.quadraticCurveTo(x, y+h, x, y+h-r); ctx.lineTo(x, y+r)
-      ctx.quadraticCurveTo(x, y, x+r, y); ctx.closePath()
-    }
-
-    ctx.fillStyle = tpl.bg; ctx.fillRect(0, 0, W, H)
-
-    ctx.fillStyle = 'rgba(255,255,255,0.025)'
-    for (let gy = 30; gy < H; gy += 36) for (let gx = 30; gx < W; gx += 36) {
-      ctx.beginPath(); ctx.arc(gx, gy, 1, 0, Math.PI*2); ctx.fill()
-    }
-
-    const hg = ctx.createRadialGradient(W*0.5, 0, 0, W*0.5, 0, 250)
-    hg.addColorStop(0, tpl.accent + '18'); hg.addColorStop(1, 'transparent')
-    ctx.fillStyle = hg; ctx.fillRect(0, 0, W, 200)
-
-    ctx.font = 'bold 24px -apple-system,BlinkMacSystemFont,sans-serif'
-    ctx.fillStyle = '#fff'; ctx.fillText(tpl.name, 28, 52)
-    ctx.fillStyle = tpl.accent; ctx.beginPath(); ctx.arc(W - 30, 30, 5, 0, Math.PI*2); ctx.fill()
-
-    ctx.fillStyle = tpl.accent + '1a'
-    rr(W - 220, 13, 180, 30, 15); ctx.fill()
-    ctx.font = '11px -apple-system,sans-serif'; ctx.fillStyle = tpl.accent
-    ctx.textAlign = 'center'; ctx.fillText(periodLabel, W - 130, 33); ctx.textAlign = 'left'
-
-    const cPad = 14, cGap = 10
-    const cW = (W - cPad * 2 - cGap * 3) / 4, cH = 80, cY = 68
-    const cards = [
-      {label:'Montant brut', val:fmtAmt(raw),    hi:true},
-      {label:'Net estimé',   val:fmtAmt(net),    hi:false},
-      {label:'Moy / jour',   val:fmtAmt(avgDay), hi:false},
-      {label:tpl.sub,        val:`${subs} +`,    hi:false},
-    ]
-    cards.forEach((c, i) => {
-      const cx = cPad + i * (cW + cGap)
-      ctx.fillStyle = c.hi ? tpl.accent + '14' : 'rgba(255,255,255,0.04)'
-      rr(cx, cY, cW, cH, 10); ctx.fill()
-      ctx.strokeStyle = c.hi ? tpl.accent + '45' : 'rgba(255,255,255,0.06)'
-      ctx.lineWidth = 1; rr(cx, cY, cW, cH, 10); ctx.stroke()
-      ctx.font = '10px -apple-system,sans-serif'
-      ctx.fillStyle = c.hi ? tpl.accent : 'rgba(255,255,255,0.4)'
-      ctx.fillText(c.label.toUpperCase(), cx + 10, cY + 20)
-      ctx.font = 'bold 18px -apple-system,sans-serif'
-      ctx.fillStyle = '#fff'; ctx.fillText(c.val, cx + 10, cY + 52)
-    })
-
-    const chartX = cPad, chartY = 168, chartW = W - cPad * 2, chartH = H - 200
-
-    ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1
-    for (let l = 1; l <= 4; l++) {
-      const y = chartY + chartH - (l / 4) * chartH
-      ctx.beginPath(); ctx.moveTo(chartX, y); ctx.lineTo(chartX + chartW, y); ctx.stroke()
-      ctx.font = '10px -apple-system,sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.2)'
-      ctx.fillText(fmtAmt(maxVal * l / 4), chartX + 2, y - 4)
-    }
-
-    const bGap = bars > 20 ? 1 : 4
-    const bW = Math.max(2, (chartW - bGap * (bars - 1)) / bars)
-    data.forEach((v, i) => {
-      const bH = Math.max(2, (v / maxVal) * chartH)
-      const bx = chartX + i * (bW + bGap), by = chartY + chartH - bH
-      const bg2 = ctx.createLinearGradient(bx, by, bx, by + bH)
-      bg2.addColorStop(0, tpl.accent); bg2.addColorStop(1, tpl.accent + '44')
-      ctx.fillStyle = bg2; rr(bx, by, bW, bH, Math.min(3, bW / 2)); ctx.fill()
-    })
-
-    const lblIdxs = bars <= 8 ? [...Array(bars).keys()] : [0, Math.round(bars/4), Math.round(bars/2), Math.round(3*bars/4), bars-1]
-    ctx.font = '10px -apple-system,sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.3)'
-    lblIdxs.forEach(i => {
-      const lbl = dashPeriod === '24h' ? `${i}h` : `J${i+1}`
-      const lx = chartX + i * (bW + bGap) + bW / 2
-      ctx.textAlign = 'center'; ctx.fillText(lbl, lx, chartY + chartH + 15)
-    })
-    ctx.textAlign = 'left'
-
-    ctx.font = '10px -apple-system,sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.1)'
-    ctx.fillText('CLIMBCLIP', W - 76, H - 10)
-  }, [dashGenerated, dashTemplate, dashAmount, dashPeriod, dashStartDate, dashEndDate])
-
-  const downloadDash = () => {
-    if (!dashCanvasRef.current) return
+  const downloadDashResult = () => {
+    if (!dashResult) return
     const a = document.createElement('a')
-    a.href = dashCanvasRef.current.toDataURL('image/png')
+    a.href = dashResult
     a.download = `dashboard-${dashTemplate || 'stats'}.png`
     a.click()
   }
@@ -2063,7 +1969,7 @@ export default function Home() {
             <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(150px, 1fr))", gap:14 }}>
               {Object.entries(DASH_TPLS).map(([key, tpl]) => (
                 <button key={key}
-                  onClick={() => { setDashTemplate(key); setDashAmount(""); setDashPeriod("30d"); setDashGenerated(false) }}
+                  onClick={() => { setDashTemplate(key); setDashAmount(""); setDashPeriod("30d"); setDashResult(null); setDashFile(null); setDashPreview(null); setDashError(null) }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = tpl.accent + "70"; e.currentTarget.style.background = tpl.accent + "0d" }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.style.background = "rgba(255,255,255,0.03)" }}
                   style={{ padding:"28px 16px", borderRadius:16, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.03)", cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:14, transition:"border-color 0.15s, background 0.15s", textAlign:"center" }}>
@@ -2083,7 +1989,7 @@ export default function Home() {
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", minHeight:"100vh", width:"100%", background:DASH_TPLS[dashTemplate].bg }}>
           <nav style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 16px", borderBottom:`1px solid ${DASH_TPLS[dashTemplate].accent}18`, background:DASH_TPLS[dashTemplate].bg + "ee", backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", position:"sticky", top:0, zIndex:50 }}>
             <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <button onClick={() => { setDashTemplate(null); setDashGenerated(false) }}
+              <button onClick={() => { setDashTemplate(null); setDashResult(null); setDashFile(null); setDashPreview(null); setDashError(null) }}
                 style={{ fontSize:12, color:"rgba(255,255,255,0.5)", background:"none", border:"none", cursor:"pointer", padding:0, display:"flex", alignItems:"center", gap:6 }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 Retour
@@ -2095,15 +2001,45 @@ export default function Home() {
             <ClimbLogo size={22}/>
           </nav>
 
-          <div style={{ width:"100%", maxWidth:860, padding:"36px 16px 60px", display:"flex", flexDirection:"column", gap:28 }}>
-            <div style={{ background:"rgba(255,255,255,0.04)", border:`1px solid ${DASH_TPLS[dashTemplate].accent}20`, borderRadius:18, padding:"26px 22px", display:"flex", flexDirection:"column", gap:22 }}>
+          <div style={{ width:"100%", maxWidth:860, padding:"32px 16px 60px", display:"flex", flexDirection:"column", gap:24 }}>
+
+            {/* ── Upload zone ── */}
+            <div>
+              <p style={{ fontSize:11, color:DASH_TPLS[dashTemplate].accent, letterSpacing:"0.12em", textTransform:"uppercase", fontWeight:600, marginBottom:10 }}>Modèle de dashboard</p>
+              <input
+                type="file" accept="image/png,image/jpeg,image/webp"
+                id="dash-upload"
+                style={{ display:"none" }}
+                onChange={e => {
+                  const f = e.target.files?.[0]; if (!f) return
+                  setDashFile(f); setDashPreview(URL.createObjectURL(f))
+                  setDashResult(null); setDashError(null)
+                }}
+              />
+              {!dashPreview ? (
+                <label htmlFor="dash-upload" style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:12, height:180, borderRadius:14, border:`2px dashed ${DASH_TPLS[dashTemplate].accent}40`, background:"rgba(255,255,255,0.02)", cursor:"pointer", transition:"border-color 0.15s" }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={DASH_TPLS[dashTemplate].accent} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  <span style={{ fontSize:13, color:"rgba(255,255,255,0.4)" }}>Clique pour uploader ton screenshot de dashboard</span>
+                  <span style={{ fontSize:11, color:"rgba(255,255,255,0.2)" }}>PNG · JPG · WEBP</span>
+                </label>
+              ) : (
+                <div style={{ position:"relative", borderRadius:14, overflow:"hidden", border:`1px solid ${DASH_TPLS[dashTemplate].accent}25` }}>
+                  <img src={dashPreview} style={{ width:"100%", maxHeight:340, objectFit:"contain", display:"block", background:"rgba(0,0,0,0.3)" }}/>
+                  <button onClick={() => { setDashFile(null); setDashPreview(null); setDashResult(null); setDashError(null) }}
+                    style={{ position:"absolute", top:10, right:10, background:"rgba(0,0,0,0.6)", border:"none", color:"#fff", borderRadius:20, width:28, height:28, cursor:"pointer", fontSize:14, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+                  <label htmlFor="dash-upload" style={{ position:"absolute", bottom:10, right:10, background:"rgba(0,0,0,0.6)", border:`1px solid rgba(255,255,255,0.15)`, color:"#fff", borderRadius:8, padding:"5px 12px", cursor:"pointer", fontSize:12 }}>Changer</label>
+                </div>
+              )}
+            </div>
+
+            {/* ── Params ── */}
+            <div style={{ background:"rgba(255,255,255,0.04)", border:`1px solid ${DASH_TPLS[dashTemplate].accent}20`, borderRadius:18, padding:"24px 20px", display:"flex", flexDirection:"column", gap:20 }}>
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 <label style={{ fontSize:11, color:DASH_TPLS[dashTemplate].accent, letterSpacing:"0.12em", textTransform:"uppercase", fontWeight:600 }}>Montant brut</label>
                 <input
                   value={dashAmount}
-                  onChange={e => { setDashAmount(e.target.value); setDashGenerated(false) }}
+                  onChange={e => { setDashAmount(e.target.value); setDashResult(null) }}
                   placeholder="ex : 5000"
-                  autoFocus
                   style={{ background:"rgba(255,255,255,0.06)", border:`1px solid ${DASH_TPLS[dashTemplate].accent}30`, borderRadius:10, padding:"14px 16px", fontSize:20, fontWeight:700, color:"#fff", outline:"none", width:"100%", boxSizing:"border-box" }}
                 />
               </div>
@@ -2113,7 +2049,7 @@ export default function Home() {
                 <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
                   {(["24h","7d","1w","30d","custom"] as const).map(p => (
                     <button key={p}
-                      onClick={() => { setDashPeriod(p); setDashGenerated(false) }}
+                      onClick={() => { setDashPeriod(p); setDashResult(null) }}
                       style={{ padding:"9px 18px", borderRadius:9, border:`1px solid ${dashPeriod === p ? DASH_TPLS[dashTemplate].accent + "80" : "rgba(255,255,255,0.1)"}`, background:dashPeriod === p ? DASH_TPLS[dashTemplate].accent + "18" : "rgba(255,255,255,0.03)", color:dashPeriod === p ? DASH_TPLS[dashTemplate].accent : "rgba(255,255,255,0.55)", cursor:"pointer", fontSize:13, fontWeight:dashPeriod === p ? 600 : 400, transition:"all 0.12s" }}>
                       {p === "24h" ? "24 heures" : p === "7d" ? "7 jours" : p === "1w" ? "1 semaine" : p === "30d" ? "30 jours" : "Personnalisé"}
                     </button>
@@ -2121,33 +2057,33 @@ export default function Home() {
                 </div>
                 {dashPeriod === "custom" && (
                   <div style={{ display:"flex", gap:10, alignItems:"center", marginTop:4 }}>
-                    <input type="date" value={dashStartDate} onChange={e => { setDashStartDate(e.target.value); setDashGenerated(false) }}
+                    <input type="date" value={dashStartDate} onChange={e => { setDashStartDate(e.target.value); setDashResult(null) }}
                       style={{ background:"rgba(255,255,255,0.05)", border:`1px solid ${DASH_TPLS[dashTemplate].accent}30`, borderRadius:8, padding:"9px 12px", fontSize:13, color:"#fff", outline:"none", colorScheme:"dark" }}/>
                     <span style={{ color:"rgba(255,255,255,0.3)" }}>→</span>
-                    <input type="date" value={dashEndDate} onChange={e => { setDashEndDate(e.target.value); setDashGenerated(false) }}
+                    <input type="date" value={dashEndDate} onChange={e => { setDashEndDate(e.target.value); setDashResult(null) }}
                       style={{ background:"rgba(255,255,255,0.05)", border:`1px solid ${DASH_TPLS[dashTemplate].accent}30`, borderRadius:8, padding:"9px 12px", fontSize:13, color:"#fff", outline:"none", colorScheme:"dark" }}/>
                   </div>
                 )}
               </div>
 
               <button
-                onClick={() => setDashGenerated(true)}
-                disabled={!dashAmount}
-                style={{ padding:"14px 0", borderRadius:10, border:"none", background:dashAmount ? DASH_TPLS[dashTemplate].accent : "rgba(255,255,255,0.06)", color:dashAmount ? "#0a0a0a" : "rgba(255,255,255,0.2)", cursor:dashAmount ? "pointer" : "not-allowed", fontSize:14, fontWeight:700, letterSpacing:"0.04em", transition:"background 0.15s" }}>
-                Générer le dashboard
+                onClick={generateDashboard}
+                disabled={!dashFile || !dashAmount || dashProcessing}
+                style={{ padding:"14px 0", borderRadius:10, border:"none", background:(dashFile && dashAmount && !dashProcessing) ? DASH_TPLS[dashTemplate].accent : "rgba(255,255,255,0.06)", color:(dashFile && dashAmount && !dashProcessing) ? "#0a0a0a" : "rgba(255,255,255,0.25)", cursor:(dashFile && dashAmount && !dashProcessing) ? "pointer" : "not-allowed", fontSize:14, fontWeight:700, letterSpacing:"0.04em", transition:"background 0.15s" }}>
+                {dashProcessing ? "Génération en cours…" : "Générer le dashboard"}
               </button>
+
+              {dashError && (
+                <p style={{ fontSize:12, color:"#f87171", background:"rgba(248,113,113,0.08)", border:"1px solid rgba(248,113,113,0.2)", borderRadius:8, padding:"10px 14px", margin:0 }}>{dashError}</p>
+              )}
             </div>
 
-            {dashGenerated && (
+            {/* ── Result ── */}
+            {dashResult && (
               <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                <canvas
-                  ref={dashCanvasRef}
-                  width={800}
-                  height={480}
-                  style={{ width:"100%", borderRadius:16, display:"block", border:`1px solid ${DASH_TPLS[dashTemplate].accent}25` }}
-                />
+                <img src={dashResult} style={{ width:"100%", borderRadius:16, display:"block", border:`1px solid ${DASH_TPLS[dashTemplate].accent}25` }}/>
                 <button
-                  onClick={downloadDash}
+                  onClick={downloadDashResult}
                   style={{ alignSelf:"flex-end", padding:"11px 24px", borderRadius:9, border:`1px solid ${DASH_TPLS[dashTemplate].accent}40`, background:DASH_TPLS[dashTemplate].accent + "0f", color:DASH_TPLS[dashTemplate].accent, cursor:"pointer", fontSize:13, fontWeight:600, display:"flex", alignItems:"center", gap:8 }}>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   Télécharger en PNG
