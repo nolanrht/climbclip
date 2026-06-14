@@ -2043,7 +2043,7 @@ export default function Home() {
         </div>
       )}
 
-      {currentMode === "dashboard" && (
+      {currentMode === "dashboard" && !dashTemplate && (
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", minHeight:"100vh", width:"100%", background:"#0a0a0a" }}>
           <MountainBg dark={true}/>
           <nav style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 16px", borderBottom:"1px solid rgba(255,255,255,0.07)", background:"rgba(10,10,10,0.92)", backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", position:"sticky", top:0, zIndex:50 }}>
@@ -2051,70 +2051,94 @@ export default function Home() {
               <ClimbLogo size={26}/>
               <span style={{ color:"#efefef", fontWeight:700, fontSize:13, letterSpacing:"0.1em" }}>DASHBOARD</span>
             </div>
-            <button onClick={() => { setCurrentMode("home"); setDashTemplate(null); setDashGenerated(false) }}
-              style={{ fontSize:12, color:"#999", background:"none", border:"1px solid rgba(255,255,255,0.07)", borderRadius:8, padding:"6px 14px", cursor:"pointer" }}>← Retour</button>
+            <button onClick={() => setCurrentMode("home")}
+              style={{ fontSize:12, color:"#999", background:"none", border:"1px solid rgba(255,255,255,0.07)", borderRadius:8, padding:"6px 14px", cursor:"pointer" }}>← Accueil</button>
           </nav>
 
-          <div style={{ width:"100%", maxWidth:860, padding:"28px 16px 60px", display:"flex", flexDirection:"column", gap:24 }}>
-            <div>
-              <p style={{ fontSize:11, color:"rgba(255,255,255,0.35)", letterSpacing:"0.12em", marginBottom:12, textTransform:"uppercase" }}>Choisir un template</p>
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:10 }}>
-                {Object.entries(DASH_TPLS).map(([key, tpl]) => (
-                  <button key={key}
-                    onClick={() => { setDashTemplate(key); setDashGenerated(false) }}
-                    style={{ padding:"16px 10px", borderRadius:12, border:`1px solid ${dashTemplate === key ? tpl.accent + "70" : "rgba(255,255,255,0.08)"}`, background:dashTemplate === key ? tpl.accent + "10" : "rgba(255,255,255,0.03)", cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:6, transition:"border-color 0.15s, background 0.15s" }}>
-                    <span style={{ width:10, height:10, borderRadius:"50%", background:tpl.accent, display:"block" }}/>
-                    <span style={{ fontSize:13, fontWeight:700, color:"#fff" }}>{key}</span>
-                    <span style={{ fontSize:10, color:"rgba(255,255,255,0.4)" }}>{tpl.name}</span>
-                  </button>
-                ))}
+          <div style={{ width:"100%", maxWidth:860, padding:"48px 16px 60px", display:"flex", flexDirection:"column", gap:32 }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+              <h1 style={{ fontSize:28, fontWeight:800, color:"#fff", letterSpacing:"-0.02em", margin:0 }}>Choisir un template</h1>
+              <p style={{ fontSize:14, color:"rgba(255,255,255,0.35)", margin:0 }}>Sélectionne la plateforme pour générer ton dashboard de revenus.</p>
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(150px, 1fr))", gap:14 }}>
+              {Object.entries(DASH_TPLS).map(([key, tpl]) => (
+                <button key={key}
+                  onClick={() => { setDashTemplate(key); setDashAmount(""); setDashPeriod("30d"); setDashGenerated(false) }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = tpl.accent + "70"; e.currentTarget.style.background = tpl.accent + "0d" }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.style.background = "rgba(255,255,255,0.03)" }}
+                  style={{ padding:"28px 16px", borderRadius:16, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.03)", cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:14, transition:"border-color 0.15s, background 0.15s", textAlign:"center" }}>
+                  <span style={{ width:14, height:14, borderRadius:"50%", background:tpl.accent, display:"block", boxShadow:`0 0 12px ${tpl.accent}66` }}/>
+                  <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+                    <span style={{ fontSize:18, fontWeight:800, color:"#fff" }}>{key}</span>
+                    <span style={{ fontSize:11, color:"rgba(255,255,255,0.35)" }}>{tpl.name}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {currentMode === "dashboard" && dashTemplate && (
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", minHeight:"100vh", width:"100%", background:DASH_TPLS[dashTemplate].bg }}>
+          <nav style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 16px", borderBottom:`1px solid ${DASH_TPLS[dashTemplate].accent}18`, background:DASH_TPLS[dashTemplate].bg + "ee", backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", position:"sticky", top:0, zIndex:50 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <button onClick={() => { setDashTemplate(null); setDashGenerated(false) }}
+                style={{ fontSize:12, color:"rgba(255,255,255,0.5)", background:"none", border:"none", cursor:"pointer", padding:0, display:"flex", alignItems:"center", gap:6 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                Retour
+              </button>
+              <span style={{ color:"rgba(255,255,255,0.15)" }}>|</span>
+              <span style={{ color:"rgba(255,255,255,0.8)", fontWeight:700, fontSize:13 }}>{dashTemplate}</span>
+              <span style={{ fontSize:11, color:DASH_TPLS[dashTemplate].accent, background:DASH_TPLS[dashTemplate].accent + "18", padding:"2px 10px", borderRadius:20 }}>{DASH_TPLS[dashTemplate].name}</span>
+            </div>
+            <ClimbLogo size={22}/>
+          </nav>
+
+          <div style={{ width:"100%", maxWidth:860, padding:"36px 16px 60px", display:"flex", flexDirection:"column", gap:28 }}>
+            <div style={{ background:"rgba(255,255,255,0.04)", border:`1px solid ${DASH_TPLS[dashTemplate].accent}20`, borderRadius:18, padding:"26px 22px", display:"flex", flexDirection:"column", gap:22 }}>
+              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                <label style={{ fontSize:11, color:DASH_TPLS[dashTemplate].accent, letterSpacing:"0.12em", textTransform:"uppercase", fontWeight:600 }}>Montant brut</label>
+                <input
+                  value={dashAmount}
+                  onChange={e => { setDashAmount(e.target.value); setDashGenerated(false) }}
+                  placeholder="ex : 5000"
+                  autoFocus
+                  style={{ background:"rgba(255,255,255,0.06)", border:`1px solid ${DASH_TPLS[dashTemplate].accent}30`, borderRadius:10, padding:"14px 16px", fontSize:20, fontWeight:700, color:"#fff", outline:"none", width:"100%", boxSizing:"border-box" }}
+                />
               </div>
+
+              <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                <label style={{ fontSize:11, color:DASH_TPLS[dashTemplate].accent, letterSpacing:"0.12em", textTransform:"uppercase", fontWeight:600 }}>Période</label>
+                <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+                  {(["24h","7d","1w","30d","custom"] as const).map(p => (
+                    <button key={p}
+                      onClick={() => { setDashPeriod(p); setDashGenerated(false) }}
+                      style={{ padding:"9px 18px", borderRadius:9, border:`1px solid ${dashPeriod === p ? DASH_TPLS[dashTemplate].accent + "80" : "rgba(255,255,255,0.1)"}`, background:dashPeriod === p ? DASH_TPLS[dashTemplate].accent + "18" : "rgba(255,255,255,0.03)", color:dashPeriod === p ? DASH_TPLS[dashTemplate].accent : "rgba(255,255,255,0.55)", cursor:"pointer", fontSize:13, fontWeight:dashPeriod === p ? 600 : 400, transition:"all 0.12s" }}>
+                      {p === "24h" ? "24 heures" : p === "7d" ? "7 jours" : p === "1w" ? "1 semaine" : p === "30d" ? "30 jours" : "Personnalisé"}
+                    </button>
+                  ))}
+                </div>
+                {dashPeriod === "custom" && (
+                  <div style={{ display:"flex", gap:10, alignItems:"center", marginTop:4 }}>
+                    <input type="date" value={dashStartDate} onChange={e => { setDashStartDate(e.target.value); setDashGenerated(false) }}
+                      style={{ background:"rgba(255,255,255,0.05)", border:`1px solid ${DASH_TPLS[dashTemplate].accent}30`, borderRadius:8, padding:"9px 12px", fontSize:13, color:"#fff", outline:"none", colorScheme:"dark" }}/>
+                    <span style={{ color:"rgba(255,255,255,0.3)" }}>→</span>
+                    <input type="date" value={dashEndDate} onChange={e => { setDashEndDate(e.target.value); setDashGenerated(false) }}
+                      style={{ background:"rgba(255,255,255,0.05)", border:`1px solid ${DASH_TPLS[dashTemplate].accent}30`, borderRadius:8, padding:"9px 12px", fontSize:13, color:"#fff", outline:"none", colorScheme:"dark" }}/>
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={() => setDashGenerated(true)}
+                disabled={!dashAmount}
+                style={{ padding:"14px 0", borderRadius:10, border:"none", background:dashAmount ? DASH_TPLS[dashTemplate].accent : "rgba(255,255,255,0.06)", color:dashAmount ? "#0a0a0a" : "rgba(255,255,255,0.2)", cursor:dashAmount ? "pointer" : "not-allowed", fontSize:14, fontWeight:700, letterSpacing:"0.04em", transition:"background 0.15s" }}>
+                Générer le dashboard
+              </button>
             </div>
 
-            {dashTemplate && (
-              <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:16, padding:"22px 20px", display:"flex", flexDirection:"column", gap:20 }}>
-                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                  <label style={{ fontSize:12, color:"rgba(255,255,255,0.5)", letterSpacing:"0.08em", textTransform:"uppercase" }}>Montant brut</label>
-                  <input
-                    value={dashAmount}
-                    onChange={e => { setDashAmount(e.target.value); setDashGenerated(false) }}
-                    placeholder="ex : 5000"
-                    style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, padding:"12px 14px", fontSize:16, color:"#fff", outline:"none", width:"100%", boxSizing:"border-box" }}
-                  />
-                </div>
-
-                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                  <label style={{ fontSize:12, color:"rgba(255,255,255,0.5)", letterSpacing:"0.08em", textTransform:"uppercase" }}>Période</label>
-                  <div style={{ display:"flex", gap:7, flexWrap:"wrap" }}>
-                    {(["24h","7d","1w","30d","custom"] as const).map(p => (
-                      <button key={p}
-                        onClick={() => { setDashPeriod(p); setDashGenerated(false) }}
-                        style={{ padding:"8px 16px", borderRadius:8, border:`1px solid ${dashPeriod === p ? DASH_TPLS[dashTemplate].accent + "70" : "rgba(255,255,255,0.1)"}`, background:dashPeriod === p ? DASH_TPLS[dashTemplate].accent + "14" : "rgba(255,255,255,0.03)", color:dashPeriod === p ? DASH_TPLS[dashTemplate].accent : "rgba(255,255,255,0.6)", cursor:"pointer", fontSize:13, transition:"all 0.12s" }}>
-                        {p === "24h" ? "24 heures" : p === "7d" ? "7 jours" : p === "1w" ? "1 semaine" : p === "30d" ? "30 jours" : "Personnalisé"}
-                      </button>
-                    ))}
-                  </div>
-                  {dashPeriod === "custom" && (
-                    <div style={{ display:"flex", gap:10, alignItems:"center", marginTop:6 }}>
-                      <input type="date" value={dashStartDate} onChange={e => { setDashStartDate(e.target.value); setDashGenerated(false) }}
-                        style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"9px 12px", fontSize:13, color:"#fff", outline:"none", colorScheme:"dark" }}/>
-                      <span style={{ color:"rgba(255,255,255,0.3)" }}>→</span>
-                      <input type="date" value={dashEndDate} onChange={e => { setDashEndDate(e.target.value); setDashGenerated(false) }}
-                        style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"9px 12px", fontSize:13, color:"#fff", outline:"none", colorScheme:"dark" }}/>
-                    </div>
-                  )}
-                </div>
-
-                <button
-                  onClick={() => setDashGenerated(true)}
-                  disabled={!dashAmount}
-                  style={{ padding:"13px 0", borderRadius:10, border:"none", background:dashAmount ? DASH_TPLS[dashTemplate].accent : "rgba(255,255,255,0.08)", color:dashAmount ? "#0a0a0a" : "rgba(255,255,255,0.2)", cursor:dashAmount ? "pointer" : "not-allowed", fontSize:14, fontWeight:700, letterSpacing:"0.04em", transition:"background 0.15s" }}>
-                  Générer le dashboard
-                </button>
-              </div>
-            )}
-
-            {dashGenerated && dashTemplate && (
+            {dashGenerated && (
               <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                 <canvas
                   ref={dashCanvasRef}
@@ -2124,7 +2148,7 @@ export default function Home() {
                 />
                 <button
                   onClick={downloadDash}
-                  style={{ alignSelf:"flex-end", padding:"10px 24px", borderRadius:9, border:`1px solid rgba(255,255,255,0.15)`, background:"rgba(255,255,255,0.06)", color:"#fff", cursor:"pointer", fontSize:13, fontWeight:600, display:"flex", alignItems:"center", gap:8 }}>
+                  style={{ alignSelf:"flex-end", padding:"11px 24px", borderRadius:9, border:`1px solid ${DASH_TPLS[dashTemplate].accent}40`, background:DASH_TPLS[dashTemplate].accent + "0f", color:DASH_TPLS[dashTemplate].accent, cursor:"pointer", fontSize:13, fontWeight:600, display:"flex", alignItems:"center", gap:8 }}>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   Télécharger en PNG
                 </button>
