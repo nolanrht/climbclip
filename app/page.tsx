@@ -188,12 +188,31 @@ const SakuraBg = () => {
   )
 }
 
+const DASH_TPLS: Record<string, {bg:string,accent:string,name:string,fee:number,sub:string}> = {
+  OF:     {bg:"#0c0c1e",accent:"#00aff0",name:"OnlyFans", fee:0.80,sub:"Abonnés"},
+  Fanfix: {bg:"#0f0a1e",accent:"#a855f7",name:"Fanfix",   fee:0.85,sub:"Supporters"},
+  Fanvue: {bg:"#081a18",accent:"#14b8a6",name:"Fanvue",   fee:0.85,sub:"Fans actifs"},
+  Reveal: {bg:"#1a0a14",accent:"#f43f5e",name:"Reveal",   fee:0.80,sub:"Viewers"},
+  Inflow: {bg:"#140f00",accent:"#f97316",name:"Inflow",   fee:0.90,sub:"Conversions"},
+}
+
+function dashGenOrganic(total: number, n: number): number[] {
+  const r: number[] = []
+  for (let i = 0; i < n; i++) {
+    const wd = i % 7; const wb = wd >= 5 ? 1.4 : 1.0
+    const tr = 0.7 + 0.6 * i / n
+    r.push(wb * tr * (0.5 + Math.random()))
+  }
+  const s = r.reduce((a, b) => a + b, 0)
+  return r.map(v => v / s * total)
+}
+
 export default function Home() {
   const router = useRouter()
   const [dark, setDark] = useState(true)
   const [lang, setLang] = useState<Lang>("FR")
   const [user, setUser] = useState<any>(null)
-  const [currentMode, setCurrentMode] = useState<"home"|"clips"|"retouche">("home")
+  const [currentMode, setCurrentMode] = useState<"home"|"clips"|"retouche"|"dashboard">("home")
   const [currentPage, setCurrentPage] = useState<"home"|"library"|"history">("home")
   const [activeOptions, setActiveOptions] = useState<string[]>(["Beat sync"])
   const [showSettings, setShowSettings] = useState(false)
@@ -319,11 +338,18 @@ export default function Home() {
   const [txtProcessing, setTxtProcessing] = useState(false)
   const [txtError, setTxtError] = useState<string|null>(null)
   const [txtSlider, setTxtSlider] = useState(50)
+  const [dashTemplate, setDashTemplate] = useState<string|null>(null)
+  const [dashAmount, setDashAmount] = useState("")
+  const [dashPeriod, setDashPeriod] = useState<"24h"|"7d"|"1w"|"30d"|"custom">("30d")
+  const [dashStartDate, setDashStartDate] = useState("")
+  const [dashEndDate, setDashEndDate] = useState("")
+  const [dashGenerated, setDashGenerated] = useState(false)
 
   const audioRef = useRef<HTMLAudioElement|null>(null)
   const searchTimeout = useRef<ReturnType<typeof setTimeout>|null>(null)
   const generatingMsgRef = useRef<ReturnType<typeof setInterval>|null>(null)
   const canvasRef = useRef<HTMLCanvasElement|null>(null)
+  const dashCanvasRef = useRef<HTMLCanvasElement|null>(null)
   const imgGommageRef = useRef<HTMLImageElement|null>(null)
   const drawingRef = useRef(false)
   const lastPosRef = useRef({x:0, y:0})
@@ -406,6 +432,122 @@ export default function Home() {
     }
     return () => { if (generatingMsgRef.current) clearInterval(generatingMsgRef.current) }
   }, [generating])
+
+  useEffect(() => {
+    if (!dashGenerated || !dashCanvasRef.current || !dashTemplate) return
+    const canvas = dashCanvasRef.current
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const W = canvas.width, H = canvas.height
+    const tpl = DASH_TPLS[dashTemplate]
+    const raw = parseFloat(dashAmount.replace(/[^0-9.,]/g,'').replace(',','.')) || 0
+    const net = Math.round(raw * tpl.fee)
+
+    let bars = 30, periodLabel = '30 derniers jours', days = 30
+    if (dashPeriod === '24h') { bars = 24; days = 1; periodLabel = 'Dernières 24h' }
+    else if (dashPeriod === '7d' || dashPeriod === '1w') { bars = 7; days = 7; periodLabel = '7 derniers jours' }
+    else if (dashPeriod === '30d') { bars = 30; days = 30; periodLabel = '30 derniers jours' }
+    else if (dashPeriod === 'custom' && dashStartDate && dashEndDate) {
+      const ms = new Date(dashEndDate).getTime() - new Date(dashStartDate).getTime()
+      days = Math.max(1, Math.ceil(ms / 86400000)); bars = Math.min(days, 60)
+      periodLabel = `${dashStartDate} → ${dashEndDate}`
+    }
+    const avgDay = raw / days
+    const subs = Math.round(raw / (tpl.fee * 12)) + 40
+    const data = dashGenOrganic(raw, bars)
+    const maxVal = Math.max(...data)
+    const fmtAmt = (v: number) => v >= 1000 ? `${(v/1000).toFixed(1)}k €` : `${Math.round(v)} €`
+
+    const rr = (x: number, y: number, w: number, h: number, r: number) => {
+      ctx.beginPath(); ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y)
+      ctx.quadraticCurveTo(x+w, y, x+w, y+r); ctx.lineTo(x+w, y+h-r)
+      ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h); ctx.lineTo(x+r, y+h)
+      ctx.quadraticCurveTo(x, y+h, x, y+h-r); ctx.lineTo(x, y+r)
+      ctx.quadraticCurveTo(x, y, x+r, y); ctx.closePath()
+    }
+
+    ctx.fillStyle = tpl.bg; ctx.fillRect(0, 0, W, H)
+
+    ctx.fillStyle = 'rgba(255,255,255,0.025)'
+    for (let gy = 30; gy < H; gy += 36) for (let gx = 30; gx < W; gx += 36) {
+      ctx.beginPath(); ctx.arc(gx, gy, 1, 0, Math.PI*2); ctx.fill()
+    }
+
+    const hg = ctx.createRadialGradient(W*0.5, 0, 0, W*0.5, 0, 250)
+    hg.addColorStop(0, tpl.accent + '18'); hg.addColorStop(1, 'transparent')
+    ctx.fillStyle = hg; ctx.fillRect(0, 0, W, 200)
+
+    ctx.font = 'bold 24px -apple-system,BlinkMacSystemFont,sans-serif'
+    ctx.fillStyle = '#fff'; ctx.fillText(tpl.name, 28, 52)
+    ctx.fillStyle = tpl.accent; ctx.beginPath(); ctx.arc(W - 30, 30, 5, 0, Math.PI*2); ctx.fill()
+
+    ctx.fillStyle = tpl.accent + '1a'
+    rr(W - 220, 13, 180, 30, 15); ctx.fill()
+    ctx.font = '11px -apple-system,sans-serif'; ctx.fillStyle = tpl.accent
+    ctx.textAlign = 'center'; ctx.fillText(periodLabel, W - 130, 33); ctx.textAlign = 'left'
+
+    const cPad = 14, cGap = 10
+    const cW = (W - cPad * 2 - cGap * 3) / 4, cH = 80, cY = 68
+    const cards = [
+      {label:'Montant brut', val:fmtAmt(raw),    hi:true},
+      {label:'Net estimé',   val:fmtAmt(net),    hi:false},
+      {label:'Moy / jour',   val:fmtAmt(avgDay), hi:false},
+      {label:tpl.sub,        val:`${subs} +`,    hi:false},
+    ]
+    cards.forEach((c, i) => {
+      const cx = cPad + i * (cW + cGap)
+      ctx.fillStyle = c.hi ? tpl.accent + '14' : 'rgba(255,255,255,0.04)'
+      rr(cx, cY, cW, cH, 10); ctx.fill()
+      ctx.strokeStyle = c.hi ? tpl.accent + '45' : 'rgba(255,255,255,0.06)'
+      ctx.lineWidth = 1; rr(cx, cY, cW, cH, 10); ctx.stroke()
+      ctx.font = '10px -apple-system,sans-serif'
+      ctx.fillStyle = c.hi ? tpl.accent : 'rgba(255,255,255,0.4)'
+      ctx.fillText(c.label.toUpperCase(), cx + 10, cY + 20)
+      ctx.font = 'bold 18px -apple-system,sans-serif'
+      ctx.fillStyle = '#fff'; ctx.fillText(c.val, cx + 10, cY + 52)
+    })
+
+    const chartX = cPad, chartY = 168, chartW = W - cPad * 2, chartH = H - 200
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1
+    for (let l = 1; l <= 4; l++) {
+      const y = chartY + chartH - (l / 4) * chartH
+      ctx.beginPath(); ctx.moveTo(chartX, y); ctx.lineTo(chartX + chartW, y); ctx.stroke()
+      ctx.font = '10px -apple-system,sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.2)'
+      ctx.fillText(fmtAmt(maxVal * l / 4), chartX + 2, y - 4)
+    }
+
+    const bGap = bars > 20 ? 1 : 4
+    const bW = Math.max(2, (chartW - bGap * (bars - 1)) / bars)
+    data.forEach((v, i) => {
+      const bH = Math.max(2, (v / maxVal) * chartH)
+      const bx = chartX + i * (bW + bGap), by = chartY + chartH - bH
+      const bg2 = ctx.createLinearGradient(bx, by, bx, by + bH)
+      bg2.addColorStop(0, tpl.accent); bg2.addColorStop(1, tpl.accent + '44')
+      ctx.fillStyle = bg2; rr(bx, by, bW, bH, Math.min(3, bW / 2)); ctx.fill()
+    })
+
+    const lblIdxs = bars <= 8 ? [...Array(bars).keys()] : [0, Math.round(bars/4), Math.round(bars/2), Math.round(3*bars/4), bars-1]
+    ctx.font = '10px -apple-system,sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.3)'
+    lblIdxs.forEach(i => {
+      const lbl = dashPeriod === '24h' ? `${i}h` : `J${i+1}`
+      const lx = chartX + i * (bW + bGap) + bW / 2
+      ctx.textAlign = 'center'; ctx.fillText(lbl, lx, chartY + chartH + 15)
+    })
+    ctx.textAlign = 'left'
+
+    ctx.font = '10px -apple-system,sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.1)'
+    ctx.fillText('CLIMBCLIP', W - 76, H - 10)
+  }, [dashGenerated, dashTemplate, dashAmount, dashPeriod, dashStartDate, dashEndDate])
+
+  const downloadDash = () => {
+    if (!dashCanvasRef.current) return
+    const a = document.createElement('a')
+    a.href = dashCanvasRef.current.toDataURL('image/png')
+    a.download = `dashboard-${dashTemplate || 'stats'}.png`
+    a.click()
+  }
+
 
   const setLangAndSave = (l: Lang) => { setLang(l); localStorage.setItem("lang", l); setShowLangMenu(false) }
   const checkServerStatus = async () => { try { const res = await fetch(`${SERVER_URL}/health`, { signal: AbortSignal.timeout(5000) }); setServerAwake(res.ok) } catch { setServerAwake(false) } }
@@ -975,30 +1117,46 @@ export default function Home() {
               <ClimbLogo size={38}/>
               <span style={{ color:t.text, fontWeight:800, fontSize:18, letterSpacing:"0.14em" }}>CLIMBCLIP</span>
             </div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, width:"100%" }}>
-              {([
-                { key:"clips" as const, title:T.clipGeneratorTitle, desc:T.clipGeneratorDesc, icon:(
+            <div style={{ display:"flex", flexDirection:"column", gap:14, width:"100%" }}>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
+                {([
+                  { key:"clips" as const, title:T.clipGeneratorTitle, desc:T.clipGeneratorDesc, icon:(
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="6" width="20" height="14" rx="2"/><path d="m8 6-2-4"/><path d="m16 6 2-4"/><line x1="12" y1="10" x2="12" y2="16"/><line x1="9" y1="13" x2="15" y2="13"/>
+                    </svg>
+                  )},
+                  { key:"retouche" as const, title:"Outil Retouche", desc:T.upscalingModeDesc, icon:(
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                  )},
+                ] as {key:"clips"|"retouche", title:string, desc:string, icon:React.ReactNode}[]).map(card => (
+                  <button key={card.key} onClick={() => setCurrentMode(card.key)}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(232,245,66,0.35)"; e.currentTarget.style.boxShadow="0 0 0 1px rgba(232,245,66,0.1), 0 12px 40px rgba(0,0,0,0.5)" }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor=dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)"; e.currentTarget.style.boxShadow="none" }}
+                    style={{ display:"flex", flexDirection:"column", alignItems:"flex-start", gap:20, padding:"28px 22px", background:dark?"rgba(255,255,255,0.04)":t.bgCard, border:dark?"1px solid rgba(255,255,255,0.1)":"1px solid rgba(0,0,0,0.1)", borderRadius:16, cursor:"pointer", textAlign:"left", transition:"border-color 0.15s, box-shadow 0.15s", backdropFilter:"blur(6px)", WebkitBackdropFilter:"blur(6px)" }}>
+                    <span style={{ color:t.accent }}>{card.icon}</span>
+                    <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+                      <span style={{ fontSize:15, fontWeight:700, color:t.text, letterSpacing:"0.01em" }}>{card.title}</span>
+                      <span style={{ fontSize:12, color:t.textMuted, lineHeight:1.6 }}>{card.desc}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <button onClick={() => setCurrentMode("dashboard")}
+                onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(232,245,66,0.35)"; e.currentTarget.style.boxShadow="0 0 0 1px rgba(232,245,66,0.1), 0 12px 40px rgba(0,0,0,0.5)" }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor=dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)"; e.currentTarget.style.boxShadow="none" }}
+                style={{ display:"flex", alignItems:"center", gap:20, padding:"22px 28px", background:dark?"rgba(255,255,255,0.04)":t.bgCard, border:dark?"1px solid rgba(255,255,255,0.1)":"1px solid rgba(0,0,0,0.1)", borderRadius:16, cursor:"pointer", textAlign:"left", transition:"border-color 0.15s, box-shadow 0.15s", backdropFilter:"blur(6px)", WebkitBackdropFilter:"blur(6px)" }}>
+                <span style={{ color:t.accent }}>
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="2" y="6" width="20" height="14" rx="2"/><path d="m8 6-2-4"/><path d="m16 6 2-4"/><line x1="12" y1="10" x2="12" y2="16"/><line x1="9" y1="13" x2="15" y2="13"/>
+                    <rect x="2" y="3" width="8" height="11" rx="1"/><rect x="14" y="3" width="8" height="6" rx="1"/><rect x="14" y="13" width="8" height="8" rx="1"/><rect x="2" y="18" width="8" height="3" rx="1"/>
                   </svg>
-                )},
-                { key:"retouche" as const, title:"Outil Retouche", desc:T.upscalingModeDesc, icon:(
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-                  </svg>
-                )},
-              ] as {key:"clips"|"retouche", title:string, desc:string, icon:React.ReactNode}[]).map(card => (
-                <button key={card.key} onClick={() => setCurrentMode(card.key)}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(232,245,66,0.35)"; e.currentTarget.style.boxShadow="0 0 0 1px rgba(232,245,66,0.1), 0 12px 40px rgba(0,0,0,0.5)" }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor=dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)"; e.currentTarget.style.boxShadow="none" }}
-                  style={{ display:"flex", flexDirection:"column", alignItems:"flex-start", gap:20, padding:"28px 22px", background:dark?"rgba(255,255,255,0.04)":t.bgCard, border:dark?"1px solid rgba(255,255,255,0.1)":"1px solid rgba(0,0,0,0.1)", borderRadius:16, cursor:"pointer", textAlign:"left", transition:"border-color 0.15s, box-shadow 0.15s", backdropFilter:"blur(6px)", WebkitBackdropFilter:"blur(6px)" }}>
-                  <span style={{ color:t.accent }}>{card.icon}</span>
-                  <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
-                    <span style={{ fontSize:15, fontWeight:700, color:t.text, letterSpacing:"0.01em" }}>{card.title}</span>
-                    <span style={{ fontSize:12, color:t.textMuted, lineHeight:1.6 }}>{card.desc}</span>
-                  </div>
-                </button>
-              ))}
+                </span>
+                <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+                  <span style={{ fontSize:15, fontWeight:700, color:t.text, letterSpacing:"0.01em" }}>Dashboard</span>
+                  <span style={{ fontSize:12, color:t.textMuted, lineHeight:1.5 }}>Génère des dashboards de revenus partageables — OF, Fanfix, Fanvue et plus.</span>
+                </div>
+              </button>
             </div>
             <div style={{ position:"relative" }} onClick={e => e.stopPropagation()}>
               <button onClick={() => setShowLangMenu(!showLangMenu)} style={{ fontSize:13, color:t.textMuted, background:"none", border:t.border, borderRadius:8, padding:"7px 14px", cursor:"pointer" }}>{lang}</button>
@@ -1881,6 +2039,97 @@ export default function Home() {
                 )}
               </>)}
             </>)}
+          </div>
+        </div>
+      )}
+
+      {currentMode === "dashboard" && (
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", minHeight:"100vh", width:"100%", background:"#0a0a0a" }}>
+          <MountainBg dark={true}/>
+          <nav style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 16px", borderBottom:"1px solid rgba(255,255,255,0.07)", background:"rgba(10,10,10,0.92)", backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", position:"sticky", top:0, zIndex:50 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+              <ClimbLogo size={26}/>
+              <span style={{ color:"#efefef", fontWeight:700, fontSize:13, letterSpacing:"0.1em" }}>DASHBOARD</span>
+            </div>
+            <button onClick={() => { setCurrentMode("home"); setDashTemplate(null); setDashGenerated(false) }}
+              style={{ fontSize:12, color:"#999", background:"none", border:"1px solid rgba(255,255,255,0.07)", borderRadius:8, padding:"6px 14px", cursor:"pointer" }}>← Retour</button>
+          </nav>
+
+          <div style={{ width:"100%", maxWidth:860, padding:"28px 16px 60px", display:"flex", flexDirection:"column", gap:24 }}>
+            <div>
+              <p style={{ fontSize:11, color:"rgba(255,255,255,0.35)", letterSpacing:"0.12em", marginBottom:12, textTransform:"uppercase" }}>Choisir un template</p>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:10 }}>
+                {Object.entries(DASH_TPLS).map(([key, tpl]) => (
+                  <button key={key}
+                    onClick={() => { setDashTemplate(key); setDashGenerated(false) }}
+                    style={{ padding:"16px 10px", borderRadius:12, border:`1px solid ${dashTemplate === key ? tpl.accent + "70" : "rgba(255,255,255,0.08)"}`, background:dashTemplate === key ? tpl.accent + "10" : "rgba(255,255,255,0.03)", cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:6, transition:"border-color 0.15s, background 0.15s" }}>
+                    <span style={{ width:10, height:10, borderRadius:"50%", background:tpl.accent, display:"block" }}/>
+                    <span style={{ fontSize:13, fontWeight:700, color:"#fff" }}>{key}</span>
+                    <span style={{ fontSize:10, color:"rgba(255,255,255,0.4)" }}>{tpl.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {dashTemplate && (
+              <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:16, padding:"22px 20px", display:"flex", flexDirection:"column", gap:20 }}>
+                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                  <label style={{ fontSize:12, color:"rgba(255,255,255,0.5)", letterSpacing:"0.08em", textTransform:"uppercase" }}>Montant brut</label>
+                  <input
+                    value={dashAmount}
+                    onChange={e => { setDashAmount(e.target.value); setDashGenerated(false) }}
+                    placeholder="ex : 5000"
+                    style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, padding:"12px 14px", fontSize:16, color:"#fff", outline:"none", width:"100%", boxSizing:"border-box" }}
+                  />
+                </div>
+
+                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                  <label style={{ fontSize:12, color:"rgba(255,255,255,0.5)", letterSpacing:"0.08em", textTransform:"uppercase" }}>Période</label>
+                  <div style={{ display:"flex", gap:7, flexWrap:"wrap" }}>
+                    {(["24h","7d","1w","30d","custom"] as const).map(p => (
+                      <button key={p}
+                        onClick={() => { setDashPeriod(p); setDashGenerated(false) }}
+                        style={{ padding:"8px 16px", borderRadius:8, border:`1px solid ${dashPeriod === p ? DASH_TPLS[dashTemplate].accent + "70" : "rgba(255,255,255,0.1)"}`, background:dashPeriod === p ? DASH_TPLS[dashTemplate].accent + "14" : "rgba(255,255,255,0.03)", color:dashPeriod === p ? DASH_TPLS[dashTemplate].accent : "rgba(255,255,255,0.6)", cursor:"pointer", fontSize:13, transition:"all 0.12s" }}>
+                        {p === "24h" ? "24 heures" : p === "7d" ? "7 jours" : p === "1w" ? "1 semaine" : p === "30d" ? "30 jours" : "Personnalisé"}
+                      </button>
+                    ))}
+                  </div>
+                  {dashPeriod === "custom" && (
+                    <div style={{ display:"flex", gap:10, alignItems:"center", marginTop:6 }}>
+                      <input type="date" value={dashStartDate} onChange={e => { setDashStartDate(e.target.value); setDashGenerated(false) }}
+                        style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"9px 12px", fontSize:13, color:"#fff", outline:"none", colorScheme:"dark" }}/>
+                      <span style={{ color:"rgba(255,255,255,0.3)" }}>→</span>
+                      <input type="date" value={dashEndDate} onChange={e => { setDashEndDate(e.target.value); setDashGenerated(false) }}
+                        style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"9px 12px", fontSize:13, color:"#fff", outline:"none", colorScheme:"dark" }}/>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => setDashGenerated(true)}
+                  disabled={!dashAmount}
+                  style={{ padding:"13px 0", borderRadius:10, border:"none", background:dashAmount ? DASH_TPLS[dashTemplate].accent : "rgba(255,255,255,0.08)", color:dashAmount ? "#0a0a0a" : "rgba(255,255,255,0.2)", cursor:dashAmount ? "pointer" : "not-allowed", fontSize:14, fontWeight:700, letterSpacing:"0.04em", transition:"background 0.15s" }}>
+                  Générer le dashboard
+                </button>
+              </div>
+            )}
+
+            {dashGenerated && dashTemplate && (
+              <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+                <canvas
+                  ref={dashCanvasRef}
+                  width={800}
+                  height={480}
+                  style={{ width:"100%", borderRadius:16, display:"block", border:`1px solid ${DASH_TPLS[dashTemplate].accent}25` }}
+                />
+                <button
+                  onClick={downloadDash}
+                  style={{ alignSelf:"flex-end", padding:"10px 24px", borderRadius:9, border:`1px solid rgba(255,255,255,0.15)`, background:"rgba(255,255,255,0.06)", color:"#fff", cursor:"pointer", fontSize:13, fontWeight:600, display:"flex", alignItems:"center", gap:8 }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Télécharger en PNG
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
