@@ -190,9 +190,9 @@ const SakuraBg = () => {
 
 const DASH_TPLS: Record<string, {bg:string,accent:string,name:string,fee:number,sub:string}> = {
   OF:     {bg:"#0c0c1e",accent:"#00aff0",name:"OnlyFans", fee:0.80,sub:"Abonnés"},
-  Fanfix: {bg:"#0f0a1e",accent:"#a855f7",name:"Fanfix",   fee:0.85,sub:"Supporters"},
-  Fanvue: {bg:"#081a18",accent:"#14b8a6",name:"Fanvue",   fee:0.85,sub:"Fans actifs"},
-  Reveal: {bg:"#140f00",accent:"#f97316",name:"Inflow",   fee:0.90,sub:"Conversions"},
+  Fanfix: {bg:"#0f0a1e",accent:"#a855f7",name:"Fanfix",   fee:0.80,sub:"Supporters"},
+  Fanvue: {bg:"#081a18",accent:"#14b8a6",name:"Fanvue",   fee:0.80,sub:"Fans actifs"},
+  Reveal: {bg:"#140f00",accent:"#f97316",name:"Inflow",   fee:1.00,sub:"Conversions"},
 }
 
 export default function Home() {
