@@ -13,7 +13,7 @@ type TimestampPreview = { start: number; duration: number; name: string; descrip
 type Lang = "EN" | "FR" | "ES" | "IT" | "DE"
 type Preset = { id: string; name: string; format: string; colorGrade: string; transition: string; prompt: string; options: string[]; exportQuality: string; exportCodec: string; watermark: boolean }
 
-const SERVER_URL = "https://climbclip-server.onrender.com"
+const SERVER_URL = "https://climbclip-server-production.up.railway.app"
 
 const CG_LABELS: Record<Lang, Record<string, string>> = {
   EN: { none:"None", cinematic:"Cinematic", orange_teal:"Orange Teal", bw:"Black & White", vibrant:"Vibrant", moody:"Moody", warm:"Warm", cold:"Cold" },
