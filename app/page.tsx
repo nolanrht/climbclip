@@ -1038,7 +1038,7 @@ export default function Home() {
         </div>
       )}
 
-      <nav style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 16px", borderBottom:t.border, background:t.bgNav, backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", position:"sticky", top:0, zIndex:50 }}>
+      <nav style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 16px", background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", border:"1px solid rgba(255,255,255,0.15)", borderTop:"1px solid rgba(255,255,255,0.30)", boxShadow:"0 8px 32px rgba(0,0,0,0.3)", borderRadius:16, position:"sticky", top:0, zIndex:50 }}>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           <ClimbLogo size={26}/>
           <div style={{ display:"flex", flexDirection:"column", lineHeight:1, gap:1 }}>
@@ -1061,9 +1061,9 @@ export default function Home() {
           </div>
         ) : (
           <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-            <button onClick={() => setCurrentPage("home")} style={{ fontSize:13, color:currentPage === "home" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "home" ? 600 : 400 }}>{T.home}</button>
-            <button onClick={() => { setCurrentPage("library"); loadLibrary() }} style={{ fontSize:13, color:currentPage === "library" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "library" ? 600 : 400 }}>{T.library}</button>
-            <button onClick={() => setCurrentPage("history")} style={{ fontSize:13, color:currentPage === "history" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "history" ? 600 : 400 }}>Historique</button>
+            <button onClick={() => setCurrentPage("home")} style={{ fontSize:13, color:currentPage === "home" ? t.accent : t.textSub, background:currentPage === "home" ? "rgba(232,245,66,0.09)" : "none", border:"none", cursor:"pointer", fontWeight:currentPage === "home" ? 600 : 400, textShadow:currentPage === "home" ? "0 0 10px rgba(232,245,66,0.5)" : "none", borderRadius:8, padding:"4px 10px" }}>{T.home}</button>
+            <button onClick={() => { setCurrentPage("library"); loadLibrary() }} style={{ fontSize:13, color:currentPage === "library" ? t.accent : t.textSub, background:currentPage === "library" ? "rgba(232,245,66,0.09)" : "none", border:"none", cursor:"pointer", fontWeight:currentPage === "library" ? 600 : 400, textShadow:currentPage === "library" ? "0 0 10px rgba(232,245,66,0.5)" : "none", borderRadius:8, padding:"4px 10px" }}>{T.library}</button>
+            <button onClick={() => setCurrentPage("history")} style={{ fontSize:13, color:currentPage === "history" ? t.accent : t.textSub, background:currentPage === "history" ? "rgba(232,245,66,0.09)" : "none", border:"none", cursor:"pointer", fontWeight:currentPage === "history" ? 600 : 400, textShadow:currentPage === "history" ? "0 0 10px rgba(232,245,66,0.5)" : "none", borderRadius:8, padding:"4px 10px" }}>Historique</button>
             <button onClick={() => setCurrentMode("home")} style={{ fontSize:13, color:t.textMuted, background:"none", border:"none", cursor:"pointer" }}>{T.backHome}</button>
           </div>
         )}
@@ -1464,12 +1464,12 @@ export default function Home() {
               <button onClick={() => setShowSettings(true)} style={{ fontSize:18, color:t.textSub, border:t.borderMed, borderRadius:7, padding:"7px 11px", background:t.bgInput, cursor:"pointer", lineHeight:1 }}>⚙</button>
             </div>
           </nav>
-          <div style={{ width:"100%", display:"flex", borderBottom:t.border, background:t.bgNav, backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", position:"sticky", top:57, zIndex:40, overflowX:"auto" }}>
+          <div style={{ width:"100%", display:"flex", background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", border:"1px solid rgba(255,255,255,0.15)", borderTop:"1px solid rgba(255,255,255,0.30)", boxShadow:"0 8px 32px rgba(0,0,0,0.3)", borderRadius:16, position:"sticky", top:57, zIndex:40, overflowX:"auto" }}>
             {(["upscaling","gommage","watermark","text"] as const).map((tab, i) => {
               const labels = ["Upscaling","Gommage","Filigrane","Texte"]
               return (
                 <button key={tab} onClick={() => setRetoucheTab(tab)}
-                  style={{ padding:"10px 18px", background:"none", border:"none", borderBottom:retoucheTab===tab ? `2px solid ${t.accent}` : "2px solid transparent", color:retoucheTab===tab ? t.accent : t.textMuted, cursor:"pointer", fontSize:13, fontWeight:retoucheTab===tab ? 700 : 400, whiteSpace:"nowrap", flexShrink:0 }}>
+                  style={{ padding:"10px 18px", background:retoucheTab===tab ? "rgba(232,245,66,0.09)" : "none", border:"none", borderBottom:retoucheTab===tab ? `2px solid ${t.accent}` : "2px solid transparent", color:retoucheTab===tab ? t.accent : t.textMuted, cursor:"pointer", fontSize:13, fontWeight:retoucheTab===tab ? 700 : 400, whiteSpace:"nowrap", flexShrink:0, textShadow:retoucheTab===tab ? "0 0 10px rgba(232,245,66,0.5)" : "none" }}>
                   {labels[i]}
                 </button>
               )
