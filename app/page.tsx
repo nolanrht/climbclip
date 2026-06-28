@@ -68,7 +68,7 @@ const MountainBg = ({ dark }: { dark: boolean }) => (
     style={{ position:"fixed", bottom:0, left:0, width:"100%", height:"32vh", pointerEvents:"none", zIndex:0, opacity: dark ? 0.052 : 0.028 }}>
     <defs>
       <linearGradient id="mg1" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor={dark ? "#c8d86e" : "#444"} stopOpacity="0.8"/>
+        <stop offset="0%" stopColor={dark ? "#4F8EF7" : "#444"} stopOpacity="0.8"/>
         <stop offset="100%" stopColor={dark ? "#ffffff" : "#000"} stopOpacity="0"/>
       </linearGradient>
     </defs>
@@ -340,22 +340,22 @@ export default function Home() {
   const generatingMsgs = [T.generatingMsg1, T.generatingMsg2, T.generatingMsg3, T.generatingMsg4, T.generatingMsg5, T.generatingMsg6]
 
   const t = {
-    bg: dark ? "#0b0b0b" : "#e5e5e0",
-    bgNav: dark ? "rgba(11,11,11,0.92)" : "rgba(235,235,230,0.92)",
-    bgCard: dark ? "#131313" : "#ebebE6",
+    bg: dark ? "#0d0d14" : "#e5e5e0",
+    bgNav: dark ? "rgba(13,13,20,0.92)" : "rgba(235,235,230,0.92)",
+    bgCard: dark ? "#121220" : "#ebebE6",
     bgInput: dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.05)",
     bgPill: dark ? "rgba(255,255,255,0.035)" : "rgba(0,0,0,0.04)",
-    bgThumb: dark ? "#1c1c1c" : "#d5d5d0",
-    bgModal: dark ? "#141414" : "#ebebE6",
+    bgThumb: dark ? "#1a1a2e" : "#d5d5d0",
+    bgModal: dark ? "#121220" : "#ebebE6",
     border: dark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.09)",
     borderMed: dark ? "1px solid rgba(255,255,255,0.09)" : "1px solid rgba(0,0,0,0.13)",
-    text: dark ? "#efefef" : "#0f0f0f",
-    textSub: dark ? "#999" : "#2f2f2f",
-    textMuted: dark ? "#4a4a4a" : "#5a5a5a",
-    textHint: dark ? "#383838" : "#7a7a7a",
+    text: dark ? "#ffffff" : "#0f0f0f",
+    textSub: dark ? "#8888aa" : "#2f2f2f",
+    textMuted: dark ? "#4a4a6a" : "#5a5a5a",
+    textHint: dark ? "#303052" : "#7a7a7a",
     overlay: dark ? "rgba(0,0,0,0.5)" : "rgba(0,0,0,0.25)",
     overlayHeavy: dark ? "rgba(0,0,0,0.85)" : "rgba(0,0,0,0.45)",
-    accent: "#e8f542",
+    accent: "#4F8EF7",
   }
 
   useEffect(() => {
@@ -932,7 +932,7 @@ export default function Home() {
   const displayedClips = currentFolder ? clips.filter(c => c.folder_id === currentFolder) : clips.filter(c => !c.folder_id)
   const modalBase: React.CSSProperties = { background:t.bgModal, border:t.border, borderRadius:16, padding:24, display:"flex", flexDirection:"column", gap:16 }
   const Pill = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
-    <button onClick={onClick} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:active ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:active ? "rgba(232,245,66,0.08)" : t.bgPill, color:active ? t.accent : t.textSub, fontWeight:active ? 500 : 400, transition:"all 0.15s", whiteSpace:"nowrap" }}>{label}</button>
+    <button onClick={onClick} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:active ? `1px solid rgba(79,142,247,0.55)` : t.borderMed, background:active ? "rgba(79,142,247,0.08)" : t.bgPill, color:active ? t.accent : t.textSub, fontWeight:active ? 500 : 400, transition:"all 0.15s", whiteSpace:"nowrap" }}>{label}</button>
   )
 
   const ClipCard = ({ clip, index }: { clip: any; index: number }) => {
@@ -968,14 +968,14 @@ export default function Home() {
           <div style={{ display:"flex", flexDirection:"column", gap:12, width:"100%" }}>
             {[T.step1, T.step2, T.step3].map((step, i) => (
               <div key={i} style={{ display:"flex", alignItems:"center", gap:14, padding:"14px 18px", background:t.bgCard, border:t.border, borderRadius:12 }}>
-                <div style={{ width:32, height:32, borderRadius:"50%", background:"rgba(232,245,66,0.1)", border:"1px solid rgba(232,245,66,0.3)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                <div style={{ width:32, height:32, borderRadius:"50%", background:"rgba(79,142,247,0.1)", border:"1px solid rgba(79,142,247,0.3)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                   <span style={{ fontSize:14, fontWeight:700, color:t.accent }}>{i+1}</span>
                 </div>
                 <p style={{ fontSize:14, color:t.text, fontWeight:500 }}>{step}</p>
               </div>
             ))}
           </div>
-          <button onClick={completeOnboarding} style={{ width:"100%", padding:"14px 0", borderRadius:12, border:"none", background:t.accent, color:"#0a0a0a", fontWeight:700, fontSize:15, cursor:"pointer", boxShadow:"0 0 28px rgba(232,245,66,0.22)" }}>Commencer →</button>
+          <button onClick={completeOnboarding} style={{ width:"100%", padding:"14px 0", borderRadius:12, border:"none", background:t.accent, color:"#ffffff", fontWeight:700, fontSize:15, cursor:"pointer", boxShadow:"0 0 28px rgba(79,142,247,0.22)" }}>Commencer →</button>
           <button onClick={completeOnboarding} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:13 }}>{T.onboardingSkip}</button>
         </div>
       </main>
@@ -1009,7 +1009,7 @@ export default function Home() {
                   )},
                 ] as {key:"clips"|"retouche", title:string, desc:string, icon:React.ReactNode}[]).map(card => (
                   <button key={card.key} onClick={() => setCurrentMode(card.key)}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(232,245,66,0.35)"; e.currentTarget.style.boxShadow="0 0 0 1px rgba(232,245,66,0.1), 0 12px 40px rgba(0,0,0,0.5)" }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(79,142,247,0.35)"; e.currentTarget.style.boxShadow="0 0 0 1px rgba(79,142,247,0.1), 0 12px 40px rgba(0,0,0,0.5)" }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor=dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)"; e.currentTarget.style.boxShadow="none" }}
                     style={{ display:"flex", flexDirection:"column", alignItems:"flex-start", gap:20, padding:"28px 22px", background:dark?"rgba(255,255,255,0.04)":t.bgCard, border:dark?"1px solid rgba(255,255,255,0.1)":"1px solid rgba(0,0,0,0.1)", borderRadius:16, cursor:"pointer", textAlign:"left", transition:"border-color 0.15s, box-shadow 0.15s", backdropFilter:"blur(6px)", WebkitBackdropFilter:"blur(6px)" }}>
                     <span style={{ color:t.accent }}>{card.icon}</span>
@@ -1026,7 +1026,7 @@ export default function Home() {
               {showLangMenu && (
                 <div style={{ position:"absolute", bottom:"calc(100% + 6px)", left:"50%", transform:"translateX(-50%)", background:t.bgModal, border:t.border, borderRadius:8, padding:"4px 0", minWidth:70, boxShadow:"0 8px 24px rgba(0,0,0,0.5)", zIndex:100 }}>
                   {(["EN","FR","ES","IT","DE"] as Lang[]).map(l => (
-                    <button key={l} onClick={() => setLangAndSave(l)} style={{ width:"100%", padding:"7px 12px", background:lang===l?"rgba(232,245,66,0.07)":"none", border:"none", color:lang===l?t.accent:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{l}</button>
+                    <button key={l} onClick={() => setLangAndSave(l)} style={{ width:"100%", padding:"7px 12px", background:lang===l?"rgba(79,142,247,0.07)":"none", border:"none", color:lang===l?t.accent:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{l}</button>
                   ))}
                 </div>
               )}
@@ -1041,14 +1041,14 @@ export default function Home() {
 
           {dark && <>
             <NoiseBg/>
-            <div style={{ position:"fixed", top:"-20%", left:"10%", width:"55vw", height:"55vw", borderRadius:"50%", background:"radial-gradient(circle, rgba(232,245,66,0.022) 0%, transparent 70%)", pointerEvents:"none", zIndex:0 }}/>
+            <div style={{ position:"fixed", top:"-20%", left:"10%", width:"55vw", height:"55vw", borderRadius:"50%", background:"radial-gradient(circle, rgba(79,142,247,0.022) 0%, transparent 70%)", pointerEvents:"none", zIndex:0 }}/>
             <div style={{ position:"fixed", bottom:"25%", right:"5%", width:"40vw", height:"40vw", borderRadius:"50%", background:"radial-gradient(circle, rgba(180,180,255,0.015) 0%, transparent 70%)", pointerEvents:"none", zIndex:0 }}/>
             <div style={{ position:"fixed", inset:0, backgroundImage:"repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.007) 3px, rgba(255,255,255,0.007) 4px)", pointerEvents:"none", zIndex:0 }}/>
           </>}
           <MountainBg dark={dark}/>
 
       {serverAwake === false && (
-        <div style={{ width:"100%", background:"rgba(232,245,66,0.04)", borderBottom:"1px solid rgba(232,245,66,0.11)", padding:"10px 24px", display:"flex", alignItems:"center", gap:10, position:"relative", zIndex:10 }}>
+        <div style={{ width:"100%", background:"rgba(79,142,247,0.04)", borderBottom:"1px solid rgba(79,142,247,0.11)", padding:"10px 24px", display:"flex", alignItems:"center", gap:10, position:"relative", zIndex:10 }}>
           <div style={{ width:6, height:6, borderRadius:"50%", background:t.accent, opacity:0.8 }}/>
           <span style={{ fontSize:12, color:t.accent }}>{T.serverStarting}</span>
           <button onClick={checkServerStatus} style={{ marginLeft:"auto", fontSize:11, color:t.textMuted, background:"none", border:t.border, borderRadius:6, padding:"3px 8px", cursor:"pointer" }}>{T.check}</button>
@@ -1070,7 +1070,7 @@ export default function Home() {
             {showNavMenu && (
               <div style={{ position:"absolute", left:"50%", transform:"translateX(-50%)", top:"calc(100% + 6px)", background:t.bgModal, border:t.border, borderRadius:10, padding:"4px 0", minWidth:160, boxShadow:"0 8px 24px rgba(0,0,0,0.6)", zIndex:300 }}>
                 {([["home", T.home], ["library", T.library], ["history", "Historique"]] as [string,string][]).map(([page, label]) => (
-                  <button key={page} onClick={() => { setCurrentPage(page as any); if (page === "library") loadLibrary(); setShowNavMenu(false) }} style={{ width:"100%", padding:"12px 18px", background:currentPage === page ? "rgba(232,245,66,0.07)" : "none", border:"none", borderBottom:t.border, color:currentPage === page ? t.accent : t.text, cursor:"pointer", fontSize:14, textAlign:"left", fontWeight:currentPage === page ? 600 : 400 }}>{label}</button>
+                  <button key={page} onClick={() => { setCurrentPage(page as any); if (page === "library") loadLibrary(); setShowNavMenu(false) }} style={{ width:"100%", padding:"12px 18px", background:currentPage === page ? "rgba(79,142,247,0.07)" : "none", border:"none", borderBottom:t.border, color:currentPage === page ? t.accent : t.text, cursor:"pointer", fontSize:14, textAlign:"left", fontWeight:currentPage === page ? 600 : 400 }}>{label}</button>
                 ))}
                 <button onClick={() => { setCurrentMode("home"); setShowNavMenu(false) }} style={{ width:"100%", padding:"12px 18px", background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:14, textAlign:"left" }}>{T.backHome}</button>
               </div>
@@ -1078,10 +1078,10 @@ export default function Home() {
           </div>
         ) : (
           <div ref={clipsTabsRef} style={{ display:"flex", alignItems:"center", gap:14, position:"relative" }}>
-            <div style={{ position:"absolute", left:0, top:"50%", transform:`translateY(-50%) translateX(${clipsPill.left}px)`, width:clipsPill.width, height:clipsPill.height, background:"rgba(232,245,66,0.15)", border:"1px solid rgba(232,245,66,0.4)", borderRadius:8, transition:"transform 0.3s cubic-bezier(0.4,0,0.2,1), width 0.3s cubic-bezier(0.4,0,0.2,1)", pointerEvents:"none", opacity:clipsPill.ready ? 1 : 0 }}/>
-            <button onClick={() => setCurrentPage("home")} style={{ fontSize:13, color:currentPage === "home" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "home" ? 600 : 400, textShadow:currentPage === "home" ? "0 0 10px rgba(232,245,66,0.5)" : "none", borderRadius:8, padding:"4px 10px", position:"relative", zIndex:1 }}>{T.home}</button>
-            <button onClick={() => { setCurrentPage("library"); loadLibrary() }} style={{ fontSize:13, color:currentPage === "library" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "library" ? 600 : 400, textShadow:currentPage === "library" ? "0 0 10px rgba(232,245,66,0.5)" : "none", borderRadius:8, padding:"4px 10px", position:"relative", zIndex:1 }}>{T.library}</button>
-            <button onClick={() => setCurrentPage("history")} style={{ fontSize:13, color:currentPage === "history" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "history" ? 600 : 400, textShadow:currentPage === "history" ? "0 0 10px rgba(232,245,66,0.5)" : "none", borderRadius:8, padding:"4px 10px", position:"relative", zIndex:1 }}>Historique</button>
+            <div style={{ position:"absolute", left:0, top:"50%", transform:`translateY(-50%) translateX(${clipsPill.left}px)`, width:clipsPill.width, height:clipsPill.height, background:"rgba(79,142,247,0.15)", border:"1px solid rgba(79,142,247,0.4)", borderRadius:8, transition:"transform 0.3s cubic-bezier(0.4,0,0.2,1), width 0.3s cubic-bezier(0.4,0,0.2,1)", pointerEvents:"none", opacity:clipsPill.ready ? 1 : 0 }}/>
+            <button onClick={() => setCurrentPage("home")} style={{ fontSize:13, color:currentPage === "home" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "home" ? 600 : 400, textShadow:currentPage === "home" ? "0 0 10px rgba(79,142,247,0.5)" : "none", borderRadius:8, padding:"4px 10px", position:"relative", zIndex:1 }}>{T.home}</button>
+            <button onClick={() => { setCurrentPage("library"); loadLibrary() }} style={{ fontSize:13, color:currentPage === "library" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "library" ? 600 : 400, textShadow:currentPage === "library" ? "0 0 10px rgba(79,142,247,0.5)" : "none", borderRadius:8, padding:"4px 10px", position:"relative", zIndex:1 }}>{T.library}</button>
+            <button onClick={() => setCurrentPage("history")} style={{ fontSize:13, color:currentPage === "history" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "history" ? 600 : 400, textShadow:currentPage === "history" ? "0 0 10px rgba(79,142,247,0.5)" : "none", borderRadius:8, padding:"4px 10px", position:"relative", zIndex:1 }}>Historique</button>
             <button onClick={() => setCurrentMode("home")} style={{ fontSize:13, color:t.textMuted, background:"none", border:"none", cursor:"pointer", position:"relative", zIndex:1 }}>{T.backHome}</button>
           </div>
         )}
@@ -1093,7 +1093,7 @@ export default function Home() {
             {showLangMenu && (
               <div style={{ position:"absolute", right:0, top:"calc(100% + 4px)", background:t.bgModal, border:t.border, borderRadius:8, padding:"4px 0", minWidth:70, boxShadow:"0 8px 24px rgba(0,0,0,0.5)", zIndex:100 }}>
                 {(["EN","FR","ES","IT","DE"] as Lang[]).map(l => (
-                  <button key={l} onClick={() => setLangAndSave(l)} style={{ width:"100%", padding:"7px 12px", background:lang === l ? "rgba(232,245,66,0.07)" : "none", border:"none", color:lang === l ? t.accent : t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{l}</button>
+                  <button key={l} onClick={() => setLangAndSave(l)} style={{ width:"100%", padding:"7px 12px", background:lang === l ? "rgba(79,142,247,0.07)" : "none", border:"none", color:lang === l ? t.accent : t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{l}</button>
                 ))}
               </div>
             )}
@@ -1110,21 +1110,21 @@ export default function Home() {
               <p style={{ fontSize:11, color:t.textMuted }}>{autoMode ? T.autoModeDesc : "Contrôle total sur les paramètres"}</p>
             </div>
             <button onClick={() => setAutoMode(!autoMode)} style={{ width:44, height:24, borderRadius:12, border:"none", background:autoMode ? t.accent : "rgba(255,255,255,0.1)", cursor:"pointer", position:"relative", flexShrink:0 }}>
-              <div style={{ width:18, height:18, borderRadius:"50%", background:autoMode ? "#0a0a0a" : "#888", position:"absolute", top:3, left:autoMode ? 23 : 3, transition:"left 0.2s" }}/>
+              <div style={{ width:18, height:18, borderRadius:"50%", background:autoMode ? "#ffffff" : "#888", position:"absolute", top:3, left:autoMode ? 23 : 3, transition:"left 0.2s" }}/>
             </button>
           </div>
 
           {analyzing && (
-            <div style={{ display:"flex", alignItems:"center", gap:10, padding:"12px 14px", background:"rgba(232,245,66,0.04)", border:"1px solid rgba(232,245,66,0.18)", borderRadius:10 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, padding:"12px 14px", background:"rgba(79,142,247,0.04)", border:"1px solid rgba(79,142,247,0.18)", borderRadius:10 }}>
               <div style={{ width:16, height:16, borderRadius:"50%", border:`2px solid ${t.accent}`, borderTopColor:"transparent", flexShrink:0, animation:"spin 0.8s linear infinite" }}/>
               <p style={{ fontSize:12, color:t.accent }}>L'IA analyse ta vidéo... 🔍</p>
             </div>
           )}
           {autoAnalysisDesc && !analyzing && (
-            <div style={{ padding:"12px 14px", background:"rgba(232,245,66,0.04)", border:"1px solid rgba(232,245,66,0.12)", borderRadius:10 }}>
+            <div style={{ padding:"12px 14px", background:"rgba(79,142,247,0.04)", border:"1px solid rgba(79,142,247,0.12)", borderRadius:10 }}>
               <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:5 }}>
                 <span style={{ fontSize:10, color:t.accent, textTransform:"uppercase", letterSpacing:"0.06em", fontWeight:700 }}>✦ Analyse IA</span>
-                {detectedContentType && <span style={{ fontSize:10, padding:"2px 7px", borderRadius:10, background:"rgba(232,245,66,0.1)", color:t.accent }}>{detectedContentType}</span>}
+                {detectedContentType && <span style={{ fontSize:10, padding:"2px 7px", borderRadius:10, background:"rgba(79,142,247,0.1)", color:t.accent }}>{detectedContentType}</span>}
               </div>
               <p style={{ fontSize:12, color:t.text, lineHeight:1.5 }}>{autoAnalysisDesc}</p>
             </div>
@@ -1154,12 +1154,12 @@ export default function Home() {
                 </div>
               </div>
             ) : (
-              <div style={{ border:`1px dashed ${dragOver ? t.accent : dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.11)"}`, borderRadius:14, padding:"44px 20px", display:"flex", flexDirection:"column", alignItems:"center", gap:12, cursor:"pointer", background:dragOver ? "rgba(232,245,66,0.03)" : dark ? "rgba(255,255,255,0.008)" : "rgba(0,0,0,0.01)", transition:"all 0.15s" }}
+              <div style={{ border:`1px dashed ${dragOver ? t.accent : dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.11)"}`, borderRadius:14, padding:"44px 20px", display:"flex", flexDirection:"column", alignItems:"center", gap:12, cursor:"pointer", background:dragOver ? "rgba(79,142,247,0.03)" : dark ? "rgba(255,255,255,0.008)" : "rgba(0,0,0,0.01)", transition:"all 0.15s" }}
                 onClick={() => document.getElementById("fileInput")?.click()}
                 onDragOver={e => { e.preventDefault(); setDragOver(true) }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={async e => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files) for (const f of Array.from(e.dataTransfer.files)) await handleFileAdd(f) }}>
-                <div style={{ width:52, height:52, borderRadius:14, background:dragOver ? "rgba(232,245,66,0.1)" : "rgba(232,245,66,0.05)", border:`1px solid ${dragOver ? "rgba(232,245,66,0.4)" : "rgba(232,245,66,0.1)"}`, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}>
+                <div style={{ width:52, height:52, borderRadius:14, background:dragOver ? "rgba(79,142,247,0.1)" : "rgba(79,142,247,0.05)", border:`1px solid ${dragOver ? "rgba(79,142,247,0.4)" : "rgba(79,142,247,0.1)"}`, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}>
                   <span style={{ fontSize:20, color:t.accent }}>{dragOver ? "📥" : "↑"}</span>
                 </div>
                 <div style={{ textAlign:"center" }}>
@@ -1181,7 +1181,7 @@ export default function Home() {
                 const fr: Record<string,[number,number,number,number]> = {"9:16":[7,2,6,16],"16:9":[2,7,16,6],"1:1":[5,5,10,10],"4:5":[6,4,8,12]}
                 const [rx,ry,rw,rh] = fr[f]
                 return (
-                  <button key={f} onClick={() => setSelectedFormat(f)} style={{ flex:1, padding:"8px 4px", borderRadius:8, border:selectedFormat === f ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:selectedFormat === f ? "rgba(232,245,66,0.08)" : t.bgInput, color:selectedFormat === f ? t.accent : t.textSub, cursor:"pointer", fontSize:11, fontWeight:selectedFormat === f ? 600 : 400, display:"flex", flexDirection:"column", alignItems:"center", gap:5 }}>
+                  <button key={f} onClick={() => setSelectedFormat(f)} style={{ flex:1, padding:"8px 4px", borderRadius:8, border:selectedFormat === f ? `1px solid rgba(79,142,247,0.55)` : t.borderMed, background:selectedFormat === f ? "rgba(79,142,247,0.08)" : t.bgInput, color:selectedFormat === f ? t.accent : t.textSub, cursor:"pointer", fontSize:11, fontWeight:selectedFormat === f ? 600 : 400, display:"flex", flexDirection:"column", alignItems:"center", gap:5 }}>
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                       <rect x={rx} y={ry} width={rw} height={rh} stroke="currentColor" strokeWidth="1.5" rx="1.5"/>
                     </svg>
@@ -1199,7 +1199,7 @@ export default function Home() {
             <Pill label={T.capsules} active={false} onClick={() => setShowCapsulesModal(true)}/>
             <Pill label={T.introOutro} active={addIntroOutro} onClick={() => setAddIntroOutro(!addIntroOutro)}/>
             <Pill label={watermark ? `✓ ${T.watermark}` : T.watermark} active={watermark} onClick={() => setWatermark(!watermark)}/>
-            <button onClick={() => { setShowMusic(true); fetchTracks(searchQuery || "phonk") }} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:selectedMusic ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:selectedMusic ? "rgba(232,245,66,0.08)" : t.bgPill, color:selectedMusic ? t.accent : t.textSub, display:"flex", alignItems:"center", gap:6, whiteSpace:"nowrap" }}>
+            <button onClick={() => { setShowMusic(true); fetchTracks(searchQuery || "phonk") }} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:selectedMusic ? `1px solid rgba(79,142,247,0.55)` : t.borderMed, background:selectedMusic ? "rgba(79,142,247,0.08)" : t.bgPill, color:selectedMusic ? t.accent : t.textSub, display:"flex", alignItems:"center", gap:6, whiteSpace:"nowrap" }}>
               {selectedMusic ? <><img src={selectedMusic.album.cover_small} style={{ width:15, height:15, borderRadius:3 }}/>{selectedMusic.title}</> : T.addMusic}
             </button>
           </div>
@@ -1209,7 +1209,7 @@ export default function Home() {
               <p style={{ fontSize:11, color:t.textMuted, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.subtitleStyle}</p>
               <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                 {[["tiktok","TikTok"],["yellow","Jaune"],["white_box","Fond blanc"],["neon","Néon"]].map(([val,label]) => (
-                  <button key={val} onClick={() => setSubtitleStyle(val)} style={{ padding:"6px 13px", borderRadius:20, fontSize:11, cursor:"pointer", border:subtitleStyle === val ? `1px solid rgba(232,245,66,0.55)` : t.borderMed, background:subtitleStyle === val ? "rgba(232,245,66,0.08)" : t.bgPill, color:subtitleStyle === val ? t.accent : t.textSub }}>{label}</button>
+                  <button key={val} onClick={() => setSubtitleStyle(val)} style={{ padding:"6px 13px", borderRadius:20, fontSize:11, cursor:"pointer", border:subtitleStyle === val ? `1px solid rgba(79,142,247,0.55)` : t.borderMed, background:subtitleStyle === val ? "rgba(79,142,247,0.08)" : t.bgPill, color:subtitleStyle === val ? t.accent : t.textSub }}>{label}</button>
                 ))}
               </div>
             </div>
@@ -1279,7 +1279,7 @@ export default function Home() {
               </div>
               <div style={{ display:"flex", gap:5 }}>
                 <button onClick={handlePreviewTimestamps} disabled={loadingTimestamps || videos.length === 0} style={{ fontSize:11, color:t.textSub, background:t.bgInput, border:t.borderMed, borderRadius:6, padding:"4px 9px", cursor:"pointer", opacity:videos.length === 0 ? 0.35 : 1 }}>{loadingTimestamps ? "⏳" : T.preview}</button>
-                <button onClick={() => setShowPromptHelper(true)} style={{ fontSize:11, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.2)", borderRadius:6, padding:"4px 9px", cursor:"pointer" }}>✦ {T.promptHelper}</button>
+                <button onClick={() => setShowPromptHelper(true)} style={{ fontSize:11, color:t.accent, background:"rgba(79,142,247,0.06)", border:"1px solid rgba(79,142,247,0.2)", borderRadius:6, padding:"4px 9px", cursor:"pointer" }}>✦ {T.promptHelper}</button>
               </div>
             </div>
             {showPromptHistory && promptHistory.length > 0 && (
@@ -1290,12 +1290,12 @@ export default function Home() {
             <textarea value={promptText} onChange={e => setPromptText(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"11px 13px", fontSize:13, color:t.text, outline:"none", resize:"none", height:52, lineHeight:"1.5", fontFamily:"sans-serif", boxSizing:"border-box" }}
               placeholder={autoMode ? "Optionnel — l'IA a déjà analysé ta vidéo" : "Ex : 1 clip 20s edit foot, cuts sur le beat..."}/>
             {capsuleModeActive && (
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.2)", borderRadius:8, padding:"7px 11px" }}>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:"rgba(79,142,247,0.06)", border:"1px solid rgba(79,142,247,0.2)", borderRadius:8, padding:"7px 11px" }}>
                 <span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>Mode capsules · {capsulesCount} clips</span>
                 <button onClick={() => setCapsuleModeActive(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:13, cursor:"pointer", padding:"0 2px", lineHeight:1 }}>✕</button>
               </div>
             )}
-            <button onClick={capsuleModeActive ? handleGenerateCapsules : handleGenerate} disabled={generating || videos.length === 0} style={{ width:"100%", background:generating ? "rgba(232,245,66,0.35)" : videos.length === 0 ? "rgba(232,245,66,0.15)" : t.accent, color:"#0a0a0a", fontWeight:700, fontSize:14, borderRadius:10, padding:"13px", border:"none", cursor:generating || videos.length === 0 ? "not-allowed" : "pointer", boxShadow:videos.length > 0 && !generating ? "0 0 24px rgba(232,245,66,0.2)" : "none" }}>
+            <button onClick={capsuleModeActive ? handleGenerateCapsules : handleGenerate} disabled={generating || videos.length === 0} style={{ width:"100%", background:generating ? "rgba(79,142,247,0.35)" : videos.length === 0 ? "rgba(79,142,247,0.15)" : t.accent, color:"#ffffff", fontWeight:700, fontSize:14, borderRadius:10, padding:"13px", border:"none", cursor:generating || videos.length === 0 ? "not-allowed" : "pointer", boxShadow:videos.length > 0 && !generating ? "0 0 24px rgba(79,142,247,0.2)" : "none" }}>
               {generating ? T.generating : capsuleModeActive ? `✦ Générer capsules (${capsulesCount})` : `✦ ${T.generate}`}
             </button>
             <p style={{ fontSize:10, color:t.textHint, textAlign:"right" }}>{T.cmdEnterHint}</p>
@@ -1305,7 +1305,7 @@ export default function Home() {
             <div style={{ display:"flex", flexDirection:"column", gap:10, background:t.bgCard, border:t.border, borderRadius:12, padding:"16px" }}>
               <p style={{ fontSize:13, color:t.text, fontWeight:500 }}>{generatingServerMsg || generatingMsgs[generatingMsgIndex]}</p>
               <div style={{ width:"100%", height:4, background:dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)", borderRadius:4 }}>
-                <div style={{ width:`${progress}%`, height:"100%", background:`linear-gradient(90deg, ${t.accent}, rgba(232,245,66,0.5))`, borderRadius:4, transition:"width 0.5s ease", boxShadow:"0 0 8px rgba(232,245,66,0.35)" }}/>
+                <div style={{ width:`${progress}%`, height:"100%", background:`linear-gradient(90deg, ${t.accent}, rgba(79,142,247,0.5))`, borderRadius:4, transition:"width 0.5s ease", boxShadow:"0 0 8px rgba(79,142,247,0.35)" }}/>
               </div>
               <div style={{ display:"flex", justifyContent:"space-between" }}>
                 <span style={{ fontSize:11, color:t.textMuted }}>{autoMode && detectedContentType ? `✦ Mode Auto · ${detectedContentType}` : "Mode Manuel"}</span>
@@ -1320,7 +1320,7 @@ export default function Home() {
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
                   <p style={{ fontSize:11, color:t.textHint, textTransform:"uppercase", letterSpacing:"0.07em" }}>{T.generatedClips} — {generatedClips.length}</p>
-                  {generatedClips.length > 1 && <button onClick={downloadAllClips} style={{ fontSize:11, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.18)", borderRadius:6, padding:"4px 9px", cursor:"pointer" }}>↓ {T.downloadAll}</button>}
+                  {generatedClips.length > 1 && <button onClick={downloadAllClips} style={{ fontSize:11, color:t.accent, background:"rgba(79,142,247,0.06)", border:"1px solid rgba(79,142,247,0.18)", borderRadius:6, padding:"4px 9px", cursor:"pointer" }}>↓ {T.downloadAll}</button>}
                 </div>
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(160px, 1fr))", gap:10 }}>
                   {generatedClips.map((clip, i) => <ClipCard key={i} clip={clip} index={i}/>)}
@@ -1353,7 +1353,7 @@ export default function Home() {
                 {displayedFolders.map(folder => (
                   <div key={folder.id} style={{ position:"relative" }}>
                     <div onClick={() => setFolderStack(prev => [...prev, folder.id])} style={{ background:t.bgCard, border:t.border, borderRadius:9, padding:"12px 13px", cursor:"pointer", display:"flex", alignItems:"center", gap:8 }}>
-                      <div style={{ width:28, height:28, borderRadius:7, background:"rgba(232,245,66,0.05)", border:"1px solid rgba(232,245,66,0.08)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}><span style={{ fontSize:12, opacity:0.6 }}>▣</span></div>
+                      <div style={{ width:28, height:28, borderRadius:7, background:"rgba(79,142,247,0.05)", border:"1px solid rgba(79,142,247,0.08)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}><span style={{ fontSize:12, opacity:0.6 }}>▣</span></div>
                       <div style={{ flex:1, minWidth:0 }}>
                         <p style={{ fontSize:12, color:t.text, fontWeight:500, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{folder.name}</p>
                         <p style={{ fontSize:10, color:t.textMuted }}>{clips.filter(c => c.folder_id === folder.id).length} clip(s)</p>
@@ -1377,7 +1377,7 @@ export default function Home() {
               <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:11, padding:"56px 0" }}>
                 <div style={{ width:50, height:50, borderRadius:13, background:t.bgCard, border:t.border, display:"flex", alignItems:"center", justifyContent:"center" }}><span style={{ fontSize:20, opacity:0.3 }}>▶</span></div>
                 <p style={{ fontSize:13, color:t.textMuted }}>{T.noClips}</p>
-                <button onClick={() => setCurrentPage("home")} style={{ fontSize:12, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.15)", borderRadius:8, padding:"7px 15px", cursor:"pointer" }}>{T.generateFirst}</button>
+                <button onClick={() => setCurrentPage("home")} style={{ fontSize:12, color:t.accent, background:"rgba(79,142,247,0.06)", border:"1px solid rgba(79,142,247,0.15)", borderRadius:8, padding:"7px 15px", cursor:"pointer" }}>{T.generateFirst}</button>
               </div>
             ) : (
               <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(150px, 1fr))", gap:10 }}>
@@ -1391,7 +1391,7 @@ export default function Home() {
                       {renamingClip === clip.id ? (
                         <div style={{ display:"flex", gap:4 }}>
                           <input value={renameValue} onChange={e => setRenameValue(e.target.value)} onKeyDown={e => { if (e.key === "Enter") renameClip(clip.id); if (e.key === "Escape") setRenamingClip(null) }} style={{ flex:1, background:t.bgInput, border:t.borderMed, borderRadius:5, padding:"4px 7px", fontSize:11, color:t.text, outline:"none" }} autoFocus/>
-                          <button onClick={() => renameClip(clip.id)} style={{ background:t.accent, border:"none", borderRadius:5, padding:"4px 7px", fontSize:11, color:"#0a0a0a", cursor:"pointer", fontWeight:700 }}>✓</button>
+                          <button onClick={() => renameClip(clip.id)} style={{ background:t.accent, border:"none", borderRadius:5, padding:"4px 7px", fontSize:11, color:"#ffffff", cursor:"pointer", fontWeight:700 }}>✓</button>
                         </div>
                       ) : (
                         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
@@ -1427,20 +1427,20 @@ export default function Home() {
             <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:11, padding:"56px 0" }}>
               <span style={{ fontSize:32, opacity:0.3 }}>⏺</span>
               <p style={{ fontSize:13, color:t.textMuted }}>Aucune génération pour l'instant</p>
-              <button onClick={() => setCurrentPage("home")} style={{ fontSize:12, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.15)", borderRadius:8, padding:"7px 15px", cursor:"pointer" }}>{T.generateFirst}</button>
+              <button onClick={() => setCurrentPage("home")} style={{ fontSize:12, color:t.accent, background:"rgba(79,142,247,0.06)", border:"1px solid rgba(79,142,247,0.15)", borderRadius:8, padding:"7px 15px", cursor:"pointer" }}>{T.generateFirst}</button>
             </div>
           ) : generationHistory.map(entry => (
             <div key={entry.id} style={{ background:t.bgCard, border:t.border, borderRadius:12, padding:"14px 16px", display:"flex", flexDirection:"column", gap:10 }}>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
                 <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                   <span style={{ fontSize:11, color:t.textMuted }}>{entry.date}</span>
-                  {entry.contentType && <span style={{ fontSize:10, padding:"2px 7px", borderRadius:10, background:"rgba(232,245,66,0.08)", color:t.accent }}>{entry.contentType}</span>}
+                  {entry.contentType && <span style={{ fontSize:10, padding:"2px 7px", borderRadius:10, background:"rgba(79,142,247,0.08)", color:t.accent }}>{entry.contentType}</span>}
                 </div>
                 <span style={{ fontSize:11, color:t.textMuted }}>{entry.clipsCount || 0} clip(s)</span>
               </div>
               {entry.prompt && <p style={{ fontSize:12, color:t.text, lineHeight:1.4 }}>{entry.prompt}</p>}
               {entry.settings && <p style={{ fontSize:10, color:t.textMuted }}>{entry.settings.format} · {entry.settings.colorGrade || "auto"} · {entry.settings.transition || "auto"}</p>}
-              <button onClick={() => { if (entry.prompt) setPromptText(entry.prompt); setCurrentPage("home") }} style={{ padding:"7px 12px", borderRadius:8, fontSize:11, border:"1px solid rgba(232,245,66,0.22)", background:"rgba(232,245,66,0.05)", color:t.accent, cursor:"pointer", alignSelf:"flex-start" }}>↺ Réutiliser ces settings</button>
+              <button onClick={() => { if (entry.prompt) setPromptText(entry.prompt); setCurrentPage("home") }} style={{ padding:"7px 12px", borderRadius:8, fontSize:11, border:"1px solid rgba(79,142,247,0.22)", background:"rgba(79,142,247,0.05)", color:t.accent, cursor:"pointer", alignSelf:"flex-start" }}>↺ Réutiliser ces settings</button>
             </div>
           ))}
         </div>
@@ -1453,7 +1453,7 @@ export default function Home() {
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", minHeight:"100vh", width:"100%" }}>
           {dark && <>
             <NoiseBg/>
-            <div style={{ position:"fixed", top:"-20%", left:"10%", width:"55vw", height:"55vw", borderRadius:"50%", background:"radial-gradient(circle, rgba(232,245,66,0.022) 0%, transparent 70%)", pointerEvents:"none", zIndex:0 }}/>
+            <div style={{ position:"fixed", top:"-20%", left:"10%", width:"55vw", height:"55vw", borderRadius:"50%", background:"radial-gradient(circle, rgba(79,142,247,0.022) 0%, transparent 70%)", pointerEvents:"none", zIndex:0 }}/>
             <div style={{ position:"fixed", bottom:"25%", right:"5%", width:"40vw", height:"40vw", borderRadius:"50%", background:"radial-gradient(circle, rgba(180,180,255,0.015) 0%, transparent 70%)", pointerEvents:"none", zIndex:0 }}/>
             <div style={{ position:"fixed", inset:0, backgroundImage:"repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.007) 3px, rgba(255,255,255,0.007) 4px)", pointerEvents:"none", zIndex:0 }}/>
           </>}
@@ -1474,7 +1474,7 @@ export default function Home() {
                 {showLangMenu && (
                   <div style={{ position:"absolute", right:0, top:"calc(100% + 4px)", background:t.bgModal, border:t.border, borderRadius:8, padding:"4px 0", minWidth:70, boxShadow:"0 8px 24px rgba(0,0,0,0.5)", zIndex:100 }}>
                     {(["EN","FR","ES","IT","DE"] as Lang[]).map(l => (
-                      <button key={l} onClick={() => setLangAndSave(l)} style={{ width:"100%", padding:"7px 12px", background:lang===l?"rgba(232,245,66,0.07)":"none", border:"none", color:lang===l?t.accent:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{l}</button>
+                      <button key={l} onClick={() => setLangAndSave(l)} style={{ width:"100%", padding:"7px 12px", background:lang===l?"rgba(79,142,247,0.07)":"none", border:"none", color:lang===l?t.accent:t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{l}</button>
                     ))}
                   </div>
                 )}
@@ -1484,12 +1484,12 @@ export default function Home() {
           </nav>
           <div style={{ position:"sticky", top:57, zIndex:40 }}>
             <div ref={retoucheTabsRef} style={{ width:"100%", display:"flex", background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", border:"1px solid rgba(255,255,255,0.15)", borderTop:"1px solid rgba(255,255,255,0.30)", boxShadow:"0 8px 32px rgba(0,0,0,0.3)", borderRadius:16, overflowX:"auto", position:"relative" }}>
-              <div style={{ position:"absolute", left:0, top:"50%", transform:`translateY(-50%) translateX(${retouchePill.left}px)`, width:retouchePill.width, height:retouchePill.height, background:"rgba(232,245,66,0.15)", border:"1px solid rgba(232,245,66,0.4)", borderRadius:10, transition:"transform 0.3s cubic-bezier(0.4,0,0.2,1), width 0.3s cubic-bezier(0.4,0,0.2,1)", pointerEvents:"none", opacity:retouchePill.ready ? 1 : 0 }}/>
+              <div style={{ position:"absolute", left:0, top:"50%", transform:`translateY(-50%) translateX(${retouchePill.left}px)`, width:retouchePill.width, height:retouchePill.height, background:"rgba(79,142,247,0.15)", border:"1px solid rgba(79,142,247,0.4)", borderRadius:10, transition:"transform 0.3s cubic-bezier(0.4,0,0.2,1), width 0.3s cubic-bezier(0.4,0,0.2,1)", pointerEvents:"none", opacity:retouchePill.ready ? 1 : 0 }}/>
               {(["upscaling","gommage","watermark","text"] as const).map((tab, i) => {
                 const labels = ["Upscaling","Gommage","Filigrane","Texte"]
                 return (
                   <button key={tab} onClick={() => setRetoucheTab(tab)}
-                    style={{ padding:"10px 18px", background:"none", border:"none", borderBottom:"2px solid transparent", color:retoucheTab===tab ? t.accent : t.textMuted, cursor:"pointer", fontSize:13, fontWeight:retoucheTab===tab ? 700 : 400, whiteSpace:"nowrap", flexShrink:0, textShadow:retoucheTab===tab ? "0 0 10px rgba(232,245,66,0.5)" : "none", position:"relative", zIndex:1 }}>
+                    style={{ padding:"10px 18px", background:"none", border:"none", borderBottom:"2px solid transparent", color:retoucheTab===tab ? t.accent : t.textMuted, cursor:"pointer", fontSize:13, fontWeight:retoucheTab===tab ? 700 : 400, whiteSpace:"nowrap", flexShrink:0, textShadow:retoucheTab===tab ? "0 0 10px rgba(79,142,247,0.5)" : "none", position:"relative", zIndex:1 }}>
                     {labels[i]}
                   </button>
                 )
@@ -1530,7 +1530,7 @@ export default function Home() {
                 </div>
 
                 {!upscaleFile && !upscaling && (
-                  <label style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, padding:"52px 20px", border:`2px dashed rgba(232,245,66,0.2)`, borderRadius:16, background:t.bgCard, cursor:"pointer" }}>
+                  <label style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, padding:"52px 20px", border:`2px dashed rgba(79,142,247,0.2)`, borderRadius:16, background:t.bgCard, cursor:"pointer" }}>
                     <input type="file" accept={upscaleMediaType === "image" ? ".jpg,.jpeg,.png,.webp" : ".mp4,.mov"} style={{ display:"none" }} onChange={e => {
                       const f = e.target.files?.[0]
                       if (!f) return
@@ -1570,9 +1570,9 @@ export default function Home() {
                         : [{ v:2 as const, label:"1080p", sub:"Full HD" }, { v:4 as const, label:"4K", sub:"Ultra HD" }]
                       ).map(({ v, label, sub }) => (
                         <button key={v} onClick={() => setUpscaleScale(v)}
-                          style={{ flex:1, padding:"11px 8px", borderRadius:10, border:upscaleScale===v ? "1px solid rgba(232,245,66,0.5)" : t.border, background:upscaleScale===v ? "rgba(232,245,66,0.07)" : t.bgCard, color:upscaleScale===v ? t.accent : t.textSub, cursor:"pointer", textAlign:"center" }}>
+                          style={{ flex:1, padding:"11px 8px", borderRadius:10, border:upscaleScale===v ? "1px solid rgba(79,142,247,0.5)" : t.border, background:upscaleScale===v ? "rgba(79,142,247,0.07)" : t.bgCard, color:upscaleScale===v ? t.accent : t.textSub, cursor:"pointer", textAlign:"center" }}>
                           <p style={{ fontSize:14, fontWeight:upscaleScale===v ? 700 : 400 }}>{label}</p>
-                          <p style={{ fontSize:10, color:upscaleScale===v ? "rgba(232,245,66,0.6)" : t.textMuted, marginTop:2 }}>{sub}</p>
+                          <p style={{ fontSize:10, color:upscaleScale===v ? "rgba(79,142,247,0.6)" : t.textMuted, marginTop:2 }}>{sub}</p>
                         </button>
                       ))}
                     </div>
@@ -1580,7 +1580,7 @@ export default function Home() {
                 )}
 
                 {upscaleFile && !upscaling && (
-                  <button onClick={handleUpscale} style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:15, fontWeight:700, cursor:"pointer", marginTop:4 }}>
+                  <button onClick={handleUpscale} style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:t.accent, color:"#ffffff", fontSize:15, fontWeight:700, cursor:"pointer", marginTop:4 }}>
                     Améliorer ↑
                   </button>
                 )}
@@ -1621,7 +1621,7 @@ export default function Home() {
                   ) : (
                     <span style={{ fontSize:14, fontWeight:600, color:t.text, flex:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{upscaleResultName}</span>
                   )}
-                  <span style={{ fontSize:10, padding:"2px 8px", borderRadius:8, background:"rgba(232,245,66,0.1)", color:t.accent, flexShrink:0 }}>
+                  <span style={{ fontSize:10, padding:"2px 8px", borderRadius:8, background:"rgba(79,142,247,0.1)", color:t.accent, flexShrink:0 }}>
                     {upscaleMediaType === "video" ? (upscaleScale === 2 ? "1080p" : "4K") : `x${upscaleScale}`}
                   </span>
                 </div>
@@ -1665,7 +1665,7 @@ export default function Home() {
                 )}
 
                 <button onClick={handleDownloadUpscaled}
-                  style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:15, fontWeight:700, cursor:"pointer" }}>
+                  style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:t.accent, color:"#ffffff", fontSize:15, fontWeight:700, cursor:"pointer" }}>
                   Télécharger
                 </button>
 
@@ -1698,12 +1698,12 @@ export default function Home() {
                 </div>
                 <div style={{ display:"flex", gap:10 }}>
                   <button onClick={() => handleDownloadResult(gommageResult, "gommage")}
-                    style={{ flex:1, padding:"15px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:15, fontWeight:700, cursor:"pointer" }}>Télécharger</button>
+                    style={{ flex:1, padding:"15px", borderRadius:14, border:"none", background:t.accent, color:"#ffffff", fontSize:15, fontWeight:700, cursor:"pointer" }}>Télécharger</button>
                   <button onClick={() => { setGommageResult(null); clearCanvas() }}
                     style={{ padding:"15px 20px", borderRadius:14, border:t.border, background:t.bgCard, color:t.textSub, fontSize:13, cursor:"pointer" }}>Retoucher</button>
                 </div>
               </>) : !gommageFile ? (
-                <label style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, padding:"52px 20px", border:`2px dashed rgba(232,245,66,0.2)`, borderRadius:16, background:t.bgCard, cursor:"pointer" }}>
+                <label style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, padding:"52px 20px", border:`2px dashed rgba(79,142,247,0.2)`, borderRadius:16, background:t.bgCard, cursor:"pointer" }}>
                   <input type="file" accept=".jpg,.jpeg,.png,.webp" style={{ display:"none" }} onChange={e => {
                     const f = e.target.files?.[0]; if (!f) return
                     setGommageFile(f); setGommageError(null); clearCanvas()
@@ -1775,7 +1775,7 @@ export default function Home() {
                   <button onClick={clearCanvas}
                     style={{ padding:"12px 16px", borderRadius:12, border:t.border, background:t.bgCard, color:t.textSub, fontSize:13, cursor:"pointer" }}>Réinitialiser</button>
                   <button onClick={handleGommage} disabled={gommageProcessing}
-                    style={{ flex:1, padding:"14px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:15, fontWeight:700, cursor:gommageProcessing?"not-allowed":"pointer", opacity:gommageProcessing?0.6:1 }}>
+                    style={{ flex:1, padding:"14px", borderRadius:14, border:"none", background:t.accent, color:"#ffffff", fontSize:15, fontWeight:700, cursor:gommageProcessing?"not-allowed":"pointer", opacity:gommageProcessing?0.6:1 }}>
                     {gommageProcessing ? "Gommage en cours..." : "Gommer"}
                   </button>
                 </div>
@@ -1804,12 +1804,12 @@ export default function Home() {
                 </div>
                 <div style={{ display:"flex", gap:10 }}>
                   <button onClick={() => handleDownloadResult(wmResult, "sans_filigrane")}
-                    style={{ flex:1, padding:"15px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:15, fontWeight:700, cursor:"pointer" }}>Télécharger</button>
+                    style={{ flex:1, padding:"15px", borderRadius:14, border:"none", background:t.accent, color:"#ffffff", fontSize:15, fontWeight:700, cursor:"pointer" }}>Télécharger</button>
                   <button onClick={() => setWmResult(null)}
                     style={{ padding:"15px 20px", borderRadius:14, border:t.border, background:t.bgCard, color:t.textSub, fontSize:13, cursor:"pointer" }}>Retoucher</button>
                 </div>
               </>) : !wmFile ? (
-                <label style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, padding:"52px 20px", border:`2px dashed rgba(232,245,66,0.2)`, borderRadius:16, background:t.bgCard, cursor:"pointer" }}>
+                <label style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, padding:"52px 20px", border:`2px dashed rgba(79,142,247,0.2)`, borderRadius:16, background:t.bgCard, cursor:"pointer" }}>
                   <input type="file" accept=".jpg,.jpeg,.png,.webp" style={{ display:"none" }} onChange={e => {
                     const f = e.target.files?.[0]; if (!f) return
                     setWmFile(f); setWmError(null)
@@ -1836,7 +1836,7 @@ export default function Home() {
                   </div>
                 )}
                 <button onClick={handleRemoveWatermark} disabled={wmProcessing}
-                  style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:15, fontWeight:700, cursor:wmProcessing?"not-allowed":"pointer", opacity:wmProcessing?0.6:1 }}>
+                  style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:t.accent, color:"#ffffff", fontSize:15, fontWeight:700, cursor:wmProcessing?"not-allowed":"pointer", opacity:wmProcessing?0.6:1 }}>
                   {wmProcessing ? "Suppression en cours..." : "Retirer le filigrane"}
                 </button>
                 {wmError && (
@@ -1864,12 +1864,12 @@ export default function Home() {
                 </div>
                 <div style={{ display:"flex", gap:10 }}>
                   <button onClick={() => handleDownloadResult(txtResult, "sans_texte")}
-                    style={{ flex:1, padding:"15px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:15, fontWeight:700, cursor:"pointer" }}>Télécharger</button>
+                    style={{ flex:1, padding:"15px", borderRadius:14, border:"none", background:t.accent, color:"#ffffff", fontSize:15, fontWeight:700, cursor:"pointer" }}>Télécharger</button>
                   <button onClick={() => setTxtResult(null)}
                     style={{ padding:"15px 20px", borderRadius:14, border:t.border, background:t.bgCard, color:t.textSub, fontSize:13, cursor:"pointer" }}>Retoucher</button>
                 </div>
               </>) : !txtFile ? (
-                <label style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, padding:"52px 20px", border:`2px dashed rgba(232,245,66,0.2)`, borderRadius:16, background:t.bgCard, cursor:"pointer" }}>
+                <label style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, padding:"52px 20px", border:`2px dashed rgba(79,142,247,0.2)`, borderRadius:16, background:t.bgCard, cursor:"pointer" }}>
                   <input type="file" accept=".jpg,.jpeg,.png,.webp" style={{ display:"none" }} onChange={e => {
                     const f = e.target.files?.[0]; if (!f) return
                     setTxtFile(f); setTxtError(null)
@@ -1896,7 +1896,7 @@ export default function Home() {
                   </div>
                 )}
                 <button onClick={handleRemoveText} disabled={txtProcessing}
-                  style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:t.accent, color:"#0a0a0a", fontSize:15, fontWeight:700, cursor:txtProcessing?"not-allowed":"pointer", opacity:txtProcessing?0.6:1 }}>
+                  style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:t.accent, color:"#ffffff", fontSize:15, fontWeight:700, cursor:txtProcessing?"not-allowed":"pointer", opacity:txtProcessing?0.6:1 }}>
                   {txtProcessing ? "Suppression en cours..." : "Retirer le texte"}
                 </button>
                 {txtError && (
@@ -1912,7 +1912,7 @@ export default function Home() {
 
 
       {lastGeneratedClip && (
-        <div style={{ position:"fixed", bottom:0, left:0, right:0, background:dark ? "rgba(11,11,11,0.96)" : "rgba(229,229,224,0.96)", borderTop:t.border, backdropFilter:"blur(14px)", padding:"9px 16px", display:"flex", alignItems:"center", gap:10, zIndex:40 }}>
+        <div style={{ position:"fixed", bottom:0, left:0, right:0, background:dark ? "rgba(13,13,20,0.96)" : "rgba(229,229,224,0.96)", borderTop:t.border, backdropFilter:"blur(14px)", padding:"9px 16px", display:"flex", alignItems:"center", gap:10, zIndex:40 }}>
           {lastGeneratedClip.thumbnail && <img src={lastGeneratedClip.thumbnail} style={{ width:34, height:22, borderRadius:4, objectFit:"cover", flexShrink:0 }}/>}
           <div style={{ flex:1, minWidth:0 }}>
             <p style={{ fontSize:10, color:t.textMuted }}>{T.lastGenerated}</p>
@@ -1920,7 +1920,7 @@ export default function Home() {
           </div>
           <button onClick={() => shareNative(lastGeneratedClip)} style={{ fontSize:11, color:t.textSub, background:t.bgInput, border:t.border, borderRadius:7, padding:"5px 9px", cursor:"pointer", whiteSpace:"nowrap", flexShrink:0 }}>↗</button>
           <button onClick={() => exportToDrive(lastGeneratedClip)} style={{ fontSize:11, color:driveConnected ? "#4285f4" : t.textMuted, background:driveConnected ? "rgba(66,133,244,0.06)" : t.bgInput, border:driveConnected ? "1px solid rgba(66,133,244,0.25)" : t.border, borderRadius:7, padding:"5px 9px", cursor:"pointer", whiteSpace:"nowrap", flexShrink:0 }}>▲</button>
-          <button onClick={() => downloadClip(lastGeneratedClip)} style={{ fontSize:11, color:t.accent, background:"rgba(232,245,66,0.06)", border:"1px solid rgba(232,245,66,0.18)", borderRadius:7, padding:"5px 9px", cursor:"pointer", whiteSpace:"nowrap", flexShrink:0 }}>↓</button>
+          <button onClick={() => downloadClip(lastGeneratedClip)} style={{ fontSize:11, color:t.accent, background:"rgba(79,142,247,0.06)", border:"1px solid rgba(79,142,247,0.18)", borderRadius:7, padding:"5px 9px", cursor:"pointer", whiteSpace:"nowrap", flexShrink:0 }}>↓</button>
           <button onClick={() => setLastGeneratedClip(null)} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15, flexShrink:0 }}>✕</button>
         </div>
       )}
@@ -1957,7 +1957,7 @@ export default function Home() {
                   <p style={{ fontSize:13, color:t.text, fontWeight:500 }}>{p.name}</p>
                   <p style={{ fontSize:10, color:t.textMuted, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.format} · {CGL[p.colorGrade]} · {TRL[p.transition]} · {p.exportQuality}</p>
                 </div>
-                <button onClick={() => loadPreset(p)} style={{ padding:"4px 10px", borderRadius:6, fontSize:11, border:"1px solid rgba(232,245,66,0.28)", background:"rgba(232,245,66,0.06)", color:t.accent, cursor:"pointer", flexShrink:0 }}>{T.use}</button>
+                <button onClick={() => loadPreset(p)} style={{ padding:"4px 10px", borderRadius:6, fontSize:11, border:"1px solid rgba(79,142,247,0.28)", background:"rgba(79,142,247,0.06)", color:t.accent, cursor:"pointer", flexShrink:0 }}>{T.use}</button>
                 <button onClick={() => deletePreset(p.id)} style={{ padding:"4px 8px", borderRadius:6, fontSize:11, border:"none", background:"none", color:"#e8453a", cursor:"pointer", flexShrink:0 }}>✕</button>
               </div>
             ))}
@@ -1974,7 +1974,7 @@ export default function Home() {
             <p style={{ fontSize:11, color:t.textMuted }}>{selectedFormat} · {CGL[colorGrade]} · {TRL[transition]} · {exportQuality}</p>
             <div style={{ display:"flex", gap:7 }}>
               <button onClick={() => setShowSavePreset(false)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.cancel}</button>
-              <button onClick={savePreset} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:700 }}>{T.savePreset}</button>
+              <button onClick={savePreset} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#ffffff", cursor:"pointer", fontSize:13, fontWeight:700 }}>{T.savePreset}</button>
             </div>
           </div>
         </div>
@@ -1988,7 +1988,7 @@ export default function Home() {
             <p style={{ fontSize:12, color:t.textMuted }}>{T.timestampDesc}</p>
             {timestampPreviews.length > 0 && (
               <div style={{ position:"relative", height:32, background:t.bgInput, borderRadius:8, overflow:"hidden", marginBottom:4 }}>
-                {timestampPreviews.map((ts, i) => { const total = timestampPreviews.reduce((acc, t2) => Math.max(acc, t2.start + t2.duration), 0); const colors = ["rgba(232,245,66,0.6)","rgba(100,200,255,0.6)","rgba(255,150,100,0.6)","rgba(150,255,150,0.6)"]; return <div key={i} style={{ position:"absolute", top:4, height:24, left:`${(ts.start/total)*100}%`, width:`${(ts.duration/total)*100}%`, background:colors[i%colors.length], borderRadius:4, display:"flex", alignItems:"center", justifyContent:"center" }}><span style={{ fontSize:9, fontWeight:700, color:"#0a0a0a" }}>{i+1}</span></div> })}
+                {timestampPreviews.map((ts, i) => { const total = timestampPreviews.reduce((acc, t2) => Math.max(acc, t2.start + t2.duration), 0); const colors = ["rgba(79,142,247,0.6)","rgba(100,200,255,0.6)","rgba(255,150,100,0.6)","rgba(150,255,150,0.6)"]; return <div key={i} style={{ position:"absolute", top:4, height:24, left:`${(ts.start/total)*100}%`, width:`${(ts.duration/total)*100}%`, background:colors[i%colors.length], borderRadius:4, display:"flex", alignItems:"center", justifyContent:"center" }}><span style={{ fontSize:9, fontWeight:700, color:"#ffffff" }}>{i+1}</span></div> })}
               </div>
             )}
             {timestampPreviews.map((ts, i) => (
@@ -1999,7 +1999,7 @@ export default function Home() {
             ))}
             <div style={{ display:"flex", gap:7 }}>
               <button onClick={() => setShowTimestampPreview(false)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.cancel}</button>
-              <button onClick={() => { setCustomTimestamps(timestampPreviews); setShowTimestampPreview(false) }} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:600 }}>{T.useTimestamps}</button>
+              <button onClick={() => { setCustomTimestamps(timestampPreviews); setShowTimestampPreview(false) }} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#ffffff", cursor:"pointer", fontSize:13, fontWeight:600 }}>{T.useTimestamps}</button>
             </div>
           </div>
         </div>
@@ -2012,7 +2012,7 @@ export default function Home() {
             <p style={{ fontSize:12, color:t.textMuted }}>{T.capsuleDesc}</p>
             <div style={{ display:"flex", gap:7 }}>
               {(["courte","longue"] as const).map(type => (
-                <button key={type} onClick={() => setCapsulesType(type)} style={{ flex:1, padding:"13px 9px", borderRadius:9, border:capsulesType === type ? `1px solid rgba(232,245,66,0.5)` : t.borderMed, background:capsulesType === type ? "rgba(232,245,66,0.07)" : t.bgInput, color:capsulesType === type ? t.accent : t.textSub, cursor:"pointer", fontSize:12, textAlign:"center" }}>
+                <button key={type} onClick={() => setCapsulesType(type)} style={{ flex:1, padding:"13px 9px", borderRadius:9, border:capsulesType === type ? `1px solid rgba(79,142,247,0.5)` : t.borderMed, background:capsulesType === type ? "rgba(79,142,247,0.07)" : t.bgInput, color:capsulesType === type ? t.accent : t.textSub, cursor:"pointer", fontSize:12, textAlign:"center" }}>
                   {type === "courte" ? T.shortVideo : T.longVideo}<br/><span style={{ fontSize:10, opacity:0.65 }}>{type === "courte" ? T.shortSub : T.longSub}</span>
                 </button>
               ))}
@@ -2027,7 +2027,7 @@ export default function Home() {
             </div>
             <div style={{ display:"flex", gap:7 }}>
               <button onClick={() => { setShowCapsulesModal(false); setCapsulesType(null) }} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.cancel}</button>
-              <button onClick={applyCapsules} disabled={!capsulesType} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:capsulesType ? t.accent : t.bgInput, color:capsulesType ? "#0a0a0a" : t.textMuted, cursor:capsulesType ? "pointer" : "not-allowed", fontSize:13, fontWeight:600 }}>{T.apply}</button>
+              <button onClick={applyCapsules} disabled={!capsulesType} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:capsulesType ? t.accent : t.bgInput, color:capsulesType ? "#ffffff" : t.textMuted, cursor:capsulesType ? "pointer" : "not-allowed", fontSize:13, fontWeight:600 }}>{T.apply}</button>
             </div>
           </div>
         </div>
@@ -2045,15 +2045,15 @@ export default function Home() {
               <span style={{ fontSize:10, color:t.textHint }}>({T.optional})</span>
             </div>
             {helperResult && (
-              <div style={{ background:"rgba(232,245,66,0.03)", border:"1px solid rgba(232,245,66,0.15)", borderRadius:8, padding:"11px 13px" }}>
+              <div style={{ background:"rgba(79,142,247,0.03)", border:"1px solid rgba(79,142,247,0.15)", borderRadius:8, padding:"11px 13px" }}>
                 <p style={{ fontSize:10, color:t.accent, marginBottom:5, fontWeight:700, textTransform:"uppercase" }}>{T.promptGenerated}</p>
                 <p style={{ fontSize:13, color:t.text, lineHeight:1.55 }}>{helperResult}</p>
               </div>
             )}
             <div style={{ display:"flex", gap:7 }}>
               <button onClick={() => setShowPromptHelper(false)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.close}</button>
-              {helperResult && <button onClick={() => { setPromptText(helperResult); setShowPromptHelper(false) }} style={{ flex:1, padding:9, borderRadius:8, border:"1px solid rgba(232,245,66,0.28)", background:"rgba(232,245,66,0.06)", color:t.accent, cursor:"pointer", fontSize:13 }}>{T.use}</button>}
-              <button onClick={handlePromptHelper} disabled={helperLoading} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:helperLoading ? "rgba(232,245,66,0.35)" : t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:700 }}>{helperLoading ? "⏳" : `✦ ${T.generate}`}</button>
+              {helperResult && <button onClick={() => { setPromptText(helperResult); setShowPromptHelper(false) }} style={{ flex:1, padding:9, borderRadius:8, border:"1px solid rgba(79,142,247,0.28)", background:"rgba(79,142,247,0.06)", color:t.accent, cursor:"pointer", fontSize:13 }}>{T.use}</button>}
+              <button onClick={handlePromptHelper} disabled={helperLoading} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:helperLoading ? "rgba(79,142,247,0.35)" : t.accent, color:"#ffffff", cursor:"pointer", fontSize:13, fontWeight:700 }}>{helperLoading ? "⏳" : `✦ ${T.generate}`}</button>
             </div>
           </div>
         </div>
@@ -2066,7 +2066,7 @@ export default function Home() {
             <input value={newFolderName} onChange={e => setNewFolderName(e.target.value)} onKeyDown={e => e.key === "Enter" && createFolder()} style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"9px 13px", fontSize:13, color:t.text, outline:"none" }} placeholder={T.newFolderName} autoFocus/>
             <div style={{ display:"flex", gap:7 }}>
               <button onClick={() => setShowNewFolder(false)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.cancel}</button>
-              <button onClick={createFolder} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:700 }}>{T.create}</button>
+              <button onClick={createFolder} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#ffffff", cursor:"pointer", fontSize:13, fontWeight:700 }}>{T.create}</button>
             </div>
           </div>
         </div>
@@ -2091,7 +2091,7 @@ export default function Home() {
             <input value={shareEmail} onChange={e => setShareEmail(e.target.value)} style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"9px 13px", fontSize:13, color:t.text, outline:"none" }} placeholder={T.emailMember}/>
             <div style={{ display:"flex", gap:7 }}>
               <button onClick={() => setShowShareModal(null)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.cancel}</button>
-              <button onClick={() => shareFolder(showShareModal)} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:700 }}>{T.share}</button>
+              <button onClick={() => shareFolder(showShareModal)} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#ffffff", cursor:"pointer", fontSize:13, fontWeight:700 }}>{T.share}</button>
             </div>
           </div>
         </div>
@@ -2104,7 +2104,7 @@ export default function Home() {
             <p style={{ fontSize:13, color:t.textMuted }}>{T.compressMsg}</p>
             <div style={{ display:"flex", gap:7 }}>
               <button onClick={() => setShowCompressModal(false)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.no}</button>
-              <button onClick={compressAndUpload} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#0a0a0a", cursor:"pointer", fontSize:13, fontWeight:700 }}>{T.yesCompress}</button>
+              <button onClick={compressAndUpload} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#ffffff", cursor:"pointer", fontSize:13, fontWeight:700 }}>{T.yesCompress}</button>
             </div>
           </div>
         </div>
@@ -2120,14 +2120,14 @@ export default function Home() {
               {loadingTracks ? <p style={{ fontSize:13, color:t.textMuted, textAlign:"center", padding:"18px 0" }}>...</p>
                 : tracks.length === 0 ? <p style={{ fontSize:13, color:t.textMuted, textAlign:"center", padding:"18px 0" }}>—</p>
                 : tracks.map(track => (
-                  <div key={track.id} style={{ display:"flex", alignItems:"center", gap:10, padding:"7px 9px", borderRadius:8, background:selectedMusic?.id === track.id ? "rgba(232,245,66,0.06)" : t.bgInput, border:selectedMusic?.id === track.id ? "1px solid rgba(232,245,66,0.28)" : "1px solid transparent" }}>
+                  <div key={track.id} style={{ display:"flex", alignItems:"center", gap:10, padding:"7px 9px", borderRadius:8, background:selectedMusic?.id === track.id ? "rgba(79,142,247,0.06)" : t.bgInput, border:selectedMusic?.id === track.id ? "1px solid rgba(79,142,247,0.28)" : "1px solid transparent" }}>
                     <img src={track.album.cover_small} style={{ width:36, height:36, borderRadius:5, flexShrink:0 }}/>
                     <div style={{ flex:1, minWidth:0 }}>
                       <p style={{ fontSize:12, color:t.text, fontWeight:500, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{track.title}</p>
                       <p style={{ fontSize:10, color:t.textMuted }}>{track.artist.name}</p>
                     </div>
                     <button onClick={() => togglePlay(track)} style={{ width:28, height:28, borderRadius:"50%", border:t.border, background:t.bgInput, color:t.textSub, cursor:"pointer", fontSize:11, flexShrink:0 }}>{playingId === track.id ? "⏸" : "▶"}</button>
-                    <button onClick={() => selectTrack(track)} style={{ padding:"4px 9px", borderRadius:5, fontSize:11, fontWeight:600, cursor:"pointer", border:"1px solid rgba(232,245,66,0.28)", background:"rgba(232,245,66,0.06)", color:t.accent, flexShrink:0 }}>OK</button>
+                    <button onClick={() => selectTrack(track)} style={{ padding:"4px 9px", borderRadius:5, fontSize:11, fontWeight:600, cursor:"pointer", border:"1px solid rgba(79,142,247,0.28)", background:"rgba(79,142,247,0.06)", color:t.accent, flexShrink:0 }}>OK</button>
                   </div>
                 ))}
             </div>
@@ -2137,14 +2137,14 @@ export default function Home() {
 
       {showSettings && (
         <div onClick={() => setShowSettings(false)} style={{ position:"fixed", inset:0, background:t.overlay, zIndex:100, display:"flex" }}>
-          <div onClick={e => e.stopPropagation()} style={{ position:"absolute", right:0, top:0, bottom:0, width:260, background:dark ? "rgba(11,11,11,0.98)" : t.bgModal, borderLeft:t.border, padding:"20px 16px", display:"flex", flexDirection:"column", gap:18, overflowY:"auto", backdropFilter:"blur(16px)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ position:"absolute", right:0, top:0, bottom:0, width:260, background:dark ? "rgba(13,13,20,0.98)" : t.bgModal, borderLeft:t.border, padding:"20px 16px", display:"flex", flexDirection:"column", gap:18, overflowY:"auto", backdropFilter:"blur(16px)" }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>{T.settings}</span><button onClick={() => setShowSettings(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
             <div style={{ height:1, background:dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)" }}/>
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
               <p style={{ fontSize:9, color:t.textHint, textTransform:"uppercase", letterSpacing:"0.08em" }}>Apparence</p>
               <div style={{ display:"flex", gap:6 }}>
-                <button onClick={() => setDark(false)} style={{ flex:1, padding:7, border:!dark ? `1px solid ${t.accent}` : t.border, borderRadius:7, background:!dark ? "rgba(232,245,66,0.07)" : "none", color:!dark ? t.accent : t.textMuted, fontSize:11, cursor:"pointer" }}>☀ Clair</button>
-                <button onClick={() => setDark(true)} style={{ flex:1, padding:7, border:dark ? `1px solid ${t.accent}` : t.border, borderRadius:7, background:dark ? "rgba(232,245,66,0.07)" : "none", color:dark ? t.accent : t.textMuted, fontSize:11, cursor:"pointer" }}>☾ Sombre</button>
+                <button onClick={() => setDark(false)} style={{ flex:1, padding:7, border:!dark ? `1px solid ${t.accent}` : t.border, borderRadius:7, background:!dark ? "rgba(79,142,247,0.07)" : "none", color:!dark ? t.accent : t.textMuted, fontSize:11, cursor:"pointer" }}>☀ Clair</button>
+                <button onClick={() => setDark(true)} style={{ flex:1, padding:7, border:dark ? `1px solid ${t.accent}` : t.border, borderRadius:7, background:dark ? "rgba(79,142,247,0.07)" : "none", color:dark ? t.accent : t.textMuted, fontSize:11, cursor:"pointer" }}>☾ Sombre</button>
               </div>
             </div>
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
@@ -2167,7 +2167,7 @@ export default function Home() {
                   <input value={newMemberEmail} onChange={e => setNewMemberEmail(e.target.value)} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"8px 11px", fontSize:12, color:t.text, outline:"none" }} placeholder="Email" type="email"/>
                   <input value={newMemberPassword} onChange={e => setNewMemberPassword(e.target.value)} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"8px 11px", fontSize:12, color:t.text, outline:"none" }} placeholder="Password" type="password"/>
                   {memberSuccess && <p style={{ fontSize:11, color:t.accent, textAlign:"center" }}>{memberSuccess}</p>}
-                  <button onClick={async () => { if (!newMemberEmail || !newMemberPassword) return; setAddingMember(true); setMemberSuccess(null); const { error } = await supabase.auth.signUp({ email:newMemberEmail, password:newMemberPassword }); if (error) alert(error.message); else { await supabase.from("allowed_users").insert({ email:newMemberEmail }); setMemberSuccess(`✓ ${newMemberEmail}`); setNewMemberEmail(""); setNewMemberPassword("") }; setAddingMember(false) }} disabled={addingMember} style={{ background:t.accent, border:"none", borderRadius:7, padding:9, fontSize:12, fontWeight:700, color:"#0a0a0a", cursor:"pointer", opacity:addingMember ? 0.6 : 1 }}>{addingMember ? T.creating : T.createAccount}</button>
+                  <button onClick={async () => { if (!newMemberEmail || !newMemberPassword) return; setAddingMember(true); setMemberSuccess(null); const { error } = await supabase.auth.signUp({ email:newMemberEmail, password:newMemberPassword }); if (error) alert(error.message); else { await supabase.from("allowed_users").insert({ email:newMemberEmail }); setMemberSuccess(`✓ ${newMemberEmail}`); setNewMemberEmail(""); setNewMemberPassword("") }; setAddingMember(false) }} disabled={addingMember} style={{ background:t.accent, border:"none", borderRadius:7, padding:9, fontSize:12, fontWeight:700, color:"#ffffff", cursor:"pointer", opacity:addingMember ? 0.6 : 1 }}>{addingMember ? T.creating : T.createAccount}</button>
                 </div>
               </>
             )}
@@ -2204,7 +2204,7 @@ export default function Home() {
               style={{ width:"100%", maxHeight:"72vh", background:"#000", display:"block", objectFit:"contain" }}
             />
             <div style={{ padding:"14px 14px 18px", display:"flex", flexDirection:"column", gap:10 }}>
-              <button onClick={() => downloadClip(videoPlayerClip)} style={{ width:"100%", padding:"15px", borderRadius:14, border:"none", background:"#e8f542", color:"#0a0a0a", fontSize:14, fontWeight:700, cursor:"pointer", letterSpacing:"-0.01em" }}>{T.download}</button>
+              <button onClick={() => downloadClip(videoPlayerClip)} style={{ width:"100%", padding:"15px", borderRadius:14, border:"none", background:"#4F8EF7", color:"#ffffff", fontSize:14, fontWeight:700, cursor:"pointer", letterSpacing:"-0.01em" }}>{T.download}</button>
               <div style={{ display:"flex", gap:8 }}>
                 <button onClick={() => shareNative(videoPlayerClip)} style={{ flex:1, padding:"13px", borderRadius:14, border:"1px solid rgba(255,255,255,0.1)", background:"rgba(255,255,255,0.05)", color:"#ccc", fontSize:13, fontWeight:500, cursor:"pointer" }}>{T.shareNative}</button>
                 <button onClick={() => exportToDrive(videoPlayerClip)} disabled={exportingDrive === (videoPlayerClip.id || videoPlayerClip.name)} style={{ flex:1, padding:"13px", borderRadius:14, border:driveConnected ? "1px solid rgba(66,133,244,0.35)" : "1px solid rgba(255,255,255,0.08)", background:driveConnected ? "rgba(66,133,244,0.1)" : "rgba(255,255,255,0.03)", color:driveConnected ? "#4285f4" : "#666", fontSize:13, fontWeight:500, cursor:"pointer" }}>Drive</button>
