@@ -301,6 +301,8 @@ export default function Home() {
   const [driveConnected, setDriveConnected] = useState(false)
   const [videoPlayerClip, setVideoPlayerClip] = useState<any|null>(null)
   const [retoucheTab, setRetoucheTab] = useState<"upscaling"|"gommage"|"watermark"|"text">("upscaling")
+  const [clipsPill, setClipsPill] = useState({left:0,width:0,height:28,ready:false})
+  const [retouchePill, setRetouchePill] = useState({left:0,width:0,height:40,ready:false})
   const [gommageFile, setGommageFile] = useState<File|null>(null)
   const [gommagePreview, setGommagePreview] = useState<string|null>(null)
   const [gommageResult, setGommageResult] = useState<string|null>(null)
@@ -328,6 +330,8 @@ export default function Home() {
   const imgGommageRef = useRef<HTMLImageElement|null>(null)
   const drawingRef = useRef(false)
   const lastPosRef = useRef({x:0, y:0})
+  const clipsTabsRef = useRef<HTMLDivElement>(null)
+  const retoucheTabsRef = useRef<HTMLDivElement>(null)
   const defaultQueries = ["phonk","rap us","drill","travis scott","central cee"]
   const T = TRANSLATIONS[lang]
   const CGL = CG_LABELS[lang]
@@ -408,6 +412,19 @@ export default function Home() {
     return () => { if (generatingMsgRef.current) clearInterval(generatingMsgRef.current) }
   }, [generating])
 
+  useEffect(() => {
+    const el = clipsTabsRef.current; if (!el) return
+    const idx = ["home","library","history"].indexOf(currentPage)
+    const btn = el.querySelectorAll<HTMLButtonElement>("button")[idx]
+    if (btn) setClipsPill({ left: btn.offsetLeft, width: btn.offsetWidth, height: btn.offsetHeight, ready: true })
+  }, [currentPage])
+
+  useEffect(() => {
+    const el = retoucheTabsRef.current; if (!el) return
+    const idx = ["upscaling","gommage","watermark","text"].indexOf(retoucheTab)
+    const btn = el.querySelectorAll<HTMLButtonElement>("button")[idx]
+    if (btn) setRetouchePill({ left: btn.offsetLeft, width: btn.offsetWidth, height: btn.offsetHeight, ready: true })
+  }, [retoucheTab])
 
   const setLangAndSave = (l: Lang) => { setLang(l); localStorage.setItem("lang", l); setShowLangMenu(false) }
   const checkServerStatus = async () => { try { const res = await fetch(`${SERVER_URL}/health`, { signal: AbortSignal.timeout(5000) }); setServerAwake(res.ok) } catch { setServerAwake(false) } }
@@ -1060,11 +1077,12 @@ export default function Home() {
             )}
           </div>
         ) : (
-          <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-            <button onClick={() => setCurrentPage("home")} style={{ fontSize:13, color:currentPage === "home" ? t.accent : t.textSub, background:currentPage === "home" ? "rgba(232,245,66,0.09)" : "none", border:"none", cursor:"pointer", fontWeight:currentPage === "home" ? 600 : 400, textShadow:currentPage === "home" ? "0 0 10px rgba(232,245,66,0.5)" : "none", borderRadius:8, padding:"4px 10px" }}>{T.home}</button>
-            <button onClick={() => { setCurrentPage("library"); loadLibrary() }} style={{ fontSize:13, color:currentPage === "library" ? t.accent : t.textSub, background:currentPage === "library" ? "rgba(232,245,66,0.09)" : "none", border:"none", cursor:"pointer", fontWeight:currentPage === "library" ? 600 : 400, textShadow:currentPage === "library" ? "0 0 10px rgba(232,245,66,0.5)" : "none", borderRadius:8, padding:"4px 10px" }}>{T.library}</button>
-            <button onClick={() => setCurrentPage("history")} style={{ fontSize:13, color:currentPage === "history" ? t.accent : t.textSub, background:currentPage === "history" ? "rgba(232,245,66,0.09)" : "none", border:"none", cursor:"pointer", fontWeight:currentPage === "history" ? 600 : 400, textShadow:currentPage === "history" ? "0 0 10px rgba(232,245,66,0.5)" : "none", borderRadius:8, padding:"4px 10px" }}>Historique</button>
-            <button onClick={() => setCurrentMode("home")} style={{ fontSize:13, color:t.textMuted, background:"none", border:"none", cursor:"pointer" }}>{T.backHome}</button>
+          <div ref={clipsTabsRef} style={{ display:"flex", alignItems:"center", gap:14, position:"relative" }}>
+            <div style={{ position:"absolute", left:0, top:"50%", transform:`translateY(-50%) translateX(${clipsPill.left}px)`, width:clipsPill.width, height:clipsPill.height, background:"rgba(232,245,66,0.15)", border:"1px solid rgba(232,245,66,0.4)", borderRadius:8, transition:"transform 0.3s cubic-bezier(0.4,0,0.2,1), width 0.3s cubic-bezier(0.4,0,0.2,1)", pointerEvents:"none", opacity:clipsPill.ready ? 1 : 0 }}/>
+            <button onClick={() => setCurrentPage("home")} style={{ fontSize:13, color:currentPage === "home" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "home" ? 600 : 400, textShadow:currentPage === "home" ? "0 0 10px rgba(232,245,66,0.5)" : "none", borderRadius:8, padding:"4px 10px", position:"relative", zIndex:1 }}>{T.home}</button>
+            <button onClick={() => { setCurrentPage("library"); loadLibrary() }} style={{ fontSize:13, color:currentPage === "library" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "library" ? 600 : 400, textShadow:currentPage === "library" ? "0 0 10px rgba(232,245,66,0.5)" : "none", borderRadius:8, padding:"4px 10px", position:"relative", zIndex:1 }}>{T.library}</button>
+            <button onClick={() => setCurrentPage("history")} style={{ fontSize:13, color:currentPage === "history" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "history" ? 600 : 400, textShadow:currentPage === "history" ? "0 0 10px rgba(232,245,66,0.5)" : "none", borderRadius:8, padding:"4px 10px", position:"relative", zIndex:1 }}>Historique</button>
+            <button onClick={() => setCurrentMode("home")} style={{ fontSize:13, color:t.textMuted, background:"none", border:"none", cursor:"pointer", position:"relative", zIndex:1 }}>{T.backHome}</button>
           </div>
         )}
         <div style={{ display:"flex", alignItems:"center", gap:6 }}>
@@ -1464,16 +1482,19 @@ export default function Home() {
               <button onClick={() => setShowSettings(true)} style={{ fontSize:18, color:t.textSub, border:t.borderMed, borderRadius:7, padding:"7px 11px", background:t.bgInput, cursor:"pointer", lineHeight:1 }}>⚙</button>
             </div>
           </nav>
-          <div style={{ width:"100%", display:"flex", background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", border:"1px solid rgba(255,255,255,0.15)", borderTop:"1px solid rgba(255,255,255,0.30)", boxShadow:"0 8px 32px rgba(0,0,0,0.3)", borderRadius:16, position:"sticky", top:57, zIndex:40, overflowX:"auto" }}>
-            {(["upscaling","gommage","watermark","text"] as const).map((tab, i) => {
-              const labels = ["Upscaling","Gommage","Filigrane","Texte"]
-              return (
-                <button key={tab} onClick={() => setRetoucheTab(tab)}
-                  style={{ padding:"10px 18px", background:retoucheTab===tab ? "rgba(232,245,66,0.09)" : "none", border:"none", borderBottom:retoucheTab===tab ? `2px solid ${t.accent}` : "2px solid transparent", color:retoucheTab===tab ? t.accent : t.textMuted, cursor:"pointer", fontSize:13, fontWeight:retoucheTab===tab ? 700 : 400, whiteSpace:"nowrap", flexShrink:0, textShadow:retoucheTab===tab ? "0 0 10px rgba(232,245,66,0.5)" : "none" }}>
-                  {labels[i]}
-                </button>
-              )
-            })}
+          <div style={{ position:"sticky", top:57, zIndex:40 }}>
+            <div ref={retoucheTabsRef} style={{ width:"100%", display:"flex", background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", border:"1px solid rgba(255,255,255,0.15)", borderTop:"1px solid rgba(255,255,255,0.30)", boxShadow:"0 8px 32px rgba(0,0,0,0.3)", borderRadius:16, overflowX:"auto", position:"relative" }}>
+              <div style={{ position:"absolute", left:0, top:"50%", transform:`translateY(-50%) translateX(${retouchePill.left}px)`, width:retouchePill.width, height:retouchePill.height, background:"rgba(232,245,66,0.15)", border:"1px solid rgba(232,245,66,0.4)", borderRadius:10, transition:"transform 0.3s cubic-bezier(0.4,0,0.2,1), width 0.3s cubic-bezier(0.4,0,0.2,1)", pointerEvents:"none", opacity:retouchePill.ready ? 1 : 0 }}/>
+              {(["upscaling","gommage","watermark","text"] as const).map((tab, i) => {
+                const labels = ["Upscaling","Gommage","Filigrane","Texte"]
+                return (
+                  <button key={tab} onClick={() => setRetoucheTab(tab)}
+                    style={{ padding:"10px 18px", background:"none", border:"none", borderBottom:"2px solid transparent", color:retoucheTab===tab ? t.accent : t.textMuted, cursor:"pointer", fontSize:13, fontWeight:retoucheTab===tab ? 700 : 400, whiteSpace:"nowrap", flexShrink:0, textShadow:retoucheTab===tab ? "0 0 10px rgba(232,245,66,0.5)" : "none", position:"relative", zIndex:1 }}>
+                    {labels[i]}
+                  </button>
+                )
+              })}
+            </div>
           </div>
 
           <div style={{ width:"100%", maxWidth:600, display:"flex", flexDirection:"column", gap:16, padding:"20px 16px 120px", position:"relative", zIndex:1 }}>
