@@ -1073,28 +1073,21 @@ export default function Home() {
           </div>
           {serverAwake === true && <div style={{ width:5, height:5, borderRadius:"50%", background:"#4ade80" }}/>}
         </div>
-        {!isMobile && (
-          <div ref={clipsTabsRef} style={{ display:"flex", alignItems:"center", gap:14, position:"relative" }}>
-            <div style={{ position:"absolute", left:0, top:"50%", transform:`translateY(-50%) translateX(${clipsPill.left}px)`, width:clipsPill.width, height:clipsPill.height, background:"rgba(79,142,247,0.15)", border:"1px solid rgba(79,142,247,0.4)", borderRadius:8, transition:"transform 0.3s cubic-bezier(0.4,0,0.2,1), width 0.3s cubic-bezier(0.4,0,0.2,1)", pointerEvents:"none", opacity:clipsPill.ready ? 1 : 0 }}/>
-            <button onClick={() => setCurrentPage("home")} style={{ fontSize:13, color:currentPage === "home" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "home" ? 600 : 400, textShadow:currentPage === "home" ? "0 0 10px rgba(79,142,247,0.5)" : "none", borderRadius:8, padding:"4px 10px", position:"relative", zIndex:1 }}>{T.home}</button>
-            <button onClick={() => { setCurrentPage("library"); loadLibrary() }} style={{ fontSize:13, color:currentPage === "library" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "library" ? 600 : 400, textShadow:currentPage === "library" ? "0 0 10px rgba(79,142,247,0.5)" : "none", borderRadius:8, padding:"4px 10px", position:"relative", zIndex:1 }}>{T.library}</button>
-            <button onClick={() => setCurrentPage("history")} style={{ fontSize:13, color:currentPage === "history" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "history" ? 600 : 400, textShadow:currentPage === "history" ? "0 0 10px rgba(79,142,247,0.5)" : "none", borderRadius:8, padding:"4px 10px", position:"relative", zIndex:1 }}>Historique</button>
-            <button onClick={() => setCurrentMode("home")} style={{ fontSize:13, color:t.textMuted, background:"none", border:"none", cursor:"pointer", position:"relative", zIndex:1 }}>{T.backHome}</button>
-          </div>
-        )}
+        <div ref={clipsTabsRef} style={{ display:"flex", alignItems:"center", gap:isMobile ? 4 : 14, position:"relative" }}>
+          <div style={{ position:"absolute", left:0, top:"50%", transform:`translateY(-50%) translateX(${clipsPill.left}px)`, width:clipsPill.width, height:clipsPill.height, background:"rgba(79,142,247,0.15)", border:"1px solid rgba(79,142,247,0.4)", borderRadius:8, transition:"transform 0.3s cubic-bezier(0.4,0,0.2,1), width 0.3s cubic-bezier(0.4,0,0.2,1)", pointerEvents:"none", opacity:clipsPill.ready ? 1 : 0 }}/>
+          <button onClick={() => setCurrentPage("home")} style={{ fontSize:isMobile ? 12 : 13, color:currentPage === "home" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "home" ? 600 : 400, textShadow:currentPage === "home" ? "0 0 10px rgba(79,142,247,0.5)" : "none", borderRadius:8, padding:isMobile ? "4px 7px" : "4px 10px", position:"relative", zIndex:1 }}>{T.home}</button>
+          <button onClick={() => { setCurrentPage("library"); loadLibrary() }} style={{ fontSize:isMobile ? 12 : 13, color:currentPage === "library" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "library" ? 600 : 400, textShadow:currentPage === "library" ? "0 0 10px rgba(79,142,247,0.5)" : "none", borderRadius:8, padding:isMobile ? "4px 7px" : "4px 10px", position:"relative", zIndex:1 }}>{T.library}</button>
+          <button onClick={() => setCurrentPage("history")} style={{ fontSize:isMobile ? 12 : 13, color:currentPage === "history" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "history" ? 600 : 400, textShadow:currentPage === "history" ? "0 0 10px rgba(79,142,247,0.5)" : "none", borderRadius:8, padding:isMobile ? "4px 7px" : "4px 10px", position:"relative", zIndex:1 }}>Historique</button>
+          {!isMobile && <button onClick={() => setCurrentMode("home")} style={{ fontSize:13, color:t.textMuted, background:"none", border:"none", cursor:"pointer", position:"relative", zIndex:1 }}>{T.backHome}</button>}
+        </div>
         {isMobile ? (
           <div style={{ position:"relative" }} onClick={e => e.stopPropagation()}>
             <button onClick={() => setShowNavMenu(!showNavMenu)} style={{ fontSize:22, color:t.textSub, background:"none", border:"none", cursor:"pointer", lineHeight:1, padding:"4px 8px" }}>☰</button>
             {showNavMenu && (
               <div style={{ position:"absolute", right:0, top:"calc(100% + 8px)", background:"rgba(12,12,20,0.94)", backdropFilter:"blur(24px)", WebkitBackdropFilter:"blur(24px)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:14, padding:"6px 0", minWidth:210, boxShadow:"0 16px 48px rgba(0,0,0,0.7)", zIndex:200 }}>
-                {([["home", T.home], ["library", T.library], ["history", T.historyTitle]] as [string,string][]).map(([page, label]) => (
-                  <button key={page} onClick={() => { setCurrentPage(page as any); if (page === "library") loadLibrary(); setShowNavMenu(false) }} style={{ width:"100%", padding:"13px 18px", background:"none", border:"none", color:currentPage === page ? t.accent : t.text, cursor:"pointer", fontSize:14, textAlign:"left", fontWeight:currentPage === page ? 600 : 400, display:"flex", alignItems:"center", gap:8 }}>
-                    <span style={{ width:6, height:6, borderRadius:"50%", background:currentPage === page ? t.accent : "transparent", border:currentPage === page ? "none" : "1px solid rgba(255,255,255,0.15)", flexShrink:0, display:"inline-block" }}/>
-                    {label}
-                  </button>
-                ))}
-                <div style={{ height:1, background:"rgba(255,255,255,0.08)", margin:"6px 0" }}/>
+                <button onClick={() => { driveConnected ? null : connectDrive(); setShowNavMenu(false) }} style={{ width:"100%", padding:"13px 18px", background:"none", border:"none", color:driveConnected ? "#4ade80" : t.text, cursor:driveConnected ? "default" : "pointer", fontSize:14, textAlign:"left" }}>{driveConnected ? "✓ Drive connecté" : "Drive"}</button>
                 <button onClick={() => { setShowStats(true); setShowNavMenu(false) }} style={{ width:"100%", padding:"13px 18px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:14, textAlign:"left" }}>📊 {T.stats}</button>
+                <div style={{ height:1, background:"rgba(255,255,255,0.08)", margin:"6px 0" }}/>
                 <div style={{ padding:"10px 18px 8px" }}>
                   <p style={{ fontSize:10, color:t.textMuted, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>Langue</p>
                   <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
@@ -1103,7 +1096,9 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
+                <div style={{ height:1, background:"rgba(255,255,255,0.08)", margin:"6px 0" }}/>
                 <button onClick={() => { setShowSettings(true); setShowNavMenu(false) }} style={{ width:"100%", padding:"13px 18px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:14, textAlign:"left" }}>⚙ {T.settings}</button>
+                <button onClick={() => { setCurrentMode("home"); setShowNavMenu(false) }} style={{ width:"100%", padding:"13px 18px", background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:14, textAlign:"left" }}>{T.backHome}</button>
               </div>
             )}
           </div>
