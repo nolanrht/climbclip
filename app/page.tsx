@@ -328,6 +328,7 @@ export default function Home() {
   const generatingMsgRef = useRef<ReturnType<typeof setInterval>|null>(null)
   const canvasRef = useRef<HTMLCanvasElement|null>(null)
   const imgGommageRef = useRef<HTMLImageElement|null>(null)
+  const imgTxtRef = useRef<HTMLImageElement|null>(null)
   const drawingRef = useRef(false)
   const lastPosRef = useRef({x:0, y:0})
   const clipsTabsRef = useRef<HTMLDivElement>(null)
@@ -879,12 +880,20 @@ export default function Home() {
   }
 
   const handleRemoveText = async () => {
-    if (!txtFile) return
+    if (!txtPreview || !canvasRef.current) return
+    const imgEl = imgTxtRef.current
+    if (!imgEl || !imgEl.complete || !imgEl.naturalWidth) {
+      setTxtError("Image pas encore chargée, réessaye dans un instant.")
+      return
+    }
     setTxtProcessing(true); setTxtError(null)
     try {
-      const fd = new FormData()
-      fd.append("image", txtFile)
-      const res = await fetch(`${SERVER_URL}/retouch/remove-text`, { method:"POST", body:fd })
+      const maskData = canvasRef.current.toDataURL("image/png")
+      const res = await fetch(`${SERVER_URL}/retouch/inpaint`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: txtPreview, mask: maskData }),
+      })
       const data = await res.json()
       if (data.error) { setTxtError(data.error); return }
       setTxtResult(data.result); setTxtSlider(50)
@@ -1865,14 +1874,14 @@ export default function Home() {
                 <div style={{ display:"flex", gap:10 }}>
                   <button onClick={() => handleDownloadResult(txtResult, "sans_texte")}
                     style={{ flex:1, padding:"15px", borderRadius:14, border:"none", background:t.accent, color:"#ffffff", fontSize:15, fontWeight:700, cursor:"pointer" }}>Télécharger</button>
-                  <button onClick={() => setTxtResult(null)}
+                  <button onClick={() => { setTxtResult(null); clearCanvas() }}
                     style={{ padding:"15px 20px", borderRadius:14, border:t.border, background:t.bgCard, color:t.textSub, fontSize:13, cursor:"pointer" }}>Retoucher</button>
                 </div>
               </>) : !txtFile ? (
                 <label style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, padding:"52px 20px", border:`2px dashed rgba(79,142,247,0.2)`, borderRadius:16, background:t.bgCard, cursor:"pointer" }}>
                   <input type="file" accept=".jpg,.jpeg,.png,.webp" style={{ display:"none" }} onChange={e => {
                     const f = e.target.files?.[0]; if (!f) return
-                    setTxtFile(f); setTxtError(null)
+                    setTxtFile(f); setTxtError(null); clearCanvas()
                     const r = new FileReader()
                     r.onload = ev => setTxtPreview(ev.target?.result as string)
                     r.readAsDataURL(f)
@@ -1881,24 +1890,70 @@ export default function Home() {
                   <div style={{ textAlign:"center" }}>
                     <p style={{ fontSize:14, color:t.text, fontWeight:500 }}>Clique ou glisse une image</p>
                     <p style={{ fontSize:11, color:t.textMuted, marginTop:4 }}>JPG, PNG, WebP · max 20MB</p>
-                    <p style={{ fontSize:11, color:t.textMuted, marginTop:2 }}>Détection automatique du texte</p>
                   </div>
                 </label>
               ) : (<>
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                  <button onClick={() => { setTxtFile(null); setTxtPreview(null); setTxtError(null) }}
+                  <button onClick={() => { setTxtFile(null); setTxtPreview(null); setTxtError(null); clearCanvas() }}
                     style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:18, lineHeight:1, padding:"0 2px" }}>←</button>
                   <span style={{ fontSize:13, fontWeight:600, color:t.text, flex:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{txtFile.name}</span>
                 </div>
-                {txtPreview && (
-                  <div style={{ borderRadius:12, overflow:"hidden", lineHeight:0 }}>
-                    <img src={txtPreview} style={{ width:"100%", display:"block" }} draggable={false}/>
+                <p style={{ fontSize:11, color:t.textMuted }}>Dessine sur le texte à effacer, puis clique "Retirer le texte"</p>
+                <div style={{ position:"relative", borderRadius:12, overflow:"hidden", userSelect:"none", lineHeight:0 }}>
+                  <img ref={imgTxtRef} src={txtPreview!} style={{ width:"100%", display:"block" }} draggable={false}
+                    onLoad={e => {
+                      const img = e.target as HTMLImageElement
+                      if (canvasRef.current) {
+                        canvasRef.current.width = img.naturalWidth
+                        canvasRef.current.height = img.naturalHeight
+                        const ctx = canvasRef.current.getContext("2d")
+                        if (ctx) ctx.clearRect(0, 0, img.naturalWidth, img.naturalHeight)
+                      }
+                    }}
+                  />
+                  <canvas ref={canvasRef}
+                    style={{ position:"absolute", inset:0, width:"100%", height:"100%", cursor:"crosshair", opacity:0.65, touchAction:"none" }}
+                    onPointerDown={e => {
+                      const c = canvasRef.current; if (!c) return
+                      c.setPointerCapture(e.pointerId)
+                      drawingRef.current = true
+                      const rect = c.getBoundingClientRect()
+                      const x = (e.clientX - rect.left) * c.width / rect.width
+                      const y = (e.clientY - rect.top) * c.height / rect.height
+                      lastPosRef.current = {x, y}
+                      const ctx = c.getContext("2d"); if (!ctx) return
+                      ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(x, y, brushSize/2, 0, Math.PI*2); ctx.fill()
+                    }}
+                    onPointerMove={e => {
+                      if (!drawingRef.current) return
+                      const c = canvasRef.current; if (!c) return
+                      const rect = c.getBoundingClientRect()
+                      const x = (e.clientX - rect.left) * c.width / rect.width
+                      const y = (e.clientY - rect.top) * c.height / rect.height
+                      const ctx = c.getContext("2d"); if (!ctx) return
+                      ctx.strokeStyle = "white"; ctx.lineWidth = brushSize; ctx.lineCap = "round"
+                      ctx.beginPath(); ctx.moveTo(lastPosRef.current.x, lastPosRef.current.y); ctx.lineTo(x, y); ctx.stroke()
+                      lastPosRef.current = {x, y}
+                    }}
+                    onPointerUp={() => { drawingRef.current = false }}
+                    onPointerLeave={() => { drawingRef.current = false }}
+                  />
+                </div>
+                <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+                  <div style={{ display:"flex", justifyContent:"space-between" }}>
+                    <span style={{ fontSize:11, color:t.textMuted }}>Taille du pinceau</span>
+                    <span style={{ fontSize:11, color:t.text }}>{brushSize}px</span>
                   </div>
-                )}
-                <button onClick={handleRemoveText} disabled={txtProcessing}
-                  style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:t.accent, color:"#ffffff", fontSize:15, fontWeight:700, cursor:txtProcessing?"not-allowed":"pointer", opacity:txtProcessing?0.6:1 }}>
-                  {txtProcessing ? "Suppression en cours..." : "Retirer le texte"}
-                </button>
+                  <input type="range" min={5} max={100} value={brushSize} onChange={e => setBrushSize(Number(e.target.value))} style={{ width:"100%", accentColor:t.accent }}/>
+                </div>
+                <div style={{ display:"flex", gap:10 }}>
+                  <button onClick={clearCanvas}
+                    style={{ padding:"12px 16px", borderRadius:12, border:t.border, background:t.bgCard, color:t.textSub, fontSize:13, cursor:"pointer" }}>Réinitialiser</button>
+                  <button onClick={handleRemoveText} disabled={txtProcessing}
+                    style={{ flex:1, padding:"14px", borderRadius:14, border:"none", background:t.accent, color:"#ffffff", fontSize:15, fontWeight:700, cursor:txtProcessing?"not-allowed":"pointer", opacity:txtProcessing?0.6:1 }}>
+                    {txtProcessing ? "Traitement en cours..." : "Retirer le texte"}
+                  </button>
+                </div>
                 {txtError && (
                   <div style={{ padding:"12px 16px", background:"rgba(255,107,107,0.07)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:10 }}>
                     <p style={{ fontSize:12, color:"#ff6b6b" }}>{txtError}</p>
