@@ -1074,17 +1074,7 @@ export default function Home() {
           {serverAwake === true && <div style={{ width:5, height:5, borderRadius:"50%", background:"#4ade80" }}/>}
         </div>
         {isMobile ? (
-          <div style={{ position:"relative" }} onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowNavMenu(!showNavMenu)} style={{ fontSize:18, color:t.textSub, background:"none", border:"none", cursor:"pointer", lineHeight:1, padding:"4px 6px" }}>☰</button>
-            {showNavMenu && (
-              <div style={{ position:"absolute", left:"50%", transform:"translateX(-50%)", top:"calc(100% + 6px)", background:t.bgModal, border:t.border, borderRadius:10, padding:"4px 0", minWidth:160, boxShadow:"0 8px 24px rgba(0,0,0,0.6)", zIndex:300 }}>
-                {([["home", T.home], ["library", T.library], ["history", "Historique"]] as [string,string][]).map(([page, label]) => (
-                  <button key={page} onClick={() => { setCurrentPage(page as any); if (page === "library") loadLibrary(); setShowNavMenu(false) }} style={{ width:"100%", padding:"12px 18px", background:currentPage === page ? "rgba(79,142,247,0.07)" : "none", border:"none", borderBottom:t.border, color:currentPage === page ? t.accent : t.text, cursor:"pointer", fontSize:14, textAlign:"left", fontWeight:currentPage === page ? 600 : 400 }}>{label}</button>
-                ))}
-                <button onClick={() => { setCurrentMode("home"); setShowNavMenu(false) }} style={{ width:"100%", padding:"12px 18px", background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:14, textAlign:"left" }}>{T.backHome}</button>
-              </div>
-            )}
-          </div>
+          <button onClick={() => setCurrentMode("home")} style={{ fontSize:20, color:t.textMuted, background:"none", border:"none", cursor:"pointer", lineHeight:1, padding:"4px 8px" }}>←</button>
         ) : (
           <div ref={clipsTabsRef} style={{ display:"flex", alignItems:"center", gap:14, position:"relative" }}>
             <div style={{ position:"absolute", left:0, top:"50%", transform:`translateY(-50%) translateX(${clipsPill.left}px)`, width:clipsPill.width, height:clipsPill.height, background:"rgba(79,142,247,0.15)", border:"1px solid rgba(79,142,247,0.4)", borderRadius:8, transition:"transform 0.3s cubic-bezier(0.4,0,0.2,1), width 0.3s cubic-bezier(0.4,0,0.2,1)", pointerEvents:"none", opacity:clipsPill.ready ? 1 : 0 }}/>
@@ -1426,6 +1416,21 @@ export default function Home() {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {isMobile && (
+        <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:60, display:"flex", background:"rgba(10,10,18,0.88)", backdropFilter:"blur(24px)", WebkitBackdropFilter:"blur(24px)", borderTop:"1px solid rgba(255,255,255,0.10)", boxShadow:"0 -4px 24px rgba(0,0,0,0.4)", paddingBottom:"env(safe-area-inset-bottom, 0px)" }}>
+          {([
+            ["home", T.home, <svg key="h" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>],
+            ["library", T.library, <svg key="l" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>],
+            ["history", T.historyTitle, <svg key="hi" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>],
+          ] as [string, string, React.ReactNode][]).map(([page, label, icon]) => (
+            <button key={page} onClick={() => { setCurrentPage(page as any); if (page === "library") loadLibrary() }} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:3, padding:"10px 0 12px", background:"none", border:"none", cursor:"pointer", color:currentPage === page ? t.accent : "rgba(255,255,255,0.38)", transition:"color 0.15s" }}>
+              {icon}
+              <span style={{ fontSize:9, fontWeight:currentPage === page ? 600 : 400, letterSpacing:"0.03em" }}>{label}</span>
+            </button>
+          ))}
         </div>
       )}
 
