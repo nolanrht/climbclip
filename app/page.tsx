@@ -287,7 +287,7 @@ export default function Home() {
   const [presets, setPresets] = useState<Preset[]>([])
   const [presetName, setPresetName] = useState("")
   const [copiedId, setCopiedId] = useState<string|null>(null)
-  const [autoMode, setAutoMode] = useState(true)
+  const [autoMode, setAutoMode] = useState(false)
   const [onboardingDone, setOnboardingDone] = useState(false)
   const [detectedContentType, setDetectedContentType] = useState<string|null>(null)
   const [analyzing, setAnalyzing] = useState(false)
