@@ -243,7 +243,7 @@ export default function Home() {
   const [linkInput, setLinkInput] = useState("")
   const [importingLink, setImportingLink] = useState(false)
   const [newMemberEmail, setNewMemberEmail] = useState("")
-  const [newMemberPassword, setNewMemberPassword] = useState("")
+
   const [addingMember, setAddingMember] = useState(false)
   const [memberSuccess, setMemberSuccess] = useState<string|null>(null)
   const [helperInput, setHelperInput] = useState("")
@@ -2230,9 +2230,8 @@ export default function Home() {
                 <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                   <p style={{ fontSize:9, color:t.textHint, textTransform:"uppercase", letterSpacing:"0.08em" }}>{T.addMember}</p>
                   <input value={newMemberEmail} onChange={e => setNewMemberEmail(e.target.value)} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"8px 11px", fontSize:12, color:t.text, outline:"none" }} placeholder="Email" type="email"/>
-                  <input value={newMemberPassword} onChange={e => setNewMemberPassword(e.target.value)} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"8px 11px", fontSize:12, color:t.text, outline:"none" }} placeholder="Password" type="password"/>
                   {memberSuccess && <p style={{ fontSize:11, color:t.accent, textAlign:"center" }}>{memberSuccess}</p>}
-                  <button onClick={async () => { if (!newMemberEmail || !newMemberPassword) return; setAddingMember(true); setMemberSuccess(null); const { error } = await supabase.auth.signUp({ email:newMemberEmail, password:newMemberPassword }); if (error) alert(error.message); else { await supabase.from("allowed_users").insert({ email:newMemberEmail }); setMemberSuccess(`✓ ${newMemberEmail}`); setNewMemberEmail(""); setNewMemberPassword("") }; setAddingMember(false) }} disabled={addingMember} style={{ background:t.accent, border:"none", borderRadius:7, padding:9, fontSize:12, fontWeight:700, color:"#ffffff", cursor:"pointer", opacity:addingMember ? 0.6 : 1 }}>{addingMember ? T.creating : T.createAccount}</button>
+                  <button onClick={async () => { if (!newMemberEmail) return; setAddingMember(true); setMemberSuccess(null); const rndPwd = crypto.randomUUID() + crypto.randomUUID(); const { error } = await supabase.auth.signUp({ email:newMemberEmail, password:rndPwd }); if (error) alert(error.message); else { await supabase.from("allowed_users").insert({ email:newMemberEmail }); setMemberSuccess(`✓ ${newMemberEmail}`); setNewMemberEmail("") }; setAddingMember(false) }} disabled={addingMember} style={{ background:t.accent, border:"none", borderRadius:7, padding:9, fontSize:12, fontWeight:700, color:"#ffffff", cursor:"pointer", opacity:addingMember ? 0.6 : 1 }}>{addingMember ? T.creating : T.createAccount}</button>
                 </div>
               </>
             )}
