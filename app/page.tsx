@@ -756,7 +756,12 @@ export default function Home() {
       setTimeout(() => URL.revokeObjectURL(blobUrl), 30000)
     } catch { window.open(src, "_blank") }
   }
-  const downloadAllClips = () => generatedClips.forEach(clip => downloadClip(clip))
+  const downloadAllClips = async () => {
+    for (let i = 0; i < generatedClips.length; i++) {
+      await new Promise(r => setTimeout(r, 500 * i))
+      downloadClip(generatedClips[i])
+    }
+  }
 
   const handlePreviewTimestamps = async () => {
     if (videos.length === 0) return; setLoadingTimestamps(true)
@@ -953,7 +958,10 @@ export default function Home() {
           <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", background:"rgba(0,0,0,0.18)", opacity:0, transition:"opacity 0.15s" }} onMouseEnter={e => (e.currentTarget.style.opacity="1")} onMouseLeave={e => (e.currentTarget.style.opacity="0")}><span style={{ fontSize:32, color:"#fff" }}>▶</span></div>
         </div>
         <div style={{ padding:"9px 10px 11px", display:"flex", flexDirection:"column", gap:5 }}>
-          <p style={{ fontSize:11, color:t.text, fontWeight:500 }}>{clip.name}</p>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:5 }}>
+            <p style={{ fontSize:11, color:t.text, fontWeight:500, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", flex:1 }}>{clip.name}</p>
+            <button onClick={() => downloadClip(clip)} title={T.download} style={{ flexShrink:0, padding:"4px 7px", borderRadius:6, fontSize:12, border:t.border, background:t.bgInput, color:t.accent, cursor:"pointer", lineHeight:1 }}>↓</button>
+          </div>
           <button onClick={() => shareNative(clip)} style={{ padding:"7px", borderRadius:7, fontSize:11, border:t.border, background:t.bgInput, color:t.textSub, cursor:"pointer" }}>{T.shareNative}</button>
           <button onClick={() => shareClipPublic(clip)} style={{ padding:"7px", borderRadius:7, fontSize:11, border:t.border, background:t.bgInput, color:copiedId === clipId ? "#4ade80" : t.textMuted, cursor:"pointer" }}>{copiedId === clipId ? T.copied : T.copyLink}</button>
           <button onClick={() => exportToDrive(clip)} disabled={exportingDrive === clipId} style={{ padding:"7px", borderRadius:7, fontSize:11, border:driveConnected ? "1px solid rgba(66,133,244,0.35)" : t.borderMed, background:driveConnected ? "rgba(66,133,244,0.06)" : t.bgInput, color:exportingDrive === clipId ? t.textMuted : driveConnected ? "#4285f4" : t.textSub, cursor:"pointer", opacity:exportingDrive === clipId ? 0.6 : 1 }}>{getDriveButtonLabel(clipId)}</button>
