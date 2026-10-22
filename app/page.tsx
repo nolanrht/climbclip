@@ -655,7 +655,7 @@ export default function Home() {
     if (videos.length === 0) return
     setHasGenerated(false); setGenerating(true); setProgress(0); setGeneratingServerMsg("")
     setGeneratingStartTime(Date.now()); setEstimatedRemaining(null)
-    const payload = { videoPaths: videos.map(v => v.path).filter(Boolean), videoUrls: [], format: selectedFormat, exportQuality, exportCodec, isCapsule: true, capsulesCount }
+    const payload = { videoPaths: videos.map(v => v.path).filter(Boolean), videoUrls: [], format: selectedFormat, exportQuality, exportCodec, isCapsule: true, capsulesCount, options: activeOptions }
     try {
       const res = await fetch(`${SERVER_URL}/generate`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) })
       setServerAwake(true); const { jobId } = await res.json()
