@@ -525,7 +525,13 @@ export default function Home() {
   }
 
   const uploadFile = async (file: File): Promise<string|null> => {
-    try { const fd = new FormData(); fd.append("file", file); const res = await fetch(`${SERVER_URL}/upload`, { method:"POST", body:fd }); const d = await res.json(); return d.path || null } catch { return null }
+    try {
+      const key = `uploads/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`
+      const { error } = await supabase.storage.from("videos").upload(key, file, { upsert: true })
+      if (error) throw error
+      const { data } = supabase.storage.from("videos").getPublicUrl(key)
+      return data.publicUrl
+    } catch { return null }
   }
 
   const handleFileAdd = async (file: File) => {
@@ -602,8 +608,8 @@ export default function Home() {
   }
 
   const buildPayload = (overrideOptions?: any) => ({
-    videoPaths: videos.map(v => v.path).filter(Boolean),
-    videoUrls: [],
+    videoPaths: [],
+    videoUrls: videos.map(v => v.path || v.url).filter(Boolean),
     prompt: promptText || AUTO_PRESETS[detectedContentType || "sport"]?.prompt,
     options: overrideOptions?.options || activeOptions,
     musicUrl: selectedMusic?.preview || null,
