@@ -204,6 +204,8 @@ export default function Home() {
   const [showPromptHelper, setShowPromptHelper] = useState(false)
   const [showCapsulesModal, setShowCapsulesModal] = useState(false)
   const [showTimestampPreview, setShowTimestampPreview] = useState(false)
+  const [showFilterModal, setShowFilterModal] = useState(false)
+  const [visualFilter, setVisualFilter] = useState<string | null>(null)
   const [showStats, setShowStats] = useState(false)
   const [showPresets, setShowPresets] = useState(false)
   const [showSavePreset, setShowSavePreset] = useState(false)
@@ -594,6 +596,7 @@ export default function Home() {
     exportQuality,
     exportCodec,
     subtitleStyle,
+    visualFilter: visualFilter || null,
   })
 
   const handleGenerate = useCallback(async () => {
@@ -649,13 +652,13 @@ export default function Home() {
       }
       eventSource.onerror = () => { eventSource.close(); alert("Connexion perdue"); setGenerating(false); setEstimatedRemaining(null) }
     } catch { alert("Erreur"); setGenerating(false) }
-  }, [videos, promptText, activeOptions, selectedMusic, selectedFormat, zoomIntensity, speedIntensity, addIntroOutro, customTimestamps, colorGrade, transition, textOverlay, stabilize, vocalVolume, watermark, exportQuality, exportCodec, autoMode, detectedContentType, subtitleStyle, generationHistory, onboardingDone])
+  }, [videos, promptText, activeOptions, selectedMusic, selectedFormat, zoomIntensity, speedIntensity, addIntroOutro, customTimestamps, colorGrade, transition, textOverlay, stabilize, vocalVolume, watermark, exportQuality, exportCodec, autoMode, detectedContentType, subtitleStyle, generationHistory, onboardingDone, visualFilter])
 
   const handleGenerateCapsules = useCallback(async () => {
     if (videos.length === 0) return
     setHasGenerated(false); setGenerating(true); setProgress(0); setGeneratingServerMsg("")
     setGeneratingStartTime(Date.now()); setEstimatedRemaining(null)
-    const payload = { videoPaths: videos.map(v => v.path).filter(Boolean), videoUrls: [], format: selectedFormat, exportQuality, exportCodec, isCapsule: true, capsulesCount, options: activeOptions }
+    const payload = { videoPaths: videos.map(v => v.path).filter(Boolean), videoUrls: [], format: selectedFormat, exportQuality, exportCodec, isCapsule: true, capsulesCount, options: activeOptions, visualFilter: visualFilter || null }
     try {
       const res = await fetch(`${SERVER_URL}/generate`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) })
       setServerAwake(true); const { jobId } = await res.json()
@@ -685,7 +688,7 @@ export default function Home() {
       }
       eventSource.onerror = () => { eventSource.close(); setGenerating(false); setEstimatedRemaining(null) }
     } catch { alert("Erreur"); setGenerating(false) }
-  }, [videos, selectedFormat, exportQuality, exportCodec, capsulesCount, activeOptions])
+  }, [videos, selectedFormat, exportQuality, exportCodec, capsulesCount, activeOptions, visualFilter])
 
 
   const savePreset = () => {
@@ -1228,6 +1231,9 @@ export default function Home() {
             <Pill label={watermark ? `✓ ${T.watermark}` : T.watermark} active={watermark} onClick={() => setWatermark(!watermark)}/>
             <button onClick={() => { setShowMusic(true); fetchTracks(searchQuery || "phonk") }} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:selectedMusic ? `1px solid rgba(79,142,247,0.55)` : t.borderMed, background:selectedMusic ? "rgba(79,142,247,0.08)" : t.bgPill, color:selectedMusic ? t.accent : t.textSub, display:"flex", alignItems:"center", gap:6, whiteSpace:"nowrap" }}>
               {selectedMusic ? <><img src={selectedMusic.album.cover_small} style={{ width:15, height:15, borderRadius:3 }}/>{selectedMusic.title}</> : T.addMusic}
+            </button>
+            <button onClick={() => setShowFilterModal(true)} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:visualFilter ? `1px solid rgba(79,142,247,0.55)` : t.borderMed, background:visualFilter ? "rgba(79,142,247,0.08)" : t.bgPill, color:visualFilter ? t.accent : t.textSub, whiteSpace:"nowrap" }}>
+              {visualFilter ? `✦ ${({vivid:"Vivid",vintage:"Vintage",sepia:"Sépia",bw:"N&B",negative:"Négatif",hdr:"HDR",glitch:"Glitch",vhs:"VHS"} as Record<string,string>)[visualFilter] || visualFilter}` : "✦ Filtre"}
             </button>
           </div>
 
@@ -2179,6 +2185,38 @@ export default function Home() {
               <button onClick={() => setShowCompressModal(false)} style={{ flex:1, padding:9, borderRadius:8, border:t.borderMed, background:"none", color:t.textSub, cursor:"pointer", fontSize:13 }}>{T.no}</button>
               <button onClick={compressAndUpload} style={{ flex:1, padding:9, borderRadius:8, border:"none", background:t.accent, color:"#ffffff", cursor:"pointer", fontSize:13, fontWeight:700 }}>{T.yesCompress}</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showFilterModal && (
+        <div onClick={() => setShowFilterModal(false)} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.7)", zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background:t.bgCard, border:t.border, borderRadius:16, padding:24, width:"100%", maxWidth:320 }}>
+            <div style={{ display:"flex", justifyContent:"space-between", marginBottom:16 }}>
+              <span style={{ fontSize:14, fontWeight:600, color:t.text }}>✦ Filtre visuel</span>
+              <button onClick={() => setShowFilterModal(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button>
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:12 }}>
+              {([
+                { key:"vivid",    label:"Vivid",   grad:"linear-gradient(135deg,#ff6b6b,#ffd93d)" },
+                { key:"vintage",  label:"Vintage", grad:"linear-gradient(135deg,#c9a96e,#6b3f1a)" },
+                { key:"sepia",    label:"Sépia",   grad:"linear-gradient(135deg,#c2a47e,#7c4f2a)" },
+                { key:"bw",       label:"N&B",     grad:"linear-gradient(135deg,#ddd,#222)" },
+                { key:"negative", label:"Négatif", grad:"linear-gradient(135deg,#111,#6b4de6)" },
+                { key:"hdr",      label:"HDR",     grad:"linear-gradient(135deg,#00c9ff,#56e09c)" },
+                { key:"glitch",   label:"Glitch",  grad:"linear-gradient(135deg,#f72585,#7209b7)" },
+                { key:"vhs",      label:"VHS",     grad:"linear-gradient(135deg,#43c6ac,#1a1a2e)" },
+              ] as { key:string; label:string; grad:string }[]).map(f => (
+                <button key={f.key} onClick={() => { setVisualFilter(visualFilter === f.key ? null : f.key); setShowFilterModal(false) }} style={{ borderRadius:10, padding:"12px 8px", cursor:"pointer", border:visualFilter === f.key ? "2px solid rgba(79,142,247,0.9)" : "2px solid transparent", background:f.grad, color:"#fff", fontSize:13, fontWeight:700, textShadow:"0 1px 3px rgba(0,0,0,0.6)" }}>
+                  {f.label}
+                </button>
+              ))}
+            </div>
+            {visualFilter && (
+              <button onClick={() => { setVisualFilter(null); setShowFilterModal(false) }} style={{ width:"100%", padding:9, borderRadius:8, border:"none", background:"rgba(248,113,113,0.12)", color:"#f87171", fontSize:13, cursor:"pointer", fontWeight:500 }}>
+                Retirer le filtre
+              </button>
+            )}
           </div>
         </div>
       )}
