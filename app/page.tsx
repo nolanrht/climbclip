@@ -2220,10 +2220,15 @@ export default function Home() {
           ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/videos/${videos[0].path}`
           : null
         const renderPreview = (cssFilter?: string) => {
-          const s: React.CSSProperties = { width:"100%", height:"100%", objectFit:"cover" as const, ...(cssFilter ? { filter: cssFilter } : {}) }
-          if (previewThumb) return <img src={previewThumb} style={s} alt=""/>
-          if (previewVideo) return <video src={previewVideo} muted playsInline preload="metadata" onLoadedMetadata={e => { (e.currentTarget as HTMLVideoElement).currentTime = 0.5 }} style={s}/>
-          return <img src={PREVIEW_SVG} style={s} alt="preview"/>
+          const filterStyle = cssFilter ? { filter: cssFilter } : {}
+          // SVG toujours en fond (visible même si l'img/video rate)
+          return (
+            <div style={{ width:"100%", height:"100%", position:"relative", ...filterStyle }}>
+              <img src={PREVIEW_SVG} style={{ width:"100%", height:"100%", objectFit:"cover", position:"absolute", inset:0 }} alt=""/>
+              {previewThumb && <img src={previewThumb} style={{ width:"100%", height:"100%", objectFit:"cover", position:"absolute", inset:0 }} alt=""/>}
+              {!previewThumb && previewVideo && <video src={previewVideo} muted playsInline preload="metadata" onLoadedMetadata={e => { (e.currentTarget as HTMLVideoElement).currentTime = 0.5 }} style={{ width:"100%", height:"100%", objectFit:"cover", position:"absolute", inset:0 }}/>}
+            </div>
+          )
         }
         return (
           <>
