@@ -189,30 +189,6 @@ const SakuraBg = () => {
 }
 
 
-// SVG preview image: colorful outdoor scene (sky, mountain, grass, sun) so filters are visible
-const PREVIEW_SVG = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 96"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a6ef7"/><stop offset="100%" stop-color="#7ec8f7"/></linearGradient><linearGradient id="mtn" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8fa8c8"/><stop offset="100%" stop-color="#c8d8e8"/></linearGradient><linearGradient id="grass" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3db84a"/><stop offset="100%" stop-color="#1e7a28"/></linearGradient></defs><rect width="72" height="96" fill="url(#sky)"/><circle cx="58" cy="14" r="9" fill="#ffe066" opacity="0.95"/><polygon points="0,62 20,30 40,62" fill="url(#mtn)"/><polygon points="28,62 52,22 72,62" fill="#a0bcd0"/><rect x="0" y="62" width="72" height="34" fill="url(#grass)"/><ellipse cx="18" cy="63" rx="12" ry="5" fill="#2ea83a" opacity="0.7"/><ellipse cx="56" cy="65" rx="9" ry="4" fill="#2ea83a" opacity="0.6"/><rect x="30" y="68" width="6" height="14" fill="#7a4a1e"/><ellipse cx="33" cy="66" rx="8" ry="7" fill="#27a83a"/></svg>')}`
-
-const VISUAL_FILTER_ITEMS = [
-  { key:"clarendon", label:"Clarendon" },
-  { key:"gingham",   label:"Gingham"   },
-  { key:"juno",      label:"Juno"      },
-  { key:"lark",      label:"Lark"      },
-  { key:"ludwig",    label:"Ludwig"    },
-  { key:"moon",      label:"Moon"      },
-  { key:"reyes",     label:"Reyes"     },
-  { key:"valencia",  label:"Valencia"  },
-] as const
-
-const CSS_FILTER_MAP: Record<string, string> = {
-  "clarendon": "saturate(1.35) contrast(1.2) brightness(1.08)",
-  "gingham":   "brightness(1.05) hue-rotate(-10deg) saturate(0.9) contrast(0.95)",
-  "juno":      "saturate(1.4) contrast(1.1) brightness(1.05) hue-rotate(5deg)",
-  "lark":      "contrast(0.9) brightness(1.12) saturate(0.85)",
-  "ludwig":    "saturate(1.05) contrast(1.08) brightness(1.06) sepia(0.12)",
-  "moon":      "grayscale(1) contrast(1.18) brightness(1.08)",
-  "reyes":     "sepia(0.22) brightness(1.1) contrast(0.85) saturate(0.75)",
-  "valencia":  "contrast(1.08) brightness(1.04) sepia(0.18) saturate(1.1) hue-rotate(-5deg)",
-}
 
 export default function Home() {
   const router = useRouter()
@@ -229,8 +205,6 @@ export default function Home() {
   const [showPromptHelper, setShowPromptHelper] = useState(false)
   const [showCapsulesModal, setShowCapsulesModal] = useState(false)
   const [showTimestampPreview, setShowTimestampPreview] = useState(false)
-  const [showFilterModal, setShowFilterModal] = useState(false)
-  const [visualFilter, setVisualFilter] = useState<string | null>(null)
   const [showStats, setShowStats] = useState(false)
   const [showPresets, setShowPresets] = useState(false)
   const [showSavePreset, setShowSavePreset] = useState(false)
@@ -621,7 +595,6 @@ export default function Home() {
     exportQuality,
     exportCodec,
     subtitleStyle,
-    visualFilter: visualFilter || null,
   })
 
   const handleGenerate = useCallback(async () => {
@@ -695,13 +668,13 @@ export default function Home() {
       }
       eventSource.onerror = () => { eventSource.close(); alert("Connexion perdue"); setGenerating(false); setEstimatedRemaining(null) }
     } catch { alert("Erreur"); setGenerating(false) }
-  }, [videos, promptText, activeOptions, selectedMusic, selectedFormat, zoomIntensity, speedIntensity, addIntroOutro, customTimestamps, colorGrade, transition, textOverlay, stabilize, vocalVolume, watermark, exportQuality, exportCodec, autoMode, detectedContentType, subtitleStyle, generationHistory, onboardingDone, visualFilter])
+  }, [videos, promptText, activeOptions, selectedMusic, selectedFormat, zoomIntensity, speedIntensity, addIntroOutro, customTimestamps, colorGrade, transition, textOverlay, stabilize, vocalVolume, watermark, exportQuality, exportCodec, autoMode, detectedContentType, subtitleStyle, generationHistory, onboardingDone])
 
   const handleGenerateCapsules = useCallback(async () => {
     if (videos.length === 0) return
     setHasGenerated(false); setGenerating(true); setProgress(0); setGeneratingServerMsg("")
     setGeneratingStartTime(Date.now()); setEstimatedRemaining(null)
-    const payload = { videoPaths: videos.map(v => v.path).filter(Boolean), videoUrls: [], format: selectedFormat, exportQuality, exportCodec, isCapsule: true, capsulesCount, options: activeOptions, visualFilter: visualFilter || null }
+    const payload = { videoPaths: videos.map(v => v.path).filter(Boolean), videoUrls: [], format: selectedFormat, exportQuality, exportCodec, isCapsule: true, capsulesCount, options: activeOptions }
     try {
       const res = await fetch(`${SERVER_URL}/generate`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) })
       setServerAwake(true); const { jobId } = await res.json()
@@ -731,7 +704,7 @@ export default function Home() {
       }
       eventSource.onerror = () => { eventSource.close(); setGenerating(false); setEstimatedRemaining(null) }
     } catch { alert("Erreur"); setGenerating(false) }
-  }, [videos, selectedFormat, exportQuality, exportCodec, capsulesCount, activeOptions, visualFilter])
+  }, [videos, selectedFormat, exportQuality, exportCodec, capsulesCount, activeOptions])
 
 
   const savePreset = () => {
@@ -1274,9 +1247,6 @@ export default function Home() {
             <Pill label={watermark ? `✓ ${T.watermark}` : T.watermark} active={watermark} onClick={() => setWatermark(!watermark)}/>
             <button onClick={() => { setShowMusic(true); fetchTracks(searchQuery || "phonk") }} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:selectedMusic ? `1px solid rgba(79,142,247,0.55)` : t.borderMed, background:selectedMusic ? "rgba(79,142,247,0.08)" : t.bgPill, color:selectedMusic ? t.accent : t.textSub, display:"flex", alignItems:"center", gap:6, whiteSpace:"nowrap" }}>
               {selectedMusic ? <><img src={selectedMusic.album.cover_small} style={{ width:15, height:15, borderRadius:3 }}/>{selectedMusic.title}</> : T.addMusic}
-            </button>
-            <button onClick={() => setShowFilterModal(true)} style={{ padding:"7px 15px", borderRadius:20, fontSize:12, cursor:"pointer", border:visualFilter ? `1px solid rgba(79,142,247,0.55)` : t.borderMed, background:visualFilter ? "rgba(79,142,247,0.08)" : t.bgPill, color:visualFilter ? t.accent : t.textSub, whiteSpace:"nowrap" }}>
-              {visualFilter ? `✦ ${({vivid:"Vivid",vintage:"Vintage",sepia:"Sépia",bw:"N&B",negative:"Négatif",hdr:"HDR",glitch:"Glitch",vhs:"VHS"} as Record<string,string>)[visualFilter] || visualFilter}` : "✦ Filtre"}
             </button>
           </div>
 
@@ -2232,52 +2202,6 @@ export default function Home() {
         </div>
       )}
 
-      {showFilterModal && (() => {
-        const previewThumb = videos[0]?.thumbnail || null
-        const previewVideo = (!previewThumb && videos[0]?.path)
-          ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/videos/${videos[0].path}`
-          : null
-        const renderPreview = (cssFilter?: string) => {
-          const filterStyle = cssFilter ? { filter: cssFilter } : {}
-          // SVG toujours en fond (visible même si l'img/video rate)
-          return (
-            <div style={{ width:"100%", height:"100%", position:"relative", ...filterStyle }}>
-              <img src={PREVIEW_SVG} style={{ width:"100%", height:"100%", objectFit:"cover", position:"absolute", inset:0 }} alt=""/>
-              {previewThumb && <img src={previewThumb} style={{ width:"100%", height:"100%", objectFit:"cover", position:"absolute", inset:0 }} alt=""/>}
-              {!previewThumb && previewVideo && <video src={previewVideo} muted playsInline preload="metadata" onLoadedMetadata={e => { (e.currentTarget as HTMLVideoElement).currentTime = 0.5 }} style={{ width:"100%", height:"100%", objectFit:"cover", position:"absolute", inset:0 }}/>}
-            </div>
-          )
-        }
-        return (
-          <>
-            <style>{`@keyframes filterSlideUp{from{transform:translateY(100%)}to{transform:translateY(0)}} .filter-strip::-webkit-scrollbar{display:none}`}</style>
-            <div onClick={() => setShowFilterModal(false)} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.55)", zIndex:200 }}>
-              <div onClick={e => e.stopPropagation()} style={{ position:"absolute", bottom:0, left:0, right:0, background:t.bgCard, borderTopLeftRadius:22, borderTopRightRadius:22, paddingBottom:36, animation:"filterSlideUp 0.3s cubic-bezier(0.32,0.72,0,1)" }}>
-                <div style={{ display:"flex", justifyContent:"center", padding:"14px 0 6px" }}>
-                  <div style={{ width:38, height:4, borderRadius:2, background: dark ? "#3a3a3a" : "#d0d0d0" }}/>
-                </div>
-                <p style={{ textAlign:"center", fontSize:11, fontWeight:600, color:t.textMuted, letterSpacing:"0.1em", textTransform:"uppercase", margin:"6px 0 18px" }}>Filtre</p>
-                <div className="filter-strip" style={{ display:"flex", gap:12, overflowX:"auto", padding:"4px 20px 4px", scrollbarWidth:"none", msOverflowStyle:"none" } as React.CSSProperties}>
-                  <div onClick={() => { setVisualFilter(null); setShowFilterModal(false) }} style={{ flexShrink:0, cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:7 }}>
-                    <div style={{ width:72, height:96, borderRadius:12, overflow:"hidden", outline: !visualFilter ? "2.5px solid rgba(79,142,247,0.9)" : "2.5px solid transparent", outlineOffset:2 }}>
-                      {renderPreview()}
-                    </div>
-                    <span style={{ fontSize:11, fontWeight: !visualFilter ? 700 : 400, color: !visualFilter ? t.accent : t.textMuted }}>Original</span>
-                  </div>
-                  {VISUAL_FILTER_ITEMS.map(f => (
-                    <div key={f.key} onClick={() => { setVisualFilter(visualFilter === f.key ? null : f.key); setShowFilterModal(false) }} style={{ flexShrink:0, cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:7 }}>
-                      <div style={{ width:72, height:96, borderRadius:12, overflow:"hidden", outline: visualFilter === f.key ? "2.5px solid rgba(79,142,247,0.9)" : "2.5px solid transparent", outlineOffset:2 }}>
-                        {renderPreview(CSS_FILTER_MAP[f.key])}
-                      </div>
-                      <span style={{ fontSize:11, fontWeight: visualFilter === f.key ? 700 : 400, color: visualFilter === f.key ? t.accent : t.textMuted }}>{f.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </>
-        )
-      })()}
 
       {showMusic && (
         <div onClick={closeMusic} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
