@@ -673,7 +673,13 @@ export default function Home() {
           setGenerationHistory(prev => { const h = [historyEntry, ...prev].slice(0, 20); localStorage.setItem("climbHistory", JSON.stringify(h)); return h })
           if (!onboardingDone) completeOnboarding()
         }
-        else if (d.status === "error") { eventSource.close(); alert("Erreur génération"); setGenerating(false); setEstimatedRemaining(null) }
+        else if (d.status === "error") {
+          eventSource.close(); setGenerating(false); setEstimatedRemaining(null)
+          if (d.error && d.error.includes("perdu")) {
+            alert("Le serveur a redémarré et ta vidéo a été perdue. Réimporte-la et regénère.")
+            setVideos([])
+          } else { alert("Erreur génération: " + (d.error || "inconnue")) }
+        }
       }
       eventSource.onerror = () => { eventSource.close(); alert("Connexion perdue"); setGenerating(false); setEstimatedRemaining(null) }
     } catch { alert("Erreur"); setGenerating(false) }
