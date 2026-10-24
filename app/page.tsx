@@ -8,7 +8,7 @@ import { fetchFile } from "@ffmpeg/util"
 type Track = { id: number; title: string; artist: { name: string }; preview: string; album: { cover_small: string } }
 type Clip = { id: string; name: string; base64: string; storage_url?: string; owner_email: string; folder_id: string | null; created_at: string; thumbnail?: string }
 type Folder = { id: string; name: string; owner_email: string; shared_with: string[]; created_at: string; parent_id: string | null }
-type VideoItem = { id: string; type: "file" | "link"; path?: string; url?: string; name: string; thumbnail?: string }
+type VideoItem = { id: string; type: "file" | "link"; path?: string; url?: string; name: string; thumbnail?: string; file?: File }
 type TimestampPreview = { start: number; duration: number; name: string; description?: string }
 type Lang = "EN" | "FR" | "ES" | "IT" | "DE"
 type Preset = { id: string; name: string; format: string; colorGrade: string; transition: string; prompt: string; options: string[]; exportQuality: string; exportCodec: string; watermark: boolean }
@@ -525,20 +525,14 @@ export default function Home() {
   }
 
   const uploadFile = async (file: File): Promise<string|null> => {
-    try {
-      const key = `uploads/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`
-      const { error } = await supabase.storage.from("videos").upload(key, file, { upsert: true })
-      if (error) throw error
-      const { data } = supabase.storage.from("videos").getPublicUrl(key)
-      return data.publicUrl
-    } catch { return null }
+    try { const fd = new FormData(); fd.append("file", file); const res = await fetch(`${SERVER_URL}/upload`, { method:"POST", body:fd }); const d = await res.json(); return d.path || null } catch { return null }
   }
 
   const handleFileAdd = async (file: File) => {
     if (file.size > 50*1024*1024) { setPendingFile(file); setShowCompressModal(true); return }
     const p = await uploadFile(file)
     if (p) {
-      setVideos(prev => [...prev, { id:Date.now().toString(), type:"file", path:p, name:file.name }])
+      setVideos(prev => [...prev, { id:Date.now().toString(), type:"file", path:p, name:file.name, file }])
       if (autoMode) {
         setAnalyzing(true); setAutoAnalysisDesc(null)
         try {
@@ -608,8 +602,8 @@ export default function Home() {
   }
 
   const buildPayload = (overrideOptions?: any) => ({
-    videoPaths: [],
-    videoUrls: videos.map(v => v.path || v.url).filter(Boolean),
+    videoPaths: videos.filter(v => v.type === "file").map(v => v.path).filter(Boolean),
+    videoUrls: videos.filter(v => v.type === "link").map(v => v.url).filter(Boolean),
     prompt: promptText || AUTO_PRESETS[detectedContentType || "sport"]?.prompt,
     options: overrideOptions?.options || activeOptions,
     musicUrl: selectedMusic?.preview || null,
@@ -635,7 +629,19 @@ export default function Home() {
     savePromptToHistory(promptText)
     setHasGenerated(false); setGenerating(true); setProgress(0); setServerAwake(null); setGeneratingServerMsg("")
     setGeneratingStartTime(Date.now()); setEstimatedRemaining(null)
-    let payload = buildPayload()
+    // Re-upload les fichiers si le serveur a redémarré (tmp vidé)
+    const refreshedVideos = await Promise.all(videos.map(async v => {
+      if (v.type !== "file" || !v.file) return v
+      try {
+        const check = await fetch(`${SERVER_URL}/check-file`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ path: v.path }) })
+        const { exists } = await check.json()
+        if (exists) return v
+        const newPath = await uploadFile(v.file)
+        return newPath ? { ...v, path: newPath } : v
+      } catch { return v }
+    }))
+    const videosToUse = refreshedVideos
+    let payload = { ...buildPayload(), videoPaths: videosToUse.filter(v => v.type === "file").map(v => v.path).filter(Boolean), videoUrls: videosToUse.filter(v => v.type === "link").map(v => v.url).filter(Boolean) }
     if (autoMode) {
       const contentType = detectedContentType || await detectContentType()
       setDetectedContentType(contentType)
