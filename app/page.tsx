@@ -189,6 +189,28 @@ const SakuraBg = () => {
 }
 
 
+const VISUAL_FILTER_ITEMS = [
+  { key:"vivid",    label:"Vivid"   },
+  { key:"vintage",  label:"Vintage" },
+  { key:"sepia",    label:"Sépia"   },
+  { key:"bw",       label:"N&B"     },
+  { key:"negative", label:"Négatif" },
+  { key:"hdr",      label:"HDR"     },
+  { key:"glitch",   label:"Glitch"  },
+  { key:"vhs",      label:"VHS"     },
+] as const
+
+const CSS_FILTER_MAP: Record<string, string> = {
+  "vivid":    "saturate(2) contrast(1.15) brightness(1.03)",
+  "vintage":  "sepia(0.45) contrast(0.88) brightness(0.88) hue-rotate(-10deg)",
+  "sepia":    "sepia(1)",
+  "bw":       "grayscale(1) contrast(1.6)",
+  "negative": "invert(1)",
+  "hdr":      "saturate(1.4) contrast(1.3) brightness(1.05)",
+  "glitch":   "hue-rotate(175deg) saturate(1.6) contrast(1.2)",
+  "vhs":      "saturate(0.85) contrast(1.1) hue-rotate(5deg) brightness(0.9)",
+}
+
 export default function Home() {
   const router = useRouter()
   const [dark, setDark] = useState(true)
@@ -2189,37 +2211,47 @@ export default function Home() {
         </div>
       )}
 
-      {showFilterModal && (
-        <div onClick={() => setShowFilterModal(false)} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.7)", zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
-          <div onClick={e => e.stopPropagation()} style={{ background:t.bgCard, border:t.border, borderRadius:16, padding:24, width:"100%", maxWidth:320 }}>
-            <div style={{ display:"flex", justifyContent:"space-between", marginBottom:16 }}>
-              <span style={{ fontSize:14, fontWeight:600, color:t.text }}>✦ Filtre visuel</span>
-              <button onClick={() => setShowFilterModal(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button>
+      {showFilterModal && (() => {
+        const previewThumb = videos[0]?.thumbnail || null
+        const previewVideo = (!previewThumb && videos[0]?.path)
+          ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/videos/${videos[0].path}`
+          : null
+        const renderPreview = (cssFilter?: string) => {
+          const s: React.CSSProperties = { width:"100%", height:"100%", objectFit:"cover" as const, ...(cssFilter ? { filter: cssFilter } : {}) }
+          if (previewThumb) return <img src={previewThumb} style={s} alt=""/>
+          if (previewVideo) return <video src={previewVideo} muted playsInline preload="metadata" onLoadedMetadata={e => { (e.currentTarget as HTMLVideoElement).currentTime = 0.5 }} style={s}/>
+          return <div style={{ width:"100%", height:"100%", background: dark ? "#1a1a1a" : "#e5e5e5", ...(cssFilter ? { filter: cssFilter } : {}) }}/>
+        }
+        return (
+          <>
+            <style>{`@keyframes filterSlideUp{from{transform:translateY(100%)}to{transform:translateY(0)}} .filter-strip::-webkit-scrollbar{display:none}`}</style>
+            <div onClick={() => setShowFilterModal(false)} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.55)", zIndex:200 }}>
+              <div onClick={e => e.stopPropagation()} style={{ position:"absolute", bottom:0, left:0, right:0, background:t.bgCard, borderTopLeftRadius:22, borderTopRightRadius:22, paddingBottom:36, animation:"filterSlideUp 0.3s cubic-bezier(0.32,0.72,0,1)" }}>
+                <div style={{ display:"flex", justifyContent:"center", padding:"14px 0 6px" }}>
+                  <div style={{ width:38, height:4, borderRadius:2, background: dark ? "#3a3a3a" : "#d0d0d0" }}/>
+                </div>
+                <p style={{ textAlign:"center", fontSize:11, fontWeight:600, color:t.textMuted, letterSpacing:"0.1em", textTransform:"uppercase", margin:"6px 0 18px" }}>Filtre</p>
+                <div className="filter-strip" style={{ display:"flex", gap:12, overflowX:"auto", padding:"4px 20px 4px", scrollbarWidth:"none", msOverflowStyle:"none" } as React.CSSProperties}>
+                  <div onClick={() => { setVisualFilter(null); setShowFilterModal(false) }} style={{ flexShrink:0, cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:7 }}>
+                    <div style={{ width:72, height:96, borderRadius:12, overflow:"hidden", outline: !visualFilter ? "2.5px solid rgba(79,142,247,0.9)" : "2.5px solid transparent", outlineOffset:2 }}>
+                      {renderPreview()}
+                    </div>
+                    <span style={{ fontSize:11, fontWeight: !visualFilter ? 700 : 400, color: !visualFilter ? t.accent : t.textMuted }}>Original</span>
+                  </div>
+                  {VISUAL_FILTER_ITEMS.map(f => (
+                    <div key={f.key} onClick={() => { setVisualFilter(visualFilter === f.key ? null : f.key); setShowFilterModal(false) }} style={{ flexShrink:0, cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:7 }}>
+                      <div style={{ width:72, height:96, borderRadius:12, overflow:"hidden", outline: visualFilter === f.key ? "2.5px solid rgba(79,142,247,0.9)" : "2.5px solid transparent", outlineOffset:2 }}>
+                        {renderPreview(CSS_FILTER_MAP[f.key])}
+                      </div>
+                      <span style={{ fontSize:11, fontWeight: visualFilter === f.key ? 700 : 400, color: visualFilter === f.key ? t.accent : t.textMuted }}>{f.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:12 }}>
-              {([
-                { key:"vivid",    label:"Vivid",   grad:"linear-gradient(135deg,#ff6b6b,#ffd93d)" },
-                { key:"vintage",  label:"Vintage", grad:"linear-gradient(135deg,#c9a96e,#6b3f1a)" },
-                { key:"sepia",    label:"Sépia",   grad:"linear-gradient(135deg,#c2a47e,#7c4f2a)" },
-                { key:"bw",       label:"N&B",     grad:"linear-gradient(135deg,#ddd,#222)" },
-                { key:"negative", label:"Négatif", grad:"linear-gradient(135deg,#111,#6b4de6)" },
-                { key:"hdr",      label:"HDR",     grad:"linear-gradient(135deg,#00c9ff,#56e09c)" },
-                { key:"glitch",   label:"Glitch",  grad:"linear-gradient(135deg,#f72585,#7209b7)" },
-                { key:"vhs",      label:"VHS",     grad:"linear-gradient(135deg,#43c6ac,#1a1a2e)" },
-              ] as { key:string; label:string; grad:string }[]).map(f => (
-                <button key={f.key} onClick={() => { setVisualFilter(visualFilter === f.key ? null : f.key); setShowFilterModal(false) }} style={{ borderRadius:10, padding:"12px 8px", cursor:"pointer", border:visualFilter === f.key ? "2px solid rgba(79,142,247,0.9)" : "2px solid transparent", background:f.grad, color:"#fff", fontSize:13, fontWeight:700, textShadow:"0 1px 3px rgba(0,0,0,0.6)" }}>
-                  {f.label}
-                </button>
-              ))}
-            </div>
-            {visualFilter && (
-              <button onClick={() => { setVisualFilter(null); setShowFilterModal(false) }} style={{ width:"100%", padding:9, borderRadius:8, border:"none", background:"rgba(248,113,113,0.12)", color:"#f87171", fontSize:13, cursor:"pointer", fontWeight:500 }}>
-                Retirer le filtre
-              </button>
-            )}
-          </div>
-        </div>
-      )}
+          </>
+        )
+      })()}
 
       {showMusic && (
         <div onClick={closeMusic} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
