@@ -685,7 +685,7 @@ export default function Home() {
       }
       eventSource.onerror = () => { eventSource.close(); setGenerating(false); setEstimatedRemaining(null) }
     } catch { alert("Erreur"); setGenerating(false) }
-  }, [videos, selectedFormat, exportQuality, exportCodec, capsulesCount])
+  }, [videos, selectedFormat, exportQuality, exportCodec, capsulesCount, activeOptions])
 
 
   const savePreset = () => {
