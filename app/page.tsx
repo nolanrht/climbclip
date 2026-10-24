@@ -189,26 +189,29 @@ const SakuraBg = () => {
 }
 
 
+// SVG preview image: colorful outdoor scene (sky, mountain, grass, sun) so filters are visible
+const PREVIEW_SVG = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 96"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a6ef7"/><stop offset="100%" stop-color="#7ec8f7"/></linearGradient><linearGradient id="mtn" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8fa8c8"/><stop offset="100%" stop-color="#c8d8e8"/></linearGradient><linearGradient id="grass" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3db84a"/><stop offset="100%" stop-color="#1e7a28"/></linearGradient></defs><rect width="72" height="96" fill="url(#sky)"/><circle cx="58" cy="14" r="9" fill="#ffe066" opacity="0.95"/><polygon points="0,62 20,30 40,62" fill="url(#mtn)"/><polygon points="28,62 52,22 72,62" fill="#a0bcd0"/><rect x="0" y="62" width="72" height="34" fill="url(#grass)"/><ellipse cx="18" cy="63" rx="12" ry="5" fill="#2ea83a" opacity="0.7"/><ellipse cx="56" cy="65" rx="9" ry="4" fill="#2ea83a" opacity="0.6"/><rect x="30" y="68" width="6" height="14" fill="#7a4a1e"/><ellipse cx="33" cy="66" rx="8" ry="7" fill="#27a83a"/></svg>')}`
+
 const VISUAL_FILTER_ITEMS = [
-  { key:"vivid",    label:"Vivid",   bg:"linear-gradient(160deg,#ff6b35 0%,#f7c59f 40%,#4ecdc4 100%)" },
-  { key:"vintage",  label:"Vintage", bg:"linear-gradient(160deg,#c9a96e 0%,#e8d5b0 50%,#8b6f47 100%)" },
-  { key:"sepia",    label:"Sépia",   bg:"linear-gradient(160deg,#b8860b 0%,#daa520 50%,#8b6914 100%)" },
-  { key:"bw",       label:"N&B",     bg:"linear-gradient(160deg,#1a1a1a 0%,#888 50%,#f0f0f0 100%)" },
-  { key:"negative", label:"Négatif", bg:"linear-gradient(160deg,#00ffff 0%,#ff00ff 50%,#ffff00 100%)" },
-  { key:"hdr",      label:"HDR",     bg:"linear-gradient(160deg,#0d0221 0%,#ff4500 40%,#ffd700 100%)" },
-  { key:"glitch",   label:"Glitch",  bg:"linear-gradient(160deg,#00ff41 0%,#ff0055 50%,#00b4ff 100%)" },
-  { key:"vhs",      label:"VHS",     bg:"linear-gradient(160deg,#1a0033 0%,#cc00ff 50%,#00ccff 100%)" },
+  { key:"clarendon", label:"Clarendon" },
+  { key:"gingham",   label:"Gingham"   },
+  { key:"juno",      label:"Juno"      },
+  { key:"lark",      label:"Lark"      },
+  { key:"ludwig",    label:"Ludwig"    },
+  { key:"moon",      label:"Moon"      },
+  { key:"reyes",     label:"Reyes"     },
+  { key:"valencia",  label:"Valencia"  },
 ] as const
 
 const CSS_FILTER_MAP: Record<string, string> = {
-  "vivid":    "saturate(2) contrast(1.15) brightness(1.03)",
-  "vintage":  "sepia(0.45) contrast(0.88) brightness(0.88) hue-rotate(-10deg)",
-  "sepia":    "sepia(1)",
-  "bw":       "grayscale(1) contrast(1.6)",
-  "negative": "invert(1)",
-  "hdr":      "saturate(1.4) contrast(1.3) brightness(1.05)",
-  "glitch":   "hue-rotate(175deg) saturate(1.6) contrast(1.2)",
-  "vhs":      "saturate(0.85) contrast(1.1) hue-rotate(5deg) brightness(0.9)",
+  "clarendon": "saturate(1.35) contrast(1.2) brightness(1.08)",
+  "gingham":   "brightness(1.05) hue-rotate(-10deg) saturate(0.9) contrast(0.95)",
+  "juno":      "saturate(1.4) contrast(1.1) brightness(1.05) hue-rotate(5deg)",
+  "lark":      "contrast(0.9) brightness(1.12) saturate(0.85)",
+  "ludwig":    "saturate(1.05) contrast(1.08) brightness(1.06) sepia(0.12)",
+  "moon":      "grayscale(1) contrast(1.18) brightness(1.08)",
+  "reyes":     "sepia(0.22) brightness(1.1) contrast(0.85) saturate(0.75)",
+  "valencia":  "contrast(1.08) brightness(1.04) sepia(0.18) saturate(1.1) hue-rotate(-5deg)",
 }
 
 export default function Home() {
@@ -2216,15 +2219,11 @@ export default function Home() {
         const previewVideo = (!previewThumb && videos[0]?.path)
           ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/videos/${videos[0].path}`
           : null
-        const FILTER_BG_MAP: Record<string, string> = Object.fromEntries(
-          VISUAL_FILTER_ITEMS.map(f => [f.key, f.bg])
-        )
-        const renderPreview = (cssFilter?: string, filterKey?: string) => {
+        const renderPreview = (cssFilter?: string) => {
           const s: React.CSSProperties = { width:"100%", height:"100%", objectFit:"cover" as const, ...(cssFilter ? { filter: cssFilter } : {}) }
           if (previewThumb) return <img src={previewThumb} style={s} alt=""/>
           if (previewVideo) return <video src={previewVideo} muted playsInline preload="metadata" onLoadedMetadata={e => { (e.currentTarget as HTMLVideoElement).currentTime = 0.5 }} style={s}/>
-          const bg = filterKey ? FILTER_BG_MAP[filterKey] : "linear-gradient(160deg,#3a7bd5 0%,#56ccf2 50%,#a8edea 100%)"
-          return <div style={{ width:"100%", height:"100%", background: bg, ...(cssFilter ? { filter: cssFilter } : {}) }}/>
+          return <img src={PREVIEW_SVG} style={s} alt="preview"/>
         }
         return (
           <>
@@ -2245,7 +2244,7 @@ export default function Home() {
                   {VISUAL_FILTER_ITEMS.map(f => (
                     <div key={f.key} onClick={() => { setVisualFilter(visualFilter === f.key ? null : f.key); setShowFilterModal(false) }} style={{ flexShrink:0, cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:7 }}>
                       <div style={{ width:72, height:96, borderRadius:12, overflow:"hidden", outline: visualFilter === f.key ? "2.5px solid rgba(79,142,247,0.9)" : "2.5px solid transparent", outlineOffset:2 }}>
-                        {renderPreview(CSS_FILTER_MAP[f.key], f.key)}
+                        {renderPreview(CSS_FILTER_MAP[f.key])}
                       </div>
                       <span style={{ fontSize:11, fontWeight: visualFilter === f.key ? 700 : 400, color: visualFilter === f.key ? t.accent : t.textMuted }}>{f.label}</span>
                     </div>
