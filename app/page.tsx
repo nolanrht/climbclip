@@ -8,7 +8,7 @@ import { fetchFile } from "@ffmpeg/util"
 type Track = { id: number; title: string; artist: { name: string }; preview: string; album: { cover_small: string } }
 type Clip = { id: string; name: string; base64: string; storage_url?: string; owner_email: string; folder_id: string | null; created_at: string; thumbnail?: string }
 type Folder = { id: string; name: string; owner_email: string; shared_with: string[]; created_at: string; parent_id: string | null }
-type VideoItem = { id: string; type: "file" | "link"; path?: string; url?: string; name: string; thumbnail?: string }
+type VideoItem = { id: string; type: "file" | "link"; path?: string; url?: string; name: string; thumbnail?: string; file?: File }
 type TimestampPreview = { start: number; duration: number; name: string; description?: string }
 type Lang = "EN" | "FR" | "ES" | "IT" | "DE"
 type Preset = { id: string; name: string; format: string; colorGrade: string; transition: string; prompt: string; options: string[]; exportQuality: string; exportCodec: string; watermark: boolean }
@@ -505,7 +505,7 @@ export default function Home() {
     if (file.size > 50*1024*1024) { setPendingFile(file); setShowCompressModal(true); return }
     const p = await uploadFile(file)
     if (p) {
-      setVideos(prev => [...prev, { id:Date.now().toString(), type:"file", path:p, name:file.name }])
+      setVideos(prev => [...prev, { id:Date.now().toString(), type:"file", path:p, name:file.name, file }])
       if (autoMode) {
         setAnalyzing(true); setAutoAnalysisDesc(null)
         try {
@@ -601,7 +601,19 @@ export default function Home() {
     savePromptToHistory(promptText)
     setHasGenerated(false); setGenerating(true); setProgress(0); setServerAwake(null); setGeneratingServerMsg("")
     setGeneratingStartTime(Date.now()); setEstimatedRemaining(null)
-    let payload = buildPayload()
+    // Re-upload si le serveur a redémarré et vidé /tmp
+    const freshVideos = await Promise.all(videos.map(async v => {
+      if (v.type !== "file" || !v.file) return v
+      try {
+        const chk = await fetch(`${SERVER_URL}/check-file`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ path: v.path }) })
+        const { exists } = await chk.json()
+        if (exists) return v
+        const newPath = await uploadFile(v.file)
+        return newPath ? { ...v, path: newPath } : v
+      } catch { return v }
+    }))
+    const payloadVideoPaths = freshVideos.filter(v => v.type === "file").map(v => v.path).filter(Boolean)
+    let payload = { ...buildPayload(), videoPaths: payloadVideoPaths }
     if (autoMode) {
       const contentType = detectedContentType || await detectContentType()
       setDetectedContentType(contentType)
