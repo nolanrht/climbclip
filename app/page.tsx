@@ -601,13 +601,10 @@ export default function Home() {
     savePromptToHistory(promptText)
     setHasGenerated(false); setGenerating(true); setProgress(0); setServerAwake(null); setGeneratingServerMsg("")
     setGeneratingStartTime(Date.now()); setEstimatedRemaining(null)
-    // Re-upload si le serveur a redémarré et vidé /tmp
+    // Re-upload systématique si on a le File original (Render vide /tmp à chaque redeploy)
     const freshVideos = await Promise.all(videos.map(async v => {
       if (v.type !== "file" || !v.file) return v
       try {
-        const chk = await fetch(`${SERVER_URL}/check-file`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ path: v.path }) })
-        const { exists } = await chk.json()
-        if (exists) return v
         const newPath = await uploadFile(v.file)
         return newPath ? { ...v, path: newPath } : v
       } catch { return v }
