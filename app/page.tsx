@@ -190,14 +190,14 @@ const SakuraBg = () => {
 
 
 const VISUAL_FILTER_ITEMS = [
-  { key:"vivid",    label:"Vivid"   },
-  { key:"vintage",  label:"Vintage" },
-  { key:"sepia",    label:"Sépia"   },
-  { key:"bw",       label:"N&B"     },
-  { key:"negative", label:"Négatif" },
-  { key:"hdr",      label:"HDR"     },
-  { key:"glitch",   label:"Glitch"  },
-  { key:"vhs",      label:"VHS"     },
+  { key:"vivid",    label:"Vivid",   bg:"linear-gradient(160deg,#ff6b35 0%,#f7c59f 40%,#4ecdc4 100%)" },
+  { key:"vintage",  label:"Vintage", bg:"linear-gradient(160deg,#c9a96e 0%,#e8d5b0 50%,#8b6f47 100%)" },
+  { key:"sepia",    label:"Sépia",   bg:"linear-gradient(160deg,#b8860b 0%,#daa520 50%,#8b6914 100%)" },
+  { key:"bw",       label:"N&B",     bg:"linear-gradient(160deg,#1a1a1a 0%,#888 50%,#f0f0f0 100%)" },
+  { key:"negative", label:"Négatif", bg:"linear-gradient(160deg,#00ffff 0%,#ff00ff 50%,#ffff00 100%)" },
+  { key:"hdr",      label:"HDR",     bg:"linear-gradient(160deg,#0d0221 0%,#ff4500 40%,#ffd700 100%)" },
+  { key:"glitch",   label:"Glitch",  bg:"linear-gradient(160deg,#00ff41 0%,#ff0055 50%,#00b4ff 100%)" },
+  { key:"vhs",      label:"VHS",     bg:"linear-gradient(160deg,#1a0033 0%,#cc00ff 50%,#00ccff 100%)" },
 ] as const
 
 const CSS_FILTER_MAP: Record<string, string> = {
@@ -2216,11 +2216,15 @@ export default function Home() {
         const previewVideo = (!previewThumb && videos[0]?.path)
           ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/videos/${videos[0].path}`
           : null
-        const renderPreview = (cssFilter?: string) => {
+        const FILTER_BG_MAP: Record<string, string> = Object.fromEntries(
+          VISUAL_FILTER_ITEMS.map(f => [f.key, f.bg])
+        )
+        const renderPreview = (cssFilter?: string, filterKey?: string) => {
           const s: React.CSSProperties = { width:"100%", height:"100%", objectFit:"cover" as const, ...(cssFilter ? { filter: cssFilter } : {}) }
           if (previewThumb) return <img src={previewThumb} style={s} alt=""/>
           if (previewVideo) return <video src={previewVideo} muted playsInline preload="metadata" onLoadedMetadata={e => { (e.currentTarget as HTMLVideoElement).currentTime = 0.5 }} style={s}/>
-          return <div style={{ width:"100%", height:"100%", background: dark ? "#1a1a1a" : "#e5e5e5", ...(cssFilter ? { filter: cssFilter } : {}) }}/>
+          const bg = filterKey ? FILTER_BG_MAP[filterKey] : "linear-gradient(160deg,#3a7bd5 0%,#56ccf2 50%,#a8edea 100%)"
+          return <div style={{ width:"100%", height:"100%", background: bg, ...(cssFilter ? { filter: cssFilter } : {}) }}/>
         }
         return (
           <>
@@ -2241,7 +2245,7 @@ export default function Home() {
                   {VISUAL_FILTER_ITEMS.map(f => (
                     <div key={f.key} onClick={() => { setVisualFilter(visualFilter === f.key ? null : f.key); setShowFilterModal(false) }} style={{ flexShrink:0, cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:7 }}>
                       <div style={{ width:72, height:96, borderRadius:12, overflow:"hidden", outline: visualFilter === f.key ? "2.5px solid rgba(79,142,247,0.9)" : "2.5px solid transparent", outlineOffset:2 }}>
-                        {renderPreview(CSS_FILTER_MAP[f.key])}
+                        {renderPreview(CSS_FILTER_MAP[f.key], f.key)}
                       </div>
                       <span style={{ fontSize:11, fontWeight: visualFilter === f.key ? 700 : 400, color: visualFilter === f.key ? t.accent : t.textMuted }}>{f.label}</span>
                     </div>
