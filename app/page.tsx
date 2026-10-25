@@ -601,18 +601,12 @@ export default function Home() {
     savePromptToHistory(promptText)
     setHasGenerated(false); setGenerating(true); setProgress(0); setServerAwake(null); setGeneratingServerMsg("")
     setGeneratingStartTime(Date.now()); setEstimatedRemaining(null)
-    // Re-upload systématique (Render vide /tmp à chaque redeploy)
-    const freshVideos = await Promise.all(videos.map(async v => {
-      if (v.type !== "file" || !v.file) return v
-      try { const newPath = await uploadFile(v.file); return newPath ? { ...v, path: newPath } : v } catch { return v }
-    }))
-    const freshPaths = freshVideos.filter(v => v.type === "file").map(v => v.path).filter(Boolean)
-    let payload = { ...buildPayload(), videoPaths: freshPaths }
+    let payload = buildPayload()
     if (autoMode) {
       const contentType = detectedContentType || await detectContentType()
       setDetectedContentType(contentType)
       const preset = AUTO_PRESETS[contentType]
-      payload = { ...buildPayload({ colorGrade: preset.colorGrade, transition: preset.transition, options: [...new Set([...activeOptions, ...preset.options])] }), videoPaths: freshPaths }
+      payload = buildPayload({ colorGrade: preset.colorGrade, transition: preset.transition, options: [...new Set([...activeOptions, ...preset.options])] })
       if (!promptText) payload.prompt = preset.prompt
     }
     try {
