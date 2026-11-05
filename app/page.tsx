@@ -1508,26 +1508,65 @@ export default function Home() {
       )}
 
       {currentPage === "history" && (
-        <div style={{ width:"100%", maxWidth:600, display:"flex", flexDirection:"column", gap:18, padding:"32px 16px 120px", position:"relative", zIndex:1 }}>
-          <p style={{ fontSize:16, fontWeight:600, color:t.text }}>{T.historyTitle}</p>
+        <div style={{ width:"100%", maxWidth:560, display:"flex", flexDirection:"column", gap:10, padding:"24px 16px 100px", position:"relative", zIndex:1 }}>
+
+          {/* Header card */}
+          <div style={{ background:t.bgCard, border:t.border, borderRadius:14, padding:"16px 18px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <div>
+              <p style={{ fontSize:15, fontWeight:700, color:t.text, marginBottom:2 }}>{T.historyTitle}</p>
+              <p style={{ fontSize:12, color:t.textMuted }}>{generationHistory.length > 0 ? `${generationHistory.length} génération${generationHistory.length > 1 ? "s" : ""}` : T.noHistory}</p>
+            </div>
+            <div style={{ width:36, height:36, borderRadius:10, background:"rgba(79,142,247,0.08)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17 }}>⏱</div>
+          </div>
+
           {generationHistory.length === 0 ? (
-            <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:11, padding:"56px 0" }}>
-              <span style={{ fontSize:32, opacity:0.3 }}>⏺</span>
-              <p style={{ fontSize:13, color:t.textMuted }}>{T.noHistory}</p>
-              <button onClick={() => setCurrentPage("home")} style={{ fontSize:12, color:t.accent, background:"rgba(79,142,247,0.06)", border:"1px solid rgba(79,142,247,0.15)", borderRadius:8, padding:"7px 15px", cursor:"pointer" }}>{T.generateFirst}</button>
+            <div style={{ background:t.bgCard, border:t.border, borderRadius:14, padding:"48px 24px", display:"flex", flexDirection:"column", alignItems:"center", gap:12 }}>
+              <div style={{ width:48, height:48, borderRadius:14, background:dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, opacity:0.5 }}>📋</div>
+              <div style={{ textAlign:"center" }}>
+                <p style={{ fontSize:13, fontWeight:600, color:t.text, marginBottom:4 }}>{T.noHistory}</p>
+                <p style={{ fontSize:12, color:t.textMuted }}>Tes générations apparaîtront ici</p>
+              </div>
+              <button onClick={() => setCurrentPage("home")} style={{ marginTop:4, fontSize:12, color:t.accent, background:"rgba(79,142,247,0.07)", border:"1px solid rgba(79,142,247,0.18)", borderRadius:9, padding:"8px 16px", cursor:"pointer", fontWeight:500 }}>{T.generateFirst}</button>
             </div>
           ) : generationHistory.map(entry => (
-            <div key={entry.id} style={{ background:t.bgCard, border:t.border, borderRadius:12, padding:"14px 16px", display:"flex", flexDirection:"column", gap:10 }}>
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <div key={entry.id} style={{ background:t.bgCard, border:t.border, borderRadius:14, overflow:"hidden" }}>
+
+              {/* Top row — date + badge + count */}
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 16px", borderBottom:t.border }}>
                 <div style={{ display:"flex", alignItems:"center", gap:7 }}>
-                  <span style={{ fontSize:11, color:t.textMuted }}>{entry.date}</span>
-                  {entry.contentType && <span style={{ fontSize:10, padding:"2px 7px", borderRadius:10, background:"rgba(79,142,247,0.08)", color:t.accent }}>{entry.contentType}</span>}
+                  <span style={{ fontSize:11, color:t.textSub, fontWeight:500 }}>{entry.date}</span>
+                  {entry.contentType && (
+                    <span style={{ fontSize:10, padding:"2px 8px", borderRadius:20, background:"rgba(79,142,247,0.09)", color:t.accent, fontWeight:600, letterSpacing:"0.02em" }}>{entry.contentType}</span>
+                  )}
                 </div>
-                <span style={{ fontSize:11, color:t.textMuted }}>{entry.clipsCount || 0} clip(s)</span>
+                <div style={{ display:"flex", alignItems:"center", gap:5, background:dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)", borderRadius:8, padding:"3px 9px" }}>
+                  <span style={{ fontSize:11 }}>🎬</span>
+                  <span style={{ fontSize:11, color:t.textMuted, fontWeight:500 }}>{entry.clipsCount || 0} clip{(entry.clipsCount || 0) > 1 ? "s" : ""}</span>
+                </div>
               </div>
-              {entry.prompt && <p style={{ fontSize:12, color:t.text, lineHeight:1.4 }}>{entry.prompt}</p>}
-              {entry.settings && <p style={{ fontSize:10, color:t.textMuted }}>{entry.settings.format} · {entry.settings.colorGrade || "auto"} · {entry.settings.transition || "auto"}</p>}
-              <button onClick={() => { if (entry.prompt) setPromptText(entry.prompt); setCurrentPage("home") }} style={{ padding:"7px 12px", borderRadius:8, fontSize:11, border:"1px solid rgba(79,142,247,0.22)", background:"rgba(79,142,247,0.05)", color:t.accent, cursor:"pointer", alignSelf:"flex-start" }}>{T.reuseSettings}</button>
+
+              {/* Body — prompt + settings */}
+              <div style={{ padding:"12px 16px", display:"flex", flexDirection:"column", gap:8 }}>
+                {entry.prompt && (
+                  <p style={{ fontSize:13, color:t.text, lineHeight:1.5, margin:0 }}>{entry.prompt}</p>
+                )}
+                {entry.settings && (
+                  <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap" }}>
+                    {[entry.settings.format, entry.settings.colorGrade || "auto", entry.settings.transition || "auto"].filter(Boolean).map((val, i) => (
+                      <span key={i} style={{ fontSize:10, padding:"2px 8px", borderRadius:6, background:dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)", color:t.textMuted, fontWeight:500 }}>{val}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Footer — CTA */}
+              <div style={{ padding:"10px 16px", borderTop:t.border, background:dark ? "rgba(255,255,255,0.015)" : "rgba(0,0,0,0.015)" }}>
+                <button
+                  onClick={() => { if (entry.prompt) setPromptText(entry.prompt); setCurrentPage("home") }}
+                  style={{ fontSize:12, color:t.accent, background:"rgba(79,142,247,0.07)", border:"1px solid rgba(79,142,247,0.18)", borderRadius:8, padding:"7px 14px", cursor:"pointer", fontWeight:500 }}
+                >{T.reuseSettings}</button>
+              </div>
+
             </div>
           ))}
         </div>
