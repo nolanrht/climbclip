@@ -1584,19 +1584,29 @@ export default function Home() {
             <div style={{ position:"fixed", inset:0, backgroundImage:"repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.007) 3px, rgba(255,255,255,0.007) 4px)", pointerEvents:"none", zIndex:0 }}/>
           </>}
           <MountainBg dark={dark}/>
-          <nav style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 16px", borderBottom:t.border, background:t.bgNav, backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", position:"sticky", top:0, zIndex:50 }}>
-            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-              <ClimbLogo size={26}/>
-              <div style={{ display:"flex", flexDirection:"column", lineHeight:1, gap:1 }}>
-                <span style={{ color:t.text, fontWeight:700, fontSize:12, letterSpacing:"0.1em" }}>CLIMB</span>
-                <span style={{ color:t.textMuted, fontSize:7, letterSpacing:"0.2em" }}>CLIP</span>
-              </div>
+          <nav style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 16px", background:dark ? "rgba(10,10,16,0.85)" : "rgba(255,255,255,0.88)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", borderBottom: dark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.07)", position:"sticky", top:0, zIndex:50, gap:12 }}>
+            {/* Logo */}
+            <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
+              <ClimbLogo size={24}/>
+              <span style={{ color:t.text, fontWeight:700, fontSize:13, letterSpacing:"0.08em" }}>CLIMBCLIP</span>
             </div>
-            <button onClick={() => { setCurrentMode("home"); setUpscaleMediaType(null); setUpscaleFile(null); setUpscalePreviewUrl(null); setUpscaleResultUrl(null); setUpscaleError(null) }}
-              style={{ fontSize:13, color:t.textMuted, background:"none", border:t.border, borderRadius:8, padding:"6px 12px", cursor:"pointer" }}>{T.backHome}</button>
-            <div style={{ display:"flex", alignItems:"center", gap:6 }} onClick={e => e.stopPropagation()}>
+            {/* Tabs outil — pill group */}
+            <div ref={retoucheTabsRef} style={{ display:"flex", alignItems:"center", gap:2, background:dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)", borderRadius:10, padding:"3px", position:"relative", flex:isMobile ? 1 : "unset", justifyContent:"center", overflowX:"auto" }}>
+              <div style={{ position:"absolute", left:3, top:"50%", transform:`translateY(-50%) translateX(${retouchePill.left}px)`, width:retouchePill.width, height:retouchePill.height, background:dark ? "rgba(255,255,255,0.1)" : "#ffffff", borderRadius:7, boxShadow:dark ? "0 1px 4px rgba(0,0,0,0.4)" : "0 1px 3px rgba(0,0,0,0.1)", transition:"transform 0.15s, width 0.15s", pointerEvents:"none", opacity:retouchePill.ready ? 1 : 0 }}/>
+              {(["upscaling","gommage","watermark","text"] as const).map((tab, i) => {
+                const labels = [T.tabUpscaling, T.tabGommage, T.tabWatermark, T.tabText]
+                return (
+                  <button key={tab} onClick={() => setRetoucheTab(tab)}
+                    style={{ fontSize:12, color:retoucheTab===tab ? t.text : t.textMuted, background:"none", border:"none", borderRadius:7, padding:"6px 12px", cursor:"pointer", fontWeight:retoucheTab===tab ? 600 : 400, whiteSpace:"nowrap", flexShrink:0, position:"relative", zIndex:1, transition:"all 0.15s" }}>
+                    {labels[i]}
+                  </button>
+                )
+              })}
+            </div>
+            {/* Actions droite */}
+            <div style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0 }} onClick={e => e.stopPropagation()}>
               <div style={{ position:"relative" }}>
-                <button onClick={() => setShowLangMenu(!showLangMenu)} style={{ fontSize:12, color:t.textSub, background:t.bgInput, border:t.border, borderRadius:7, padding:"6px 10px", cursor:"pointer" }}>{lang}</button>
+                <button onClick={() => setShowLangMenu(!showLangMenu)} style={{ fontSize:12, color:t.textSub, background:t.bgInput, border:t.border, borderRadius:7, padding:"5px 9px", cursor:"pointer" }}>{lang}</button>
                 {showLangMenu && (
                   <div style={{ position:"absolute", right:0, top:"calc(100% + 4px)", background:t.bgModal, border:t.border, borderRadius:8, padding:"4px 0", minWidth:70, boxShadow:"0 8px 24px rgba(0,0,0,0.5)", zIndex:100 }}>
                     {(["EN","FR","ES","IT","DE"] as Lang[]).map(l => (
@@ -1605,23 +1615,11 @@ export default function Home() {
                   </div>
                 )}
               </div>
-              <button onClick={() => setShowSettings(true)} style={{ fontSize:18, color:t.textSub, border:t.borderMed, borderRadius:7, padding:"7px 11px", background:t.bgInput, cursor:"pointer", lineHeight:1 }}>⚙</button>
+              <button onClick={() => setShowSettings(true)} style={{ fontSize:16, color:t.textSub, border:t.border, borderRadius:7, padding:"5px 9px", background:t.bgInput, cursor:"pointer", lineHeight:1 }}>⚙</button>
+              <button onClick={() => { setCurrentMode("home"); setUpscaleMediaType(null); setUpscaleFile(null); setUpscalePreviewUrl(null); setUpscaleResultUrl(null); setUpscaleError(null) }}
+                style={{ fontSize:12, color:t.textMuted, border:t.border, borderRadius:7, padding:"5px 9px", background:t.bgInput, cursor:"pointer" }}>{T.backHome}</button>
             </div>
           </nav>
-          <div style={{ position:"sticky", top:57, zIndex:40 }}>
-            <div ref={retoucheTabsRef} style={{ width:"100%", display:"flex", background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", border:"1px solid rgba(255,255,255,0.15)", borderTop:"1px solid rgba(255,255,255,0.30)", boxShadow:"0 8px 32px rgba(0,0,0,0.3)", borderRadius:16, overflowX:"auto", position:"relative" }}>
-              <div style={{ position:"absolute", left:0, top:"50%", transform:`translateY(-50%) translateX(${retouchePill.left}px)`, width:retouchePill.width, height:retouchePill.height, background:"rgba(79,142,247,0.15)", border:"1px solid rgba(79,142,247,0.4)", borderRadius:10, transition:"transform 0.3s cubic-bezier(0.4,0,0.2,1), width 0.3s cubic-bezier(0.4,0,0.2,1)", pointerEvents:"none", opacity:retouchePill.ready ? 1 : 0 }}/>
-              {(["upscaling","gommage","watermark","text"] as const).map((tab, i) => {
-                const labels = [T.tabUpscaling, T.tabGommage, T.tabWatermark, T.tabText]
-                return (
-                  <button key={tab} onClick={() => setRetoucheTab(tab)}
-                    style={{ padding:"10px 18px", background:"none", border:"none", borderBottom:"2px solid transparent", color:retoucheTab===tab ? t.accent : t.textMuted, cursor:"pointer", fontSize:13, fontWeight:retoucheTab===tab ? 700 : 400, whiteSpace:"nowrap", flexShrink:0, textShadow:retoucheTab===tab ? "0 0 10px rgba(79,142,247,0.5)" : "none", position:"relative", zIndex:1 }}>
-                    {labels[i]}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
 
           <div style={{ width:"100%", maxWidth:600, display:"flex", flexDirection:"column", gap:16, padding:"20px 16px 120px", position:"relative", zIndex:1 }}>
             {retoucheTab === "upscaling" && (<>
