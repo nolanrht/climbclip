@@ -1092,59 +1092,69 @@ export default function Home() {
         </div>
       )}
 
-      <nav style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 16px", background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", border:"1px solid rgba(255,255,255,0.15)", borderTop:"1px solid rgba(255,255,255,0.30)", boxShadow:"0 8px 32px rgba(0,0,0,0.3)", borderRadius:16, position:"sticky", top:0, zIndex:50 }}>
-        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-          <ClimbLogo size={26}/>
-          <div style={{ display:"flex", flexDirection:"column", lineHeight:1, gap:1 }}>
-            <span style={{ color:t.text, fontWeight:700, fontSize:12, letterSpacing:"0.1em" }}>CLIMB</span>
-            <span style={{ color:t.textMuted, fontSize:7, letterSpacing:"0.2em" }}>CLIP</span>
-          </div>
-          {serverAwake === true && <div style={{ width:5, height:5, borderRadius:"50%", background:"#4ade80" }}/>}
+      <nav style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 16px", background:dark ? "rgba(10,10,16,0.85)" : "rgba(255,255,255,0.88)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", borderBottom: dark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.07)", position:"sticky", top:0, zIndex:50, gap:12 }}>
+
+        {/* Logo */}
+        <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
+          <ClimbLogo size={24}/>
+          <span style={{ color:t.text, fontWeight:700, fontSize:13, letterSpacing:"0.08em" }}>CLIMBCLIP</span>
+          {serverAwake === true && <div style={{ width:5, height:5, borderRadius:"50%", background:"#4ade80", flexShrink:0 }}/>}
         </div>
-        <div ref={clipsTabsRef} style={{ display:"flex", alignItems:"center", gap:isMobile ? 4 : 14, position:"relative" }}>
-          <div style={{ position:"absolute", left:0, top:"50%", transform:`translateY(-50%) translateX(${clipsPill.left}px)`, width:clipsPill.width, height:clipsPill.height, background:"rgba(79,142,247,0.15)", border:"1px solid rgba(79,142,247,0.4)", borderRadius:8, transition:"transform 0.3s cubic-bezier(0.4,0,0.2,1), width 0.3s cubic-bezier(0.4,0,0.2,1)", pointerEvents:"none", opacity:clipsPill.ready ? 1 : 0 }}/>
-          <button onClick={() => setCurrentPage("home")} style={{ fontSize:isMobile ? 12 : 13, color:currentPage === "home" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "home" ? 600 : 400, textShadow:currentPage === "home" ? "0 0 10px rgba(79,142,247,0.5)" : "none", borderRadius:8, padding:isMobile ? "4px 7px" : "4px 10px", position:"relative", zIndex:1 }}>{T.home}</button>
-          <button onClick={() => { setCurrentPage("library"); loadLibrary() }} style={{ fontSize:isMobile ? 12 : 13, color:currentPage === "library" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "library" ? 600 : 400, textShadow:currentPage === "library" ? "0 0 10px rgba(79,142,247,0.5)" : "none", borderRadius:8, padding:isMobile ? "4px 7px" : "4px 10px", position:"relative", zIndex:1 }}>{T.library}</button>
-          <button onClick={() => setCurrentPage("history")} style={{ fontSize:isMobile ? 12 : 13, color:currentPage === "history" ? t.accent : t.textSub, background:"none", border:"none", cursor:"pointer", fontWeight:currentPage === "history" ? 600 : 400, textShadow:currentPage === "history" ? "0 0 10px rgba(79,142,247,0.5)" : "none", borderRadius:8, padding:isMobile ? "4px 7px" : "4px 10px", position:"relative", zIndex:1 }}>{T.historyTitle}</button>
-          {!isMobile && <button onClick={() => setCurrentMode("home")} style={{ fontSize:13, color:t.textMuted, background:"none", border:"none", cursor:"pointer", position:"relative", zIndex:1 }}>{T.backHome}</button>}
+
+        {/* Tabs centrés */}
+        <div ref={clipsTabsRef} style={{ display:"flex", alignItems:"center", gap:2, background:dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)", borderRadius:10, padding:"3px", position:"relative", flex:isMobile ? 1 : "unset", justifyContent:"center" }}>
+          {[
+            { id:"home", label:T.home, action:() => setCurrentPage("home") },
+            { id:"library", label:T.library, action:() => { setCurrentPage("library"); loadLibrary() } },
+            { id:"history", label:T.historyTitle, action:() => setCurrentPage("history") },
+          ].map(tab => (
+            <button key={tab.id} onClick={tab.action} style={{ fontSize:12, color:currentPage === tab.id ? t.text : t.textMuted, background:currentPage === tab.id ? (dark ? "rgba(255,255,255,0.1)" : "#ffffff") : "none", border:"none", borderRadius:7, padding:"6px 12px", cursor:"pointer", fontWeight:currentPage === tab.id ? 600 : 400, transition:"all 0.15s", boxShadow:currentPage === tab.id ? (dark ? "0 1px 4px rgba(0,0,0,0.4)" : "0 1px 3px rgba(0,0,0,0.1)") : "none", whiteSpace:"nowrap" }}>{tab.label}</button>
+          ))}
         </div>
+
+        {/* Actions droite */}
         {isMobile ? (
-          <div style={{ position:"relative" }} onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowNavMenu(!showNavMenu)} style={{ fontSize:22, color:t.textSub, background:"none", border:"none", cursor:"pointer", lineHeight:1, padding:"4px 8px" }}>☰</button>
+          <div style={{ position:"relative", flexShrink:0 }} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowNavMenu(!showNavMenu)} style={{ width:34, height:34, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:4, background:dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)", border:"none", borderRadius:9, cursor:"pointer" }}>
+              <div style={{ width:14, height:1.5, background:t.textSub, borderRadius:1 }}/>
+              <div style={{ width:14, height:1.5, background:t.textSub, borderRadius:1 }}/>
+              <div style={{ width:14, height:1.5, background:t.textSub, borderRadius:1 }}/>
+            </button>
             {showNavMenu && (
-              <div style={{ position:"absolute", right:0, top:"calc(100% + 8px)", background:"rgba(12,12,20,0.94)", backdropFilter:"blur(24px)", WebkitBackdropFilter:"blur(24px)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:14, padding:"6px 0", minWidth:210, boxShadow:"0 16px 48px rgba(0,0,0,0.7)", zIndex:200 }}>
-                <button onClick={() => { driveConnected ? null : connectDrive(); setShowNavMenu(false) }} style={{ width:"100%", padding:"13px 18px", background:"none", border:"none", color:driveConnected ? "#4ade80" : t.text, cursor:driveConnected ? "default" : "pointer", fontSize:14, textAlign:"left" }}>{driveConnected ? `✓ ${T.driveConnectedLabel}` : T.connectDrive}</button>
-                <button onClick={() => { setShowStats(true); setShowNavMenu(false) }} style={{ width:"100%", padding:"13px 18px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:14, textAlign:"left" }}>📊 {T.stats}</button>
-                <div style={{ height:1, background:"rgba(255,255,255,0.08)", margin:"6px 0" }}/>
-                <div style={{ padding:"10px 18px 8px" }}>
+              <div style={{ position:"absolute", right:0, top:"calc(100% + 8px)", background:dark ? "rgba(12,12,20,0.96)" : "rgba(255,255,255,0.98)", backdropFilter:"blur(24px)", WebkitBackdropFilter:"blur(24px)", border: dark ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.1)", borderRadius:14, padding:"6px 0", minWidth:200, boxShadow:"0 12px 40px rgba(0,0,0,0.3)", zIndex:200 }}>
+                <button onClick={() => { driveConnected ? null : connectDrive(); setShowNavMenu(false) }} style={{ width:"100%", padding:"11px 16px", background:"none", border:"none", color:driveConnected ? "#4ade80" : t.text, cursor:driveConnected ? "default" : "pointer", fontSize:13, textAlign:"left" }}>{driveConnected ? `✓ ${T.driveConnectedLabel}` : T.connectDrive}</button>
+                <button onClick={() => { setShowStats(true); setShowNavMenu(false) }} style={{ width:"100%", padding:"11px 16px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:13, textAlign:"left" }}>📊 {T.stats}</button>
+                <div style={{ height:1, background: dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)", margin:"4px 0" }}/>
+                <div style={{ padding:"8px 16px" }}>
                   <p style={{ fontSize:10, color:t.textMuted, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>{T.languageLabel}</p>
-                  <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+                  <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>
                     {(["EN","FR","ES","IT","DE"] as Lang[]).map(l => (
-                      <button key={l} onClick={() => { setLangAndSave(l); setShowNavMenu(false) }} style={{ padding:"5px 10px", borderRadius:7, fontSize:12, border:lang === l ? `1px solid ${t.accent}` : "1px solid rgba(255,255,255,0.12)", background:lang === l ? "rgba(79,142,247,0.14)" : "none", color:lang === l ? t.accent : t.textSub, cursor:"pointer", fontWeight:lang === l ? 700 : 400 }}>{l}</button>
+                      <button key={l} onClick={() => { setLangAndSave(l); setShowNavMenu(false) }} style={{ padding:"4px 9px", borderRadius:7, fontSize:12, border:lang === l ? `1px solid ${t.accent}` : t.border, background:lang === l ? "rgba(79,142,247,0.1)" : "none", color:lang === l ? t.accent : t.textSub, cursor:"pointer", fontWeight:lang === l ? 700 : 400 }}>{l}</button>
                     ))}
                   </div>
                 </div>
-                <div style={{ height:1, background:"rgba(255,255,255,0.08)", margin:"6px 0" }}/>
-                <button onClick={() => { setShowSettings(true); setShowNavMenu(false) }} style={{ width:"100%", padding:"13px 18px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:14, textAlign:"left" }}>⚙ {T.settings}</button>
-                <button onClick={() => { setCurrentMode("home"); setShowNavMenu(false) }} style={{ width:"100%", padding:"13px 18px", background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:14, textAlign:"left" }}>{T.backHome}</button>
+                <div style={{ height:1, background: dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)", margin:"4px 0" }}/>
+                <button onClick={() => { setShowSettings(true); setShowNavMenu(false) }} style={{ width:"100%", padding:"11px 16px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:13, textAlign:"left" }}>⚙ {T.settings}</button>
+                <button onClick={() => { setCurrentMode("home"); setShowNavMenu(false) }} style={{ width:"100%", padding:"11px 16px", background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:13, textAlign:"left" }}>← {T.backHome}</button>
               </div>
             )}
           </div>
         ) : (
-          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-            <button onClick={() => driveConnected ? null : connectDrive()} style={{ fontSize:11, color:driveConnected ? "#4ade80" : t.textMuted, border:driveConnected ? "1px solid rgba(74,222,128,0.3)" : t.border, borderRadius:7, padding:"6px 10px", background:driveConnected ? "rgba(74,222,128,0.06)" : t.bgInput, cursor:driveConnected ? "default" : "pointer" }}>{driveConnected ? "✓ Drive" : "Drive"}</button>
-            <button onClick={() => setShowStats(true)} style={{ fontSize:13, color:t.textSub, border:t.border, borderRadius:7, padding:"6px 10px", background:t.bgInput, cursor:"pointer" }}>📊</button>
+          <div style={{ display:"flex", alignItems:"center", gap:5, flexShrink:0 }}>
+            <button onClick={() => driveConnected ? null : connectDrive()} style={{ fontSize:11, color:driveConnected ? "#4ade80" : t.textMuted, border:driveConnected ? "1px solid rgba(74,222,128,0.3)" : t.border, borderRadius:7, padding:"5px 9px", background:driveConnected ? "rgba(74,222,128,0.05)" : t.bgInput, cursor:driveConnected ? "default" : "pointer" }}>{driveConnected ? "✓ Drive" : "Drive"}</button>
+            <button onClick={() => setShowStats(true)} style={{ fontSize:12, color:t.textSub, border:t.border, borderRadius:7, padding:"5px 9px", background:t.bgInput, cursor:"pointer" }}>📊</button>
             <div style={{ position:"relative" }} onClick={e => e.stopPropagation()}>
-              <button onClick={() => setShowLangMenu(!showLangMenu)} style={{ fontSize:12, color:t.textSub, background:t.bgInput, border:t.border, borderRadius:7, padding:"6px 10px", cursor:"pointer" }}>{lang}</button>
+              <button onClick={() => setShowLangMenu(!showLangMenu)} style={{ fontSize:12, color:t.textSub, background:t.bgInput, border:t.border, borderRadius:7, padding:"5px 9px", cursor:"pointer" }}>{lang}</button>
               {showLangMenu && (
-                <div style={{ position:"absolute", right:0, top:"calc(100% + 4px)", background:t.bgModal, border:t.border, borderRadius:8, padding:"4px 0", minWidth:70, boxShadow:"0 8px 24px rgba(0,0,0,0.5)", zIndex:100 }}>
+                <div style={{ position:"absolute", right:0, top:"calc(100% + 4px)", background:dark ? "rgba(12,12,20,0.96)" : "rgba(255,255,255,0.98)", border:t.border, borderRadius:10, padding:"4px 0", minWidth:70, boxShadow:"0 8px 24px rgba(0,0,0,0.3)", zIndex:100 }}>
                   {(["EN","FR","ES","IT","DE"] as Lang[]).map(l => (
                     <button key={l} onClick={() => setLangAndSave(l)} style={{ width:"100%", padding:"7px 12px", background:lang === l ? "rgba(79,142,247,0.07)" : "none", border:"none", color:lang === l ? t.accent : t.text, cursor:"pointer", fontSize:12, textAlign:"left" }}>{l}</button>
                   ))}
                 </div>
               )}
             </div>
-            <button onClick={() => setShowSettings(true)} style={{ fontSize:18, color:t.textSub, border:t.borderMed, borderRadius:7, padding:"7px 11px", background:t.bgInput, cursor:"pointer", lineHeight:1 }}>⚙</button>
+            <button onClick={() => setShowSettings(true)} style={{ fontSize:16, color:t.textSub, border:t.border, borderRadius:7, padding:"5px 9px", background:t.bgInput, cursor:"pointer", lineHeight:1 }}>⚙</button>
+            <button onClick={() => setCurrentMode("home")} style={{ fontSize:12, color:t.textMuted, border:t.border, borderRadius:7, padding:"5px 9px", background:t.bgInput, cursor:"pointer" }}>← {T.backHome}</button>
           </div>
         )}
       </nav>
