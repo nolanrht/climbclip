@@ -497,6 +497,26 @@ export default function Home() {
     } catch(e) { console.error("save error:", e) }
   }
 
+  const handleDropboxImport = () => {
+    const Dropbox = (window as any).Dropbox
+    if (!Dropbox) { alert("Dropbox non chargé, réessaie dans quelques secondes"); return }
+    Dropbox.choose({
+      success: async (files: any[]) => {
+        for (const f of files) {
+          const url = f.link.replace("?dl=0", "?dl=1")
+          try {
+            const res = await fetch(`${SERVER_URL}/download`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ url }) })
+            const d = await res.json()
+            if (d.path) setVideos(prev => [...prev, { id:Date.now().toString(), type:"link", path:d.path, url, name:f.name }])
+          } catch { alert("Erreur import Dropbox") }
+        }
+      },
+      linkType: "direct",
+      multiselect: true,
+      extensions: [".mp4", ".mov", ".avi", ".mkv", ".webm"],
+    })
+  }
+
   const uploadFile = async (file: File): Promise<string|null> => {
     try { const fd = new FormData(); fd.append("file", file); const res = await fetch(`${SERVER_URL}/upload`, { method:"POST", body:fd }); const d = await res.json(); return d.path || null } catch { return null }
   }
@@ -1160,7 +1180,10 @@ export default function Home() {
           <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
               <p style={{ fontSize:12, color:t.textSub }}>{T.videos} ({videos.length})</p>
-              <button onClick={() => document.getElementById("fileInput")?.click()} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"5px 10px", fontSize:11, color:t.textSub, cursor:"pointer" }}>{T.addFile}</button>
+              <div style={{ display:"flex", gap:6 }}>
+                <button onClick={handleDropboxImport} style={{ background:"#0061FF", border:"none", borderRadius:7, padding:"5px 10px", fontSize:11, color:"#fff", cursor:"pointer", fontWeight:600 }}>📦 Dropbox</button>
+                <button onClick={() => document.getElementById("fileInput")?.click()} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"5px 10px", fontSize:11, color:t.textSub, cursor:"pointer" }}>{T.addFile}</button>
+              </div>
             </div>
             <input id="fileInput" type="file" accept="video/*" multiple style={{ display:"none" }} onChange={async e => { if (e.target.files) for (const f of Array.from(e.target.files)) await handleFileAdd(f) }}/>
             {videos.length > 0 ? (
