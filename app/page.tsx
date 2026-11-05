@@ -2269,21 +2269,10 @@ export default function Home() {
             )}
             <div style={{ height:1, background:dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)" }}/>
             <button onClick={async () => { await supabase.auth.signOut(); setUser(null) }} style={{ background:"none", border:"1px solid rgba(232,69,58,0.25)", borderRadius:8, padding:9, fontSize:12, fontWeight:500, color:"#e8453a", cursor:"pointer" }}>{T.logout}</button>
-            <button onClick={() => { setShowSettings(false); setShowReport(true) }} style={{ background:"none", border:"1px solid rgba(255,255,255,0.07)", borderRadius:8, padding:9, fontSize:12, color:t.textSub, cursor:"pointer" }}>⚠ {T.reportProblem}</button>
           </div>
         </div>
       )}
 
-      {showReport && (
-        <div onClick={() => setShowReport(false)} style={{ position:"fixed", inset:0, background:t.overlayHeavy, zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
-          <div onClick={e => e.stopPropagation()} style={{ ...modalBase, width:"100%", maxWidth:330 }}>
-            <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ fontSize:14, fontWeight:600, color:t.text }}>⚠ {T.reportProblem}</span><button onClick={() => setShowReport(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:17, cursor:"pointer" }}>✕</button></div>
-            <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>{problems.map(p => <button key={p} onClick={() => toggleProblem(p)} style={{ padding:"5px 11px", borderRadius:20, fontSize:11, cursor:"pointer", border:selectedProblems.includes(p) ? "1px solid rgba(232,69,58,0.4)" : t.border, background:selectedProblems.includes(p) ? "rgba(232,69,58,0.06)" : t.bgPill, color:selectedProblems.includes(p) ? "#e8453a" : t.textSub }}>{p}</button>)}</div>
-            <textarea style={{ background:t.bgInput, border:t.border, borderRadius:8, padding:"9px 11px", fontSize:12, color:t.text, outline:"none", resize:"none", height:70, fontFamily:"sans-serif", width:"100%" }} placeholder={T.detailsPlaceholder}/>
-            <button style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:9, fontSize:12, fontWeight:500, color:t.textSub, cursor:"pointer" }}>{T.send}</button>
-          </div>
-        </div>
-      )}
 
       {videoPlayerClip && (
         <div onClick={() => setVideoPlayerClip(null)} style={{ position:"fixed", inset:0, zIndex:1000, background:"rgba(0,0,0,0.85)", display:"flex", alignItems:"center", justifyContent:"center", padding:"16px" }}>
