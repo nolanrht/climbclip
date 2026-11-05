@@ -1135,7 +1135,7 @@ export default function Home() {
                 </div>
                 <div style={{ height:1, background: dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)", margin:"4px 0" }}/>
                 <button onClick={() => { setShowSettings(true); setShowNavMenu(false) }} style={{ width:"100%", padding:"11px 16px", background:"none", border:"none", color:t.text, cursor:"pointer", fontSize:13, textAlign:"left" }}>⚙ {T.settings}</button>
-                <button onClick={() => { setCurrentMode("home"); setShowNavMenu(false) }} style={{ width:"100%", padding:"11px 16px", background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:13, textAlign:"left" }}>← {T.backHome}</button>
+                <button onClick={() => { setCurrentMode("home"); setShowNavMenu(false) }} style={{ width:"100%", padding:"11px 16px", background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:13, textAlign:"left" }}>{T.backHome}</button>
               </div>
             )}
           </div>
@@ -1154,7 +1154,7 @@ export default function Home() {
               )}
             </div>
             <button onClick={() => setShowSettings(true)} style={{ fontSize:16, color:t.textSub, border:t.border, borderRadius:7, padding:"5px 9px", background:t.bgInput, cursor:"pointer", lineHeight:1 }}>⚙</button>
-            <button onClick={() => setCurrentMode("home")} style={{ fontSize:12, color:t.textMuted, border:t.border, borderRadius:7, padding:"5px 9px", background:t.bgInput, cursor:"pointer" }}>← {T.backHome}</button>
+            <button onClick={() => setCurrentMode("home")} style={{ fontSize:12, color:t.textMuted, border:t.border, borderRadius:7, padding:"5px 9px", background:t.bgInput, cursor:"pointer" }}>{T.backHome}</button>
           </div>
         )}
       </nav>
