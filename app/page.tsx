@@ -1394,6 +1394,7 @@ export default function Home() {
             <div style={{ display:"flex", gap:7 }}>
               {currentFolder && <button onClick={() => { setNewFolderParent(currentFolder); setShowNewFolder(true) }} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"6px 10px", fontSize:11, color:t.textSub, cursor:"pointer" }}>{T.newSubfolder}</button>}
               <button onClick={() => { setNewFolderParent(null); setShowNewFolder(true) }} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"6px 11px", fontSize:12, color:t.textSub, cursor:"pointer" }}>{T.newFolder}</button>
+              <button onClick={async () => { if (!confirm("Supprimer tous les clips ?")) return; const email = user?.email; if (!email) return; await supabase.from("clips").delete().eq("owner_email", email); loadLibrary() }} style={{ background:"rgba(239,68,68,0.15)", border:"1px solid rgba(239,68,68,0.3)", borderRadius:7, padding:"6px 11px", fontSize:12, color:"#ef4444", cursor:"pointer" }}>Tout supprimer</button>
             </div>
           </div>
           {displayedFolders.length > 0 && (
