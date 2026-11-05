@@ -1181,7 +1181,7 @@ export default function Home() {
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
               <p style={{ fontSize:12, color:t.textSub }}>{T.videos} ({videos.length})</p>
               <div style={{ display:"flex", gap:6 }}>
-                <button onClick={handleDropboxImport} style={{ background:"#0061FF", border:"none", borderRadius:7, padding:"5px 10px", fontSize:11, color:"#fff", cursor:"pointer", fontWeight:600 }}>📦 Dropbox</button>
+                <button onClick={handleDropboxImport} style={{ background:"#0061FF", border:"none", borderRadius:7, padding:"5px 10px", fontSize:11, color:"#fff", cursor:"pointer", fontWeight:600 }}>Dropbox</button>
                 <button onClick={() => document.getElementById("fileInput")?.click()} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"5px 10px", fontSize:11, color:t.textSub, cursor:"pointer" }}>{T.addFile}</button>
               </div>
             </div>
