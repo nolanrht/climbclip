@@ -1150,141 +1150,145 @@ export default function Home() {
       </nav>
 
       {currentPage === "home" && (
-        <div style={{ width:"100%", maxWidth:580, display:"flex", flexDirection:"column", gap:0, padding:"28px 16px 120px", position:"relative", zIndex:1 }}>
+        <div style={{ width:"100%", maxWidth:560, display:"flex", flexDirection:"column", gap:12, padding:"24px 16px 100px", position:"relative", zIndex:1 }}>
 
-          {/* Mode toggle */}
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24 }}>
+          {/* ── Mode Auto / Manuel ── */}
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:t.bgCard, border:autoMode ? "1px solid rgba(79,142,247,0.25)" : t.border, borderRadius:14, padding:"14px 18px" }}>
             <div>
-              <p style={{ fontSize:14, fontWeight:600, color:autoMode ? t.accent : t.text, marginBottom:2 }}>{autoMode ? `✦ ${T.autoMode}` : T.manualMode}</p>
-              <p style={{ fontSize:11, color:t.textMuted }}>{autoMode ? T.autoModeDesc : T.manualModeDesc}</p>
+              <p style={{ fontSize:15, fontWeight:700, color:autoMode ? t.accent : t.text, marginBottom:3, letterSpacing:"-0.01em" }}>{autoMode ? `✦ ${T.autoMode}` : T.manualMode}</p>
+              <p style={{ fontSize:12, color:t.textMuted, lineHeight:1.4 }}>{autoMode ? T.autoModeDesc : T.manualModeDesc}</p>
             </div>
-            <button onClick={() => setAutoMode(!autoMode)} style={{ width:46, height:26, borderRadius:13, border:"none", background:autoMode ? t.accent : dark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)", cursor:"pointer", position:"relative", flexShrink:0, transition:"background 0.2s" }}>
-              <div style={{ width:20, height:20, borderRadius:"50%", background:"#ffffff", position:"absolute", top:3, left:autoMode ? 23 : 3, transition:"left 0.2s", boxShadow:"0 1px 4px rgba(0,0,0,0.3)" }}/>
+            <button onClick={() => setAutoMode(!autoMode)} style={{ width:48, height:28, borderRadius:14, border:"none", background:autoMode ? t.accent : dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)", cursor:"pointer", position:"relative", flexShrink:0, transition:"background 0.2s" }}>
+              <div style={{ width:22, height:22, borderRadius:"50%", background:"#ffffff", position:"absolute", top:3, left:autoMode ? 23 : 3, transition:"left 0.2s", boxShadow:"0 1px 4px rgba(0,0,0,0.3)" }}/>
             </button>
           </div>
 
           {analyzing && (
-            <div style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 14px", background:"rgba(79,142,247,0.05)", border:"1px solid rgba(79,142,247,0.15)", borderRadius:10, marginBottom:16 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 15px", background:"rgba(79,142,247,0.05)", border:"1px solid rgba(79,142,247,0.2)", borderRadius:12 }}>
               <div style={{ width:14, height:14, borderRadius:"50%", border:`2px solid ${t.accent}`, borderTopColor:"transparent", flexShrink:0, animation:"spin 0.8s linear infinite" }}/>
               <p style={{ fontSize:12, color:t.accent }}>{T.analyzingVideo}</p>
             </div>
           )}
           {autoAnalysisDesc && !analyzing && (
-            <div style={{ padding:"12px 14px", background:"rgba(79,142,247,0.04)", border:"1px solid rgba(79,142,247,0.12)", borderRadius:10, marginBottom:16 }}>
-              <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:5 }}>
+            <div style={{ padding:"13px 16px", background:"rgba(79,142,247,0.04)", border:"1px solid rgba(79,142,247,0.15)", borderRadius:12 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
                 <span style={{ fontSize:10, color:t.accent, textTransform:"uppercase", letterSpacing:"0.07em", fontWeight:700 }}>{T.analysisLabel}</span>
-                {detectedContentType && <span style={{ fontSize:10, padding:"2px 8px", borderRadius:10, background:"rgba(79,142,247,0.1)", color:t.accent, fontWeight:600 }}>{detectedContentType}</span>}
+                {detectedContentType && <span style={{ fontSize:10, padding:"2px 8px", borderRadius:10, background:"rgba(79,142,247,0.12)", color:t.accent, fontWeight:600 }}>{detectedContentType}</span>}
               </div>
               <p style={{ fontSize:12, color:t.text, lineHeight:1.55 }}>{autoAnalysisDesc}</p>
             </div>
           )}
 
-          {/* ── Section : Vidéo ── */}
-          <div style={{ marginBottom:20 }}>
-            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
-              <span style={{ fontSize:11, fontWeight:600, color:t.textMuted, textTransform:"uppercase", letterSpacing:"0.08em" }}>{T.videos}{videos.length > 0 ? ` · ${videos.length}` : ""}</span>
+          {/* ── Vidéo ── */}
+          <div style={{ background:t.bgCard, border:t.border, borderRadius:14, overflow:"hidden" }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 16px", borderBottom: videos.length > 0 ? t.border : "none" }}>
+              <span style={{ fontSize:13, fontWeight:600, color:t.text }}>{T.videos}{videos.length > 0 ? <span style={{ fontSize:11, color:t.textMuted, fontWeight:400, marginLeft:6 }}>{videos.length} fichier{videos.length > 1 ? "s" : ""}</span> : null}</span>
               <div style={{ display:"flex", gap:6 }}>
-                <button onClick={handleDropboxImport} style={{ background:"#0061FF", border:"none", borderRadius:7, padding:"5px 11px", fontSize:11, color:"#fff", cursor:"pointer", fontWeight:600, letterSpacing:"0.01em" }}>Dropbox</button>
+                <button onClick={handleDropboxImport} style={{ background:"#0061FF", border:"none", borderRadius:7, padding:"5px 11px", fontSize:11, color:"#fff", cursor:"pointer", fontWeight:600 }}>Dropbox</button>
                 <button onClick={() => document.getElementById("fileInput")?.click()} style={{ background:t.bgInput, border:t.borderMed, borderRadius:7, padding:"5px 11px", fontSize:11, color:t.textSub, cursor:"pointer" }}>{T.addFile}</button>
               </div>
             </div>
             <input id="fileInput" type="file" accept="video/*" multiple style={{ display:"none" }} onChange={async e => { if (e.target.files) for (const f of Array.from(e.target.files)) await handleFileAdd(f) }}/>
-            {videos.length > 0 ? (
-              <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
-                {videos.map(v => (
-                  <div key={v.id} style={{ display:"flex", alignItems:"center", gap:10, background:t.bgCard, border:t.border, borderRadius:10, padding:"10px 13px" }}>
-                    {v.thumbnail
-                      ? <img src={v.thumbnail} style={{ width:48, height:32, borderRadius:5, objectFit:"cover", flexShrink:0 }}/>
-                      : <div style={{ width:48, height:32, borderRadius:5, background:t.bgThumb, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}><span style={{ fontSize:13, color:t.textMuted }}>▶</span></div>}
-                    <p style={{ flex:1, fontSize:12, color:t.text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", fontWeight:500 }}>{v.name}</p>
-                    <button onClick={() => removeVideo(v.id)} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:16, flexShrink:0, lineHeight:1, padding:"2px 4px" }}>✕</button>
+            <div style={{ padding: videos.length > 0 ? "10px 12px" : "0" }}>
+              {videos.length > 0 ? (
+                <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                  {videos.map(v => (
+                    <div key={v.id} style={{ display:"flex", alignItems:"center", gap:10, background:dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)", border:t.border, borderRadius:9, padding:"9px 12px" }}>
+                      {v.thumbnail
+                        ? <img src={v.thumbnail} style={{ width:46, height:30, borderRadius:5, objectFit:"cover", flexShrink:0 }}/>
+                        : <div style={{ width:46, height:30, borderRadius:5, background:t.bgThumb, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}><span style={{ fontSize:12, color:t.textMuted }}>▶</span></div>}
+                      <p style={{ flex:1, fontSize:12, color:t.text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", fontWeight:500 }}>{v.name}</p>
+                      <button onClick={() => removeVideo(v.id)} style={{ background:"none", border:"none", color:t.textMuted, cursor:"pointer", fontSize:15, flexShrink:0, lineHeight:1 }}>✕</button>
+                    </div>
+                  ))}
+                  <div style={{ border:`1px dashed ${dragOver ? t.accent : dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.1)"}`, borderRadius:9, padding:"10px", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:dragOver ? t.accent : t.textMuted, fontSize:12, transition:"all 0.15s", marginTop:2 }}
+                    onClick={() => document.getElementById("fileInput")?.click()}
+                    onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+                    onDragLeave={() => setDragOver(false)}
+                    onDrop={async e => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files) for (const f of Array.from(e.dataTransfer.files)) await handleFileAdd(f) }}>
+                    {compressing ? T.compressing : `+ ${T.addAnother}`}
                   </div>
-                ))}
-                <div style={{ border:`1px dashed ${dragOver ? t.accent : dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.1)"}`, borderRadius:10, padding:"11px", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:dragOver ? t.accent : t.textMuted, fontSize:12, transition:"all 0.15s", background:dragOver ? "rgba(79,142,247,0.03)" : "transparent" }}
+                </div>
+              ) : (
+                <div style={{ border:`1px dashed ${dragOver ? t.accent : dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.1)"}`, borderRadius:10, padding:"32px 20px", display:"flex", flexDirection:"column", alignItems:"center", gap:10, cursor:"pointer", background:dragOver ? "rgba(79,142,247,0.03)" : "transparent", transition:"all 0.15s", margin:"12px" }}
                   onClick={() => document.getElementById("fileInput")?.click()}
                   onDragOver={e => { e.preventDefault(); setDragOver(true) }}
                   onDragLeave={() => setDragOver(false)}
                   onDrop={async e => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files) for (const f of Array.from(e.dataTransfer.files)) await handleFileAdd(f) }}>
-                  {compressing ? T.compressing : `+ ${T.addAnother}`}
+                  <div style={{ width:42, height:42, borderRadius:11, background:dragOver ? "rgba(79,142,247,0.1)" : dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)", border:`1px solid ${dragOver ? "rgba(79,142,247,0.35)" : dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <span style={{ fontSize:16, color:dragOver ? t.accent : t.textMuted }}>{dragOver ? "↓" : "↑"}</span>
+                  </div>
+                  <div style={{ textAlign:"center" }}>
+                    <p style={{ fontSize:13, color:dragOver ? t.accent : t.text, marginBottom:3, fontWeight:500 }}>{dragOver ? T.dragOverText : T.dragVideo}</p>
+                    <p style={{ fontSize:11, color:t.textMuted }}>{T.dragSub}</p>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div style={{ border:`1px dashed ${dragOver ? t.accent : dark ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.1)"}`, borderRadius:12, padding:"36px 20px", display:"flex", flexDirection:"column", alignItems:"center", gap:10, cursor:"pointer", background:dragOver ? "rgba(79,142,247,0.03)" : "transparent", transition:"all 0.15s" }}
-                onClick={() => document.getElementById("fileInput")?.click()}
-                onDragOver={e => { e.preventDefault(); setDragOver(true) }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={async e => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files) for (const f of Array.from(e.dataTransfer.files)) await handleFileAdd(f) }}>
-                <div style={{ width:44, height:44, borderRadius:12, background:dragOver ? "rgba(79,142,247,0.12)" : dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)", border:`1px solid ${dragOver ? "rgba(79,142,247,0.4)" : dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}>
-                  <span style={{ fontSize:18, color:dragOver ? t.accent : t.textMuted }}>{dragOver ? "↓" : "↑"}</span>
-                </div>
-                <div style={{ textAlign:"center" }}>
-                  <p style={{ fontSize:13, color:dragOver ? t.accent : t.text, marginBottom:3, fontWeight:500 }}>{dragOver ? T.dragOverText : T.dragVideo}</p>
-                  <p style={{ fontSize:11, color:t.textMuted }}>{T.dragSub}</p>
-                </div>
-              </div>
-            )}
-            <div style={{ display:"flex", gap:6, marginTop:8 }} onClick={e => e.stopPropagation()}>
+              )}
+            </div>
+            <div style={{ display:"flex", gap:6, padding:"10px 12px", borderTop:t.border }} onClick={e => e.stopPropagation()}>
               <input value={linkInput} onChange={e => setLinkInput(e.target.value)} onKeyDown={e => e.key === "Enter" && handleLinkImport()} style={{ flex:1, background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 12px", fontSize:12, color:t.text, outline:"none" }} placeholder={T.pasteLink}/>
               <button onClick={handleLinkImport} disabled={importingLink} style={{ background:t.bgInput, border:t.borderMed, borderRadius:8, padding:"8px 12px", fontSize:12, color:t.textSub, cursor:"pointer", opacity:importingLink ? 0.6 : 1, flexShrink:0 }}>{importingLink ? "⏳" : T.import}</button>
             </div>
           </div>
 
-          {/* ── Section : Format ── */}
-          <div style={{ marginBottom:20 }}>
-            <p style={{ fontSize:11, fontWeight:600, color:t.textMuted, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:10 }}>{T.outputFormat}</p>
-            <div style={{ display:"flex", gap:6 }}>
-              {formats.map(f => {
-                const fr: Record<string,[number,number,number,number]> = {"9:16":[7,2,6,16],"16:9":[2,7,16,6],"1:1":[5,5,10,10],"4:5":[6,4,8,12]}
-                const [rx,ry,rw,rh] = fr[f]
-                const active = selectedFormat === f
-                return (
-                  <button key={f} onClick={() => setSelectedFormat(f)} style={{ flex:1, padding:"10px 4px", borderRadius:9, border:active ? `1px solid rgba(79,142,247,0.5)` : t.borderMed, background:active ? "rgba(79,142,247,0.09)" : t.bgInput, color:active ? t.accent : t.textSub, cursor:"pointer", fontSize:11, fontWeight:active ? 700 : 400, display:"flex", flexDirection:"column", alignItems:"center", gap:6, transition:"all 0.15s" }}>
-                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                      <rect x={rx} y={ry} width={rw} height={rh} stroke="currentColor" strokeWidth="1.6" rx="1.5"/>
-                    </svg>
-                    {f}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* ── Section : Options ── */}
-          <div style={{ marginBottom:20 }}>
-            <p style={{ fontSize:11, fontWeight:600, color:t.textMuted, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:10 }}>Options</p>
-            <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-              {[["Beat sync","Beat sync"],["Sous-titres",T.subtitles],["Auto-zoom",T.autoZoom],["Speed ramp",T.speedRamp],["Miroir",T.mirror]].map(([key,label]) => (
-                <Pill key={key} label={label} active={activeOptions.includes(key)} onClick={() => toggleOption(key)}/>
-              ))}
-              <Pill label={T.capsules} active={false} onClick={() => setShowCapsulesModal(true)}/>
-              <Pill label={T.introOutro} active={addIntroOutro} onClick={() => setAddIntroOutro(!addIntroOutro)}/>
-              <Pill label={watermark ? `✓ ${T.watermark}` : T.watermark} active={watermark} onClick={() => setWatermark(!watermark)}/>
-              <button onClick={() => { setShowMusic(true); fetchTracks(searchQuery || "phonk") }} style={{ padding:"7px 14px", borderRadius:20, fontSize:12, cursor:"pointer", border:selectedMusic ? `1px solid rgba(79,142,247,0.5)` : t.borderMed, background:selectedMusic ? "rgba(79,142,247,0.09)" : t.bgPill, color:selectedMusic ? t.accent : t.textSub, display:"flex", alignItems:"center", gap:6, whiteSpace:"nowrap", fontWeight:selectedMusic ? 600 : 400 }}>
-                {selectedMusic ? <><img src={selectedMusic.album.cover_small} style={{ width:14, height:14, borderRadius:3 }}/>{selectedMusic.title}</> : T.addMusic}
-              </button>
-            </div>
-
-            {activeOptions.includes("Sous-titres") && (
-              <div style={{ marginTop:12 }}>
-                <p style={{ fontSize:11, color:t.textMuted, marginBottom:7 }}>{T.subtitleStyle}</p>
-                <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
-                  {([["tiktok","TikTok"],["yellow",T.subStyleYellow],["white_box",T.subStyleWhite],["neon",T.subStyleNeon]] as [string,string][]).map(([val,label]) => (
-                    <button key={val} onClick={() => setSubtitleStyle(val)} style={{ padding:"6px 13px", borderRadius:20, fontSize:11, cursor:"pointer", border:subtitleStyle === val ? `1px solid rgba(79,142,247,0.5)` : t.borderMed, background:subtitleStyle === val ? "rgba(79,142,247,0.09)" : t.bgPill, color:subtitleStyle === val ? t.accent : t.textSub }}>{label}</button>
-                  ))}
-                </div>
+          {/* ── Format + Options (même card) ── */}
+          <div style={{ background:t.bgCard, border:t.border, borderRadius:14, overflow:"hidden" }}>
+            {/* Format */}
+            <div style={{ padding:"13px 16px", borderBottom:t.border }}>
+              <p style={{ fontSize:12, fontWeight:600, color:t.text, marginBottom:10 }}>{T.outputFormat}</p>
+              <div style={{ display:"flex", gap:6 }}>
+                {formats.map(f => {
+                  const fr: Record<string,[number,number,number,number]> = {"9:16":[7,2,6,16],"16:9":[2,7,16,6],"1:1":[5,5,10,10],"4:5":[6,4,8,12]}
+                  const [rx,ry,rw,rh] = fr[f]
+                  const active = selectedFormat === f
+                  return (
+                    <button key={f} onClick={() => setSelectedFormat(f)} style={{ flex:1, padding:"10px 4px", borderRadius:9, border:active ? `1px solid rgba(79,142,247,0.5)` : t.borderMed, background:active ? "rgba(79,142,247,0.1)" : t.bgInput, color:active ? t.accent : t.textSub, cursor:"pointer", fontSize:11, fontWeight:active ? 700 : 400, display:"flex", flexDirection:"column", alignItems:"center", gap:6, transition:"all 0.12s" }}>
+                      <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                        <rect x={rx} y={ry} width={rw} height={rh} stroke="currentColor" strokeWidth="1.6" rx="1.5"/>
+                      </svg>
+                      {f}
+                    </button>
+                  )
+                })}
               </div>
-            )}
+            </div>
+            {/* Options */}
+            <div style={{ padding:"13px 16px" }}>
+              <p style={{ fontSize:12, fontWeight:600, color:t.text, marginBottom:10 }}>Options</p>
+              <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                {[["Beat sync","Beat sync"],["Sous-titres",T.subtitles],["Auto-zoom",T.autoZoom],["Speed ramp",T.speedRamp],["Miroir",T.mirror]].map(([key,label]) => (
+                  <Pill key={key} label={label} active={activeOptions.includes(key)} onClick={() => toggleOption(key)}/>
+                ))}
+                <Pill label={T.capsules} active={false} onClick={() => setShowCapsulesModal(true)}/>
+                <Pill label={T.introOutro} active={addIntroOutro} onClick={() => setAddIntroOutro(!addIntroOutro)}/>
+                <Pill label={watermark ? `✓ ${T.watermark}` : T.watermark} active={watermark} onClick={() => setWatermark(!watermark)}/>
+                <button onClick={() => { setShowMusic(true); fetchTracks(searchQuery || "phonk") }} style={{ padding:"7px 14px", borderRadius:20, fontSize:12, cursor:"pointer", border:selectedMusic ? `1px solid rgba(79,142,247,0.5)` : t.borderMed, background:selectedMusic ? "rgba(79,142,247,0.1)" : t.bgPill, color:selectedMusic ? t.accent : t.textSub, display:"flex", alignItems:"center", gap:6, whiteSpace:"nowrap", fontWeight:selectedMusic ? 600 : 400 }}>
+                  {selectedMusic ? <><img src={selectedMusic.album.cover_small} style={{ width:14, height:14, borderRadius:3 }}/>{selectedMusic.title}</> : T.addMusic}
+                </button>
+              </div>
+              {activeOptions.includes("Sous-titres") && (
+                <div style={{ marginTop:12, paddingTop:12, borderTop:t.border }}>
+                  <p style={{ fontSize:11, color:t.textMuted, marginBottom:8 }}>{T.subtitleStyle}</p>
+                  <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+                    {([["tiktok","TikTok"],["yellow",T.subStyleYellow],["white_box",T.subStyleWhite],["neon",T.subStyleNeon]] as [string,string][]).map(([val,label]) => (
+                      <button key={val} onClick={() => setSubtitleStyle(val)} style={{ padding:"6px 13px", borderRadius:20, fontSize:11, cursor:"pointer", border:subtitleStyle === val ? `1px solid rgba(79,142,247,0.5)` : t.borderMed, background:subtitleStyle === val ? "rgba(79,142,247,0.1)" : t.bgPill, color:subtitleStyle === val ? t.accent : t.textSub }}>{label}</button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* ── Section : Paramètres avancés ── */}
+          {/* ── Paramètres avancés ── */}
           {!autoMode && (
-            <div style={{ marginBottom:20 }}>
-              <button onClick={() => setShowAdvanced(!showAdvanced)} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", width:"100%", background:"none", border:t.borderMed, borderRadius:9, padding:"10px 14px", cursor:"pointer", color:t.textSub, fontSize:12 }}>
-                <span style={{ fontWeight:500 }}>⚙ {T.advancedSettings}</span>
-                <span style={{ fontSize:10, opacity:0.6 }}>{showAdvanced ? "▲" : "▼"}</span>
+            <div style={{ background:t.bgCard, border:t.border, borderRadius:14, overflow:"hidden" }}>
+              <button onClick={() => setShowAdvanced(!showAdvanced)} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", width:"100%", background:"none", border:"none", padding:"13px 16px", cursor:"pointer", color:t.textSub }}>
+                <span style={{ fontSize:12, fontWeight:600, color:t.text }}>⚙ {T.advancedSettings}</span>
+                <span style={{ fontSize:10, color:t.textMuted }}>{showAdvanced ? "▲" : "▼"}</span>
               </button>
               {showAdvanced && (
-                <div style={{ display:"flex", flexDirection:"column", gap:14, background:t.bgCard, border:t.border, borderRadius:"0 0 10px 10px", padding:"16px", marginTop:-1, borderTop:"none" }}>
+                <div style={{ display:"flex", flexDirection:"column", gap:14, padding:"0 16px 16px", borderTop:t.border }}>
+                  <div style={{ height:14 }}/>
                   <div style={{ display:"flex", gap:10 }}>
                     <div style={{ flex:1 }}>
                       <p style={{ fontSize:11, color:t.textMuted, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.05em" }}>{T.colorGrade}</p>
@@ -1334,12 +1338,12 @@ export default function Home() {
             </div>
           )}
 
-          {/* ── Section : Description + Générer ── */}
-          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:2 }}>
-              <div style={{ display:"flex", alignItems:"center", gap:7 }}>
-                <span style={{ fontSize:11, fontWeight:600, color:t.textMuted, textTransform:"uppercase", letterSpacing:"0.08em" }}>{T.description}</span>
-                {promptHistory.length > 0 && <button onClick={e => { e.stopPropagation(); setShowPromptHistory(!showPromptHistory) }} style={{ fontSize:10, color:t.textMuted, background:t.bgInput, border:t.border, borderRadius:5, padding:"2px 7px", cursor:"pointer" }}>{T.promptHistory}</button>}
+          {/* ── Description ── */}
+          <div style={{ background:t.bgCard, border:t.border, borderRadius:14, overflow:"hidden" }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 16px", borderBottom:t.border }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                <span style={{ fontSize:12, fontWeight:600, color:t.text }}>{T.description}</span>
+                {promptHistory.length > 0 && <button onClick={e => { e.stopPropagation(); setShowPromptHistory(!showPromptHistory) }} style={{ fontSize:10, color:t.textMuted, background:t.bgInput, border:t.border, borderRadius:5, padding:"2px 8px", cursor:"pointer" }}>{T.promptHistory}</button>}
               </div>
               <div style={{ display:"flex", gap:5 }}>
                 <button onClick={handlePreviewTimestamps} disabled={loadingTimestamps || videos.length === 0} style={{ fontSize:11, color:t.textSub, background:t.bgInput, border:t.borderMed, borderRadius:6, padding:"4px 9px", cursor:"pointer", opacity:videos.length === 0 ? 0.3 : 1 }}>{loadingTimestamps ? "⏳" : T.preview}</button>
@@ -1347,53 +1351,58 @@ export default function Home() {
               </div>
             </div>
             {showPromptHistory && promptHistory.length > 0 && (
-              <div onClick={e => e.stopPropagation()} style={{ background:t.bgModal, border:t.border, borderRadius:8, overflow:"hidden" }}>
-                {promptHistory.map((h, i) => <button key={i} onClick={() => { setPromptText(h); setShowPromptHistory(false) }} style={{ width:"100%", padding:"9px 13px", background:"none", border:"none", borderBottom:i < promptHistory.length-1 ? t.border : "none", color:t.textSub, cursor:"pointer", fontSize:12, textAlign:"left", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{h}</button>)}
+              <div onClick={e => e.stopPropagation()} style={{ borderBottom:t.border }}>
+                {promptHistory.map((h, i) => <button key={i} onClick={() => { setPromptText(h); setShowPromptHistory(false) }} style={{ width:"100%", padding:"9px 16px", background:"none", border:"none", borderBottom:i < promptHistory.length-1 ? t.border : "none", color:t.textSub, cursor:"pointer", fontSize:12, textAlign:"left", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{h}</button>)}
               </div>
             )}
-            <textarea value={promptText} onChange={e => setPromptText(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:9, padding:"12px 14px", fontSize:13, color:t.text, outline:"none", resize:"none", height:56, lineHeight:"1.5", fontFamily:"sans-serif", boxSizing:"border-box" }}
-              placeholder={autoMode ? T.promptPlaceholderAuto : T.promptPlaceholderManual}/>
-            {capsuleModeActive && (
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:"rgba(79,142,247,0.06)", border:"1px solid rgba(79,142,247,0.18)", borderRadius:8, padding:"8px 12px" }}>
-                <span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>Mode capsules · {capsulesCount} clips</span>
-                <button onClick={() => setCapsuleModeActive(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:14, cursor:"pointer", lineHeight:1 }}>✕</button>
-              </div>
-            )}
+            <div style={{ padding:"12px 16px" }}>
+              <textarea value={promptText} onChange={e => setPromptText(e.target.value)} style={{ width:"100%", background:t.bgInput, border:t.borderMed, borderRadius:9, padding:"12px 14px", fontSize:13, color:t.text, outline:"none", resize:"none", height:60, lineHeight:"1.5", fontFamily:"sans-serif", boxSizing:"border-box" }}
+                placeholder={autoMode ? T.promptPlaceholderAuto : T.promptPlaceholderManual}/>
+              {capsuleModeActive && (
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:"rgba(79,142,247,0.06)", border:"1px solid rgba(79,142,247,0.18)", borderRadius:8, padding:"8px 12px", marginTop:8 }}>
+                  <span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>Mode capsules · {capsulesCount} clips</span>
+                  <button onClick={() => setCapsuleModeActive(false)} style={{ background:"none", border:"none", color:t.textMuted, fontSize:14, cursor:"pointer", lineHeight:1 }}>✕</button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ── Bouton Générer ── */}
+          <div>
             <button
               onClick={capsuleModeActive ? handleGenerateCapsules : handleGenerate}
               disabled={generating || videos.length === 0}
-              style={{ width:"100%", background:generating ? "rgba(79,142,247,0.3)" : videos.length === 0 ? (dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)") : t.accent, color: videos.length === 0 ? t.textMuted : "#ffffff", fontWeight:700, fontSize:14, letterSpacing:"0.02em", borderRadius:11, padding:"14px", border:"none", cursor:generating || videos.length === 0 ? "not-allowed" : "pointer", boxShadow:videos.length > 0 && !generating ? "0 2px 20px rgba(79,142,247,0.25)" : "none", transition:"all 0.15s" }}>
+              style={{ width:"100%", background:generating ? "rgba(79,142,247,0.3)" : videos.length === 0 ? (dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)") : t.accent, color:videos.length === 0 ? t.textMuted : "#ffffff", fontWeight:700, fontSize:15, letterSpacing:"-0.01em", borderRadius:14, padding:"16px", border:"none", cursor:generating || videos.length === 0 ? "not-allowed" : "pointer", boxShadow:videos.length > 0 && !generating ? "0 4px 24px rgba(79,142,247,0.3)" : "none", transition:"all 0.15s" }}>
               {generating ? T.generating : capsuleModeActive ? `✦ Générer capsules (${capsulesCount})` : `✦ ${T.generate}`}
             </button>
-            <p style={{ fontSize:10, color:t.textHint, textAlign:"right" }}>{T.cmdEnterHint}</p>
+            <p style={{ fontSize:10, color:t.textHint, textAlign:"right", marginTop:6 }}>{T.cmdEnterHint}</p>
           </div>
 
           {/* ── Progression ── */}
           {generating && (
-            <div style={{ display:"flex", flexDirection:"column", gap:10, background:t.bgCard, border:t.border, borderRadius:12, padding:"16px", marginTop:16 }}>
+            <div style={{ background:t.bgCard, border:t.border, borderRadius:14, padding:"16px 18px", display:"flex", flexDirection:"column", gap:10 }}>
               <p style={{ fontSize:12, color:t.text, fontWeight:500 }}>{generatingServerMsg || generatingMsgs[generatingMsgIndex]}</p>
               <div style={{ width:"100%", height:3, background:dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)", borderRadius:4 }}>
-                <div style={{ width:`${progress}%`, height:"100%", background:`linear-gradient(90deg, ${t.accent}, rgba(79,142,247,0.6))`, borderRadius:4, transition:"width 0.5s ease", boxShadow:"0 0 8px rgba(79,142,247,0.3)" }}/>
+                <div style={{ width:`${progress}%`, height:"100%", background:`linear-gradient(90deg, ${t.accent}, rgba(79,142,247,0.6))`, borderRadius:4, transition:"width 0.5s ease" }}/>
               </div>
               <div style={{ display:"flex", justifyContent:"space-between" }}>
                 <span style={{ fontSize:11, color:t.textMuted }}>{autoMode && detectedContentType ? `✦ Mode Auto · ${detectedContentType}` : "Mode Manuel"}</span>
-                <span style={{ fontSize:11, color:t.accent, fontWeight:600 }}>{estimatedRemaining || `${progress}%`}</span>
+                <span style={{ fontSize:11, color:t.accent, fontWeight:700 }}>{estimatedRemaining || `${progress}%`}</span>
               </div>
             </div>
           )}
 
           {/* ── Clips générés ── */}
           {hasGenerated && generatedClips.length > 0 && (
-            <div style={{ marginTop:28 }}>
-              <div style={{ width:"100%", height:1, background:dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)", marginBottom:20 }}/>
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14 }}>
-                <span style={{ fontSize:11, fontWeight:600, color:t.textMuted, textTransform:"uppercase", letterSpacing:"0.08em" }}>{T.generatedClips} · {generatedClips.length}</span>
-                {generatedClips.length > 1 && <button onClick={downloadAllClips} style={{ fontSize:11, color:t.accent, background:"rgba(79,142,247,0.07)", border:"1px solid rgba(79,142,247,0.18)", borderRadius:6, padding:"5px 10px", cursor:"pointer" }}>↓ {T.downloadAll}</button>}
+            <div style={{ marginTop:4 }}>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
+                <span style={{ fontSize:13, fontWeight:700, color:t.text }}>{T.generatedClips} <span style={{ fontSize:12, fontWeight:400, color:t.textMuted }}>· {generatedClips.length}</span></span>
+                {generatedClips.length > 1 && <button onClick={downloadAllClips} style={{ fontSize:11, color:t.accent, background:"rgba(79,142,247,0.07)", border:"1px solid rgba(79,142,247,0.2)", borderRadius:7, padding:"5px 10px", cursor:"pointer", fontWeight:600 }}>↓ {T.downloadAll}</button>}
               </div>
               <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(160px, 1fr))", gap:10 }}>
                 {generatedClips.map((clip, i) => <ClipCard key={i} clip={clip} index={i}/>)}
               </div>
-              <button onClick={() => { setVideos([]); setPromptText(""); setGeneratedClips([]); setHasGenerated(false); setLastGeneratedClip(null); window.scrollTo({ top:0, behavior:"smooth" }) }} style={{ width:"100%", marginTop:14, padding:"11px", borderRadius:10, border:t.border, background:"none", color:t.textSub, fontSize:13, cursor:"pointer" }}>
+              <button onClick={() => { setVideos([]); setPromptText(""); setGeneratedClips([]); setHasGenerated(false); setLastGeneratedClip(null); window.scrollTo({ top:0, behavior:"smooth" }) }} style={{ width:"100%", marginTop:12, padding:"12px", borderRadius:12, border:t.border, background:"none", color:t.textSub, fontSize:13, cursor:"pointer" }}>
                 {T.generateMore}
               </button>
             </div>
